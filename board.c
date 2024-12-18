@@ -14,3 +14,11 @@ bool board_equals(Board *a, Board *b)
 {
     return pieces_equals(&a->white_pieces, &b->white_pieces) && pieces_equals(&a->black_pieces, &b->black_pieces) && a->en_passant == b->en_passant && a->castling_rights == b->castling_rights && a->side_to_move == b->side_to_move;
 }
+
+static inline void copy_board(Board *from, Board *to)
+{
+    to->white_pieces = from->white_pieces;
+    to->black_pieces = from->black_pieces;
+    to->en_passant = from->en_passant;
+    to->castling_rights = to->castling_rights;
+}
