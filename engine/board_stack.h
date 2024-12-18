@@ -1,10 +1,10 @@
 #pragma once
 #include <stdint.h>
-#include "board.h"
+#include "board_state.h"
 
 typedef struct
 {
-    Board *boards;
+    BoardState *boards;
     uint16_t count;
 } BoardStack;
 
