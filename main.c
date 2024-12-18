@@ -5,30 +5,39 @@
 
 int main()
 {
-    Board board = {0};
-    board.white_pieces.bishops = 1;
-    print_board(&board);
-    //  board.white_pieces.knights = 1;
     BoardStack *stack = create_board_stack(1000);
-    printf("Hello, World!\n");
-    generate_moves(&board, stack);
-    printf("count: %d\n", stack->count);
+    Board board;
 
+    stack->count = 0;
+    board = (Board){0};
+    board.white_pieces.bishops = 1;
+    generate_moves(&board, stack);
     for (uint16_t i = 0; i < stack->count; i++)
     {
         printf("i: %d\n", i);
         print_board(&stack->boards[i].board);
     }
 
-    board.white_pieces.bishops = 1;
-    if (board.white_pieces.bishops == 1)
+    stack->count = 0;
+    board = (Board){0};
+    board.black_pieces.bishops = 1;
+    generate_moves(&board, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
     {
-        printf("Success\n");
+        printf("i: %d\n", i);
+        print_board(&stack->boards[i].board);
     }
-    else
-    {
-        printf("Failure\n");
-    }
-    printf("Hello, uuWorld!\n");
+
+    // stack->count = 0;
+    // board = (Board){0};
+    // board.white_pieces.knights = 1;
+    // generate_moves(&board, stack);
+    // for (uint16_t i = 0; i < stack->count; i++)
+    // {
+    //     printf("i: %d\n", i);
+    //     print_board(&stack->boards[i].board);
+    // }
+
+    destroy_board_stack(stack);
     return 0;
 }
