@@ -1,27 +1,19 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -MMD -MP -O3
+CFLAGS = -Wall -Wextra -std=c11 -O3 -march=native -flto -funroll-loops -Iengine
 TARGET = main.exe
-SRCS = main.c
 BUILD_DIR = build
-OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
-DEPS = $(SRCS:%.c=$(BUILD_DIR)/%.d)
+UNITY_SRC = $(BUILD_DIR)/unity.c
 
-all: $(BUILD_DIR) $(TARGET)
+# Include all .c files in all directories except the build directory
+SRCS = $(shell dir /s /b *.c | findstr /v /i /c:"\\$(BUILD_DIR)\\")
 
-# Create build directory
-$(BUILD_DIR):
+all: $(UNITY_SRC)
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	@echo /* Unity Build File */ > $(UNITY_SRC)
+	@for %%i in ($(SRCS)) do @echo #include "%%i" >> $(UNITY_SRC)
+	$(CC) $(CFLAGS) -o $(TARGET) $(UNITY_SRC)
 
-# Link the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# Include dependencies
--include $(DEPS)
-
-# Compile object files
-$(BUILD_DIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(UNITY_SRC): $(SRCS)
 
 # Clean target for Windows
 clean:

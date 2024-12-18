@@ -1,4 +1,5 @@
 #include "board_stack.h"
+#include <stdlib.h>
 
 BoardStack *create_board_stack(uint16_t size)
 {

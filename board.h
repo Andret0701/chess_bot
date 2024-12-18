@@ -37,3 +37,4 @@ typedef struct
 bool pieces_equals(Pieces *a, Pieces *b);
 bool board_equals(Board *a, Board *b);
 void copy_board(Board *from, Board *to);
+void print_board(Board *board);

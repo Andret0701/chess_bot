@@ -1,6 +1,6 @@
 #include "piece_moves.h"
 
-static inline void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     for (uint8_t i = x + 1; i < 8; i++)
     {
