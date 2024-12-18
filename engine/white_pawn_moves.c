@@ -232,7 +232,7 @@ static inline void white_pawn_en_passant(BoardState *board_state, uint8_t x, uin
 
 static inline void generate_white_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
-    if (y == 7)
+    if (y == 6)
     {
         white_pawn_promote(board_state, x, y, stack);
         white_pawn_promotion_attack(board_state, x, y, stack);
