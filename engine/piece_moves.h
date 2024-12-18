@@ -18,3 +18,9 @@ static inline void generate_white_knight_moves(BoardState *board_state, uint8_t 
 static inline void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 static inline void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 static inline void generate_black_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_white_queen_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_black_queen_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
