@@ -13,6 +13,11 @@ int main()
     generate_moves(&board, stack);
 
     printf("Number of moves: %d\n", stack->count);
+    for (int i = 0; i < stack->count; i++)
+    {
+        printf("Move %d\n", i);
+        print_board(&stack->boards[i].board);
+    }
 
     destroy_board_stack(stack);
     return 0;

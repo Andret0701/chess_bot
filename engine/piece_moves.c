@@ -4,6 +4,7 @@ void init_board(BoardState *board_state)
 {
     board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
     board_state->black_pieces = board_state->board.black_pieces.pawns | board_state->board.black_pieces.knights | board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens | board_state->board.black_pieces.king;
+    board_state->occupied = board_state->white_pieces | board_state->black_pieces;
 }
 void validate_white_move(BoardStack *stack)
 {
@@ -38,6 +39,7 @@ void generate_moves(Board *board, BoardStack *stack)
 {
     BoardState *board_state = &stack->boards[stack->count];
     copy_board(board, &board_state->board);
+    init_board(board_state);
     stack->count++;
 
     if (board->side_to_move == WHITE)
