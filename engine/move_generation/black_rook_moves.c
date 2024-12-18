@@ -14,6 +14,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
                 new_board_state->board.black_pieces.rooks |= position_to_u64(i, y);
                 new_board_state->board.side_to_move = WHITE;
+                new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 validate_black_move(stack);
             }
@@ -26,6 +27,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.rooks |= position_to_u64(i, y);
         new_board_state->board.side_to_move = WHITE;
+        new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         validate_black_move(stack);
     }
@@ -42,6 +44,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
                 new_board_state->board.black_pieces.rooks |= position_to_u64(i, y);
                 new_board_state->board.side_to_move = WHITE;
+                new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 validate_black_move(stack);
             }
@@ -54,6 +57,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.rooks |= position_to_u64(i, y);
         new_board_state->board.side_to_move = WHITE;
+        new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         validate_black_move(stack);
     }
@@ -70,6 +74,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
                 new_board_state->board.black_pieces.rooks |= position_to_u64(x, i);
                 new_board_state->board.side_to_move = WHITE;
+                new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 validate_black_move(stack);
             }
@@ -82,6 +87,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.rooks |= position_to_u64(x, i);
         new_board_state->board.side_to_move = WHITE;
+        new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         validate_black_move(stack);
     }
@@ -98,6 +104,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
                 new_board_state->board.black_pieces.rooks |= position_to_u64(x, i);
                 new_board_state->board.side_to_move = WHITE;
+                new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 validate_black_move(stack);
             }
@@ -110,6 +117,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.black_pieces.rooks &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.rooks |= position_to_u64(x, i);
         new_board_state->board.side_to_move = WHITE;
+        new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         validate_black_move(stack);
     }
