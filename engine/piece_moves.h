@@ -16,3 +16,5 @@ static inline void generate_white_pawn_moves(BoardState *board_state, uint8_t x,
 static inline void generate_black_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 static inline void generate_white_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 static inline void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+static inline void generate_black_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
