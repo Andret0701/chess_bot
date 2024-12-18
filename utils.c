@@ -32,3 +32,17 @@ uint64_t position_to_u64(uint8_t x, uint8_t y)
 {
     return 1ULL << (y * 8ULL + x);
 }
+
+uint64_t flip_bitmap(uint64_t bitmap)
+{ // only y should be flipped
+    uint64_t result = 0;
+    for (int i = 0; i < 64; i++)
+    {
+        int x = i % 8;
+        int y = i / 8;
+        y = 7 - y;
+        if (bitmap & (1ULL << i))
+            result |= 1ULL << (y * 8 + x);
+    }
+    return result;
+}

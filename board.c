@@ -25,6 +25,39 @@ void copy_board(Board *from, Board *to)
     to->castling_rights = from->castling_rights;
 }
 
+Board flip_board(Board *board)
+{
+    Board flipped;
+    flipped.white_pieces.pawns = flip_bitmap(board->black_pieces.pawns);
+    flipped.white_pieces.knights = flip_bitmap(board->black_pieces.knights);
+    flipped.white_pieces.bishops = flip_bitmap(board->black_pieces.bishops);
+    flipped.white_pieces.rooks = flip_bitmap(board->black_pieces.rooks);
+    flipped.white_pieces.queens = flip_bitmap(board->black_pieces.queens);
+    flipped.white_pieces.king = flip_bitmap(board->black_pieces.king);
+
+    flipped.black_pieces.pawns = flip_bitmap(board->white_pieces.pawns);
+    flipped.black_pieces.knights = flip_bitmap(board->white_pieces.knights);
+    flipped.black_pieces.bishops = flip_bitmap(board->white_pieces.bishops);
+    flipped.black_pieces.rooks = flip_bitmap(board->white_pieces.rooks);
+    flipped.black_pieces.queens = flip_bitmap(board->white_pieces.queens);
+    flipped.black_pieces.king = flip_bitmap(board->white_pieces.king);
+
+    flipped.en_passant = flip_bitmap(board->en_passant);
+
+    flipped.castling_rights = 0;
+    if (board->castling_rights & WHITE_KINGSIDE_CASTLE)
+        flipped.castling_rights |= BLACK_KINGSIDE_CASTLE;
+    if (board->castling_rights & WHITE_QUEENSIDE_CASTLE)
+        flipped.castling_rights |= BLACK_KINGSIDE_CASTLE;
+    if (board->castling_rights & BLACK_KINGSIDE_CASTLE)
+        flipped.castling_rights |= WHITE_KINGSIDE_CASTLE;
+    if (board->castling_rights & BLACK_QUEENSIDE_CASTLE)
+        flipped.castling_rights |= WHITE_QUEENSIDE_CASTLE;
+
+    flipped.side_to_move = board->side_to_move == WHITE ? BLACK : WHITE;
+    return flipped;
+}
+
 void print_board(Board *board)
 {
     for (int y = 7; y >= 0; y--)

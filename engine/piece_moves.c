@@ -37,10 +37,9 @@ void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
 
 void generate_moves(Board *board, BoardStack *stack)
 {
-    BoardState *board_state = &stack->boards[stack->count];
-    copy_board(board, &board_state->board);
-    init_board(board_state);
-    stack->count++;
+    BoardState board_state;
+    copy_board(board, &board_state.board);
+    init_board(&board_state);
 
     if (board->side_to_move == WHITE)
     {
@@ -50,17 +49,17 @@ void generate_moves(Board *board, BoardStack *stack)
             {
                 uint64_t position = position_to_u64(x, y);
                 if (board->white_pieces.pawns & position)
-                    generate_white_pawn_moves(board_state, x, y, stack);
+                    generate_white_pawn_moves(&board_state, x, y, stack);
                 else if (board->white_pieces.knights & position)
-                    generate_white_knight_moves(board_state, x, y, stack);
+                    generate_white_knight_moves(&board_state, x, y, stack);
                 else if (board->white_pieces.bishops & position)
-                    generate_white_bishop_moves(board_state, x, y, stack);
+                    generate_white_bishop_moves(&board_state, x, y, stack);
                 else if (board->white_pieces.rooks & position)
-                    generate_white_rook_moves(board_state, x, y, stack);
+                    generate_white_rook_moves(&board_state, x, y, stack);
                 else if (board->white_pieces.queens & position)
-                    generate_white_queen_moves(board_state, x, y, stack);
+                    generate_white_queen_moves(&board_state, x, y, stack);
                 else if (board->white_pieces.king & position)
-                    generate_white_king_moves(board_state, x, y, stack);
+                    generate_white_king_moves(&board_state, x, y, stack);
             }
         }
     }
@@ -72,17 +71,17 @@ void generate_moves(Board *board, BoardStack *stack)
             {
                 uint64_t position = position_to_u64(x, y);
                 if (board->black_pieces.pawns & position)
-                    generate_black_pawn_moves(board_state, x, y, stack);
+                    generate_black_pawn_moves(&board_state, x, y, stack);
                 else if (board->black_pieces.knights & position)
-                    generate_black_knight_moves(board_state, x, y, stack);
+                    generate_black_knight_moves(&board_state, x, y, stack);
                 else if (board->black_pieces.bishops & position)
-                    generate_black_bishop_moves(board_state, x, y, stack);
+                    generate_black_bishop_moves(&board_state, x, y, stack);
                 else if (board->black_pieces.rooks & position)
-                    generate_black_rook_moves(board_state, x, y, stack);
+                    generate_black_rook_moves(&board_state, x, y, stack);
                 else if (board->black_pieces.queens & position)
-                    generate_black_queen_moves(board_state, x, y, stack);
+                    generate_black_queen_moves(&board_state, x, y, stack);
                 else if (board->black_pieces.king & position)
-                    generate_black_king_moves(board_state, x, y, stack);
+                    generate_black_king_moves(&board_state, x, y, stack);
             }
         }
     }
