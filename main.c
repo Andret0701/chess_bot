@@ -28,15 +28,45 @@ int main()
         print_board(&stack->boards[i].board);
     }
 
-    // stack->count = 0;
-    // board = (Board){0};
-    // board.white_pieces.knights = 1;
-    // generate_moves(&board, stack);
-    // for (uint16_t i = 0; i < stack->count; i++)
-    // {
-    //     printf("i: %d\n", i);
-    //     print_board(&stack->boards[i].board);
-    // }
+    stack->count = 0;
+    board = (Board){0};
+    board.white_pieces.knights = 1;
+    generate_moves(&board, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        printf("i: %d\n", i);
+        print_board(&stack->boards[i].board);
+    }
+
+    stack->count = 0;
+    board = (Board){0};
+    board.black_pieces.knights = 1;
+    generate_moves(&board, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        printf("i: %d\n", i);
+        print_board(&stack->boards[i].board);
+    }
+
+    stack->count = 0;
+    board = (Board){0};
+    board.white_pieces.pawns = 1;
+    generate_moves(&board, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        printf("i: %d\n", i);
+        print_board(&stack->boards[i].board);
+    }
+
+    stack->count = 0;
+    board = (Board){0};
+    board.black_pieces.pawns = 1;
+    generate_moves(&board, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        printf("i: %d\n", i);
+        print_board(&stack->boards[i].board);
+    }
 
     destroy_board_stack(stack);
     return 0;

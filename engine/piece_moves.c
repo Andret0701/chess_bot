@@ -37,16 +37,13 @@ void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
 void generate_moves(Board *board, BoardStack *stack)
 {
     BoardState *board_state = &stack->boards[stack->count];
-    printf("generate_moves\n");
     copy_board(board, &board_state->board);
-    printf("copy_board\n");
     stack->count++;
 
     for (uint8_t y = 0; y < 8; y++)
     {
         for (uint8_t x = 0; x < 8; x++)
         {
-            printf("x: %d, y: %d\n", x, y);
             uint64_t position = position_to_u64(x, y);
             if (board->white_pieces.pawns & position)
                 generate_white_pawn_moves(board_state, x, y, stack);
