@@ -1,6 +1,6 @@
 #include "piece_moves.h"
 
-static inline void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     // One step forward
     if ((board_state->occupied & position_to_u64(x, y - 1)) == 0)
@@ -32,7 +32,7 @@ static inline void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_
     }
 }
 
-static inline void black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     if (x > 0)
     {
@@ -71,7 +71,7 @@ static inline void black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t
     }
 }
 
-static inline void black_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void black_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     // Promote to knight
     BoardState *new_board_state = &stack->boards[stack->count];
@@ -110,7 +110,7 @@ static inline void black_pawn_promote(BoardState *board_state, uint8_t x, uint8_
     validate_black_move(stack);
 }
 
-static inline void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     if (x > 0 && (board_state->white_pieces & position_to_u64(x - 1, y - 1)) != 0)
     {
@@ -199,7 +199,7 @@ static inline void black_pawn_promotion_attack(BoardState *board_state, uint8_t 
     }
 }
 
-static inline void black_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void black_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     if (y == 3)
     {
@@ -237,7 +237,7 @@ static inline void black_pawn_en_passant(BoardState *board_state, uint8_t x, uin
     }
 }
 
-static inline void generate_black_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void generate_black_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     if (y == 1)
     {

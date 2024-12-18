@@ -1,6 +1,6 @@
 #include "piece_moves.h"
 
-static inline void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
+void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
     if (board_state->black_pieces & position_to_u64(x + 1, y + 2))
     {
