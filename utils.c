@@ -56,3 +56,25 @@ uint64_t flip_bitmap(uint64_t bitmap)
     }
     return result;
 }
+
+void print_bitboard(uint64_t bitboard)
+{
+    for (int rank = 7; rank >= 0; rank--)
+    {
+        for (int file = 0; file < 8; file++)
+        {
+            int square = rank * 8 + file;
+            if (bitboard & (1ULL << square))
+            {
+                printf("[]");
+            }
+            else
+            {
+                printf(". ");
+            }
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+}
