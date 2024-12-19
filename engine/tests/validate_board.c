@@ -127,12 +127,12 @@ void validate_check(Board *board)
 
     if (board->side_to_move == WHITE)
     {
-        if (board_state.white_check)
+        if (board_state.black_check)
             errorf(board, "White is in check\n");
     }
     else
     {
-        if (board_state.black_check)
+        if (board_state.white_check)
             errorf(board, "Black is in check\n");
     }
 }
