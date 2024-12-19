@@ -36,7 +36,7 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
     // Castling
     if (x == 4 && y == 7)
     {
-        if ((board_state->white_attack & position_to_u64(4, 7)) == 0)
+        if (!board_state->black_check)
         {
             if ((board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE) != 0)
             {
