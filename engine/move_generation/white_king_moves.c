@@ -37,53 +37,57 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
     // Castling
     if (x == 4 && y == 0)
     {
-        if ((board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE) != 0)
+        if ((board_state->black_attack & position_to_u64(4, 0)) == 0)
         {
-            if ((board_state->occupied & position_to_u64(5, 0)) == 0 &&
-                (board_state->occupied & position_to_u64(6, 0)) == 0 &&
-                (board_state->black_attack & position_to_u64(5, 0)) == 0 &&
-                (board_state->black_attack & position_to_u64(6, 0)) == 0)
+
+            if ((board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE) != 0)
             {
-                BoardState *new_board_state = &stack->boards[stack->count];
-                copy_board(&board_state->board, &new_board_state->board);
+                if ((board_state->occupied & position_to_u64(5, 0)) == 0 &&
+                    (board_state->occupied & position_to_u64(6, 0)) == 0 &&
+                    (board_state->black_attack & position_to_u64(5, 0)) == 0 &&
+                    (board_state->black_attack & position_to_u64(6, 0)) == 0)
+                {
+                    BoardState *new_board_state = &stack->boards[stack->count];
+                    copy_board(&board_state->board, &new_board_state->board);
 
-                new_board_state->board.white_pieces.king &= ~position_to_u64(4, 0);
-                new_board_state->board.white_pieces.king |= position_to_u64(6, 0);
-                new_board_state->board.white_pieces.rooks &= ~position_to_u64(7, 0);
-                new_board_state->board.white_pieces.rooks |= position_to_u64(5, 0);
-                new_board_state->board.side_to_move = BLACK;
-                new_board_state->board.en_passant = 0;
-                new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
-                new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
-                init_board(new_board_state);
+                    new_board_state->board.white_pieces.king &= ~position_to_u64(4, 0);
+                    new_board_state->board.white_pieces.king |= position_to_u64(6, 0);
+                    new_board_state->board.white_pieces.rooks &= ~position_to_u64(7, 0);
+                    new_board_state->board.white_pieces.rooks |= position_to_u64(5, 0);
+                    new_board_state->board.side_to_move = BLACK;
+                    new_board_state->board.en_passant = 0;
+                    new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
+                    new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
+                    init_board(new_board_state);
 
-                validate_white_move(stack);
+                    validate_white_move(stack);
+                }
             }
-        }
 
-        if ((board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE) != 0)
-        {
-            if ((board_state->occupied & position_to_u64(3, 0)) == 0 &&
-                (board_state->occupied & position_to_u64(2, 0)) == 0 &&
-                (board_state->occupied & position_to_u64(1, 0)) == 0 &&
-                (board_state->black_attack & position_to_u64(1, 0)) == 0 &&
-                (board_state->black_attack & position_to_u64(2, 0)) == 0 &&
-                (board_state->black_attack & position_to_u64(3, 0)) == 0)
-
+            if ((board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE) != 0)
             {
-                BoardState *new_board_state = &stack->boards[stack->count];
-                copy_board(&board_state->board, &new_board_state->board);
+                if ((board_state->occupied & position_to_u64(3, 0)) == 0 &&
+                    (board_state->occupied & position_to_u64(2, 0)) == 0 &&
+                    (board_state->occupied & position_to_u64(1, 0)) == 0 &&
+                    (board_state->black_attack & position_to_u64(1, 0)) == 0 &&
+                    (board_state->black_attack & position_to_u64(2, 0)) == 0 &&
+                    (board_state->black_attack & position_to_u64(3, 0)) == 0)
 
-                new_board_state->board.white_pieces.king &= ~position_to_u64(4, 0);
-                new_board_state->board.white_pieces.king |= position_to_u64(2, 0);
-                new_board_state->board.white_pieces.rooks &= ~position_to_u64(0, 0);
-                new_board_state->board.white_pieces.rooks |= position_to_u64(3, 0);
-                new_board_state->board.side_to_move = BLACK;
-                new_board_state->board.en_passant = 0;
-                new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
-                new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
-                init_board(new_board_state);
-                validate_white_move(stack);
+                {
+                    BoardState *new_board_state = &stack->boards[stack->count];
+                    copy_board(&board_state->board, &new_board_state->board);
+
+                    new_board_state->board.white_pieces.king &= ~position_to_u64(4, 0);
+                    new_board_state->board.white_pieces.king |= position_to_u64(2, 0);
+                    new_board_state->board.white_pieces.rooks &= ~position_to_u64(0, 0);
+                    new_board_state->board.white_pieces.rooks |= position_to_u64(3, 0);
+                    new_board_state->board.side_to_move = BLACK;
+                    new_board_state->board.en_passant = 0;
+                    new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
+                    new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
+                    init_board(new_board_state);
+                    validate_white_move(stack);
+                }
             }
         }
     }
