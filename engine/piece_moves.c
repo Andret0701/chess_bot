@@ -1,4 +1,5 @@
 #include "piece_moves.h"
+#include "attack_generation/attack_generation.h"
 
 void init_board(BoardState *board_state)
 {
