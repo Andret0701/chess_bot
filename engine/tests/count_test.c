@@ -1,4 +1,12 @@
 #include "count_test.h"
+#include "validate_board.h"
+#include "../../fen.h"
+typedef struct
+{
+    const char *fen;
+    uint8_t depth;
+    uint64_t expected;
+} Test;
 
 Test tests[] = {
     // Normal chess board
@@ -38,21 +46,17 @@ Test tests[] = {
 
 };
 
-uint64_t count_recursive(Board *board, uint8_t depth, BoardStack *stack)
+uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
-    validate_board(board);
+    validate_board(&board_state->board);
     if (depth == 0)
-    {
         return 1;
-    }
 
     uint32_t base = stack->count;
-    generate_moves(board, stack);
+    generate_moves(&board_state->board, stack);
 
     if (stack->count == base)
-    {
         return 0;
-    }
 
     uint64_t total = 0;
     for (uint16_t i = base; i < stack->count; i++)
@@ -64,6 +68,28 @@ uint64_t count_recursive(Board *board, uint8_t depth, BoardStack *stack)
     return total;
 }
 
-void run_count_tests(Test *tests, uint8_t count)
+void run_count_tests()
 {
+    BoardStack *stack = create_board_stack(65535);
+    for (uint8_t i = 0; i < sizeof(tests) / sizeof(Test); i++)
+    {
+        stack->count = 0;
+        Board board = fen_to_board(tests[i].fen);
+        BoardState board_state = board_to_board_state(&board);
+
+        uint64_t result = count_recursive(&board_state, tests[i].depth, stack);
+        if (result != tests[i].expected)
+            printf(":( Test %u failed. Expected %llu, got %llu. Of by %llu\n", i, tests[i].expected, result, result - tests[i].expected);
+        else
+            printf(":) Test %u passed. Expected %llu, got %llu\n", i, tests[i].expected, result);
+
+        board = flip_board(&board);
+        board_state = board_to_board_state(&board);
+        result = count_recursive(&board_state, tests[i].depth, stack);
+        if (result != tests[i].expected)
+            printf(":( Flipped %u failed. Expected %llu, got %llu. Of by %llu\n", i, tests[i].expected, result, result - tests[i].expected);
+        else
+            printf(":) Flipped %u passed. Expected %llu, got %llu\n", i, tests[i].expected, result);
+    }
+    destroy_board_stack(stack);
 }

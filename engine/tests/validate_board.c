@@ -1,6 +1,8 @@
 #include "validate_board.h"
 #include "../../utils.h"
 #include "../board_state.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 void errorf(Board *board, const char *format, ...)
 {
@@ -9,6 +11,7 @@ void errorf(Board *board, const char *format, ...)
     vprintf(format, args);
     va_end(args);
     print_board(board);
+    printf("\n");
 }
 
 void validate_kings(Board *board)
@@ -89,8 +92,12 @@ void validate_no_duplicates(Board *board)
     {
         for (int j = 0; j < 12; j++)
         {
+            if (i == j)
+                continue;
+
             for (int k = 0; k < 64; k++)
             {
+
                 if (bitboards[i] & bitboards[j] & (1ULL << k))
                     errorf(board, "There is both a %s and a %s on tile %s\n", piece_names[i], piece_names[j], tile_names[k]);
             }

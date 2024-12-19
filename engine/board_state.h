@@ -19,3 +19,5 @@ typedef struct
     bool white_check;
     bool black_check;
 } BoardState;
+
+BoardState board_to_board_state(Board *board);
