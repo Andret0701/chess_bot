@@ -23,11 +23,12 @@ void copy_board(Board *from, Board *to)
     to->black_pieces = from->black_pieces;
     to->en_passant = from->en_passant;
     to->castling_rights = from->castling_rights;
+    to->side_to_move = from->side_to_move;
 }
 
 Board flip_board(Board *board)
 {
-    Board flipped;
+    Board flipped = {0};
     flipped.white_pieces.pawns = flip_bitmap(board->black_pieces.pawns);
     flipped.white_pieces.knights = flip_bitmap(board->black_pieces.knights);
     flipped.white_pieces.bishops = flip_bitmap(board->black_pieces.bishops);
@@ -48,7 +49,7 @@ Board flip_board(Board *board)
     if (board->castling_rights & WHITE_KINGSIDE_CASTLE)
         flipped.castling_rights |= BLACK_KINGSIDE_CASTLE;
     if (board->castling_rights & WHITE_QUEENSIDE_CASTLE)
-        flipped.castling_rights |= BLACK_KINGSIDE_CASTLE;
+        flipped.castling_rights |= BLACK_QUEENSIDE_CASTLE;
     if (board->castling_rights & BLACK_KINGSIDE_CASTLE)
         flipped.castling_rights |= WHITE_KINGSIDE_CASTLE;
     if (board->castling_rights & BLACK_QUEENSIDE_CASTLE)
@@ -66,31 +67,32 @@ void print_board(Board *board)
         {
             uint64_t position = position_to_u64(x, y);
             if (board->white_pieces.pawns & position)
-                printf("P ");
-            else if (board->white_pieces.knights & position)
-                printf("N ");
-            else if (board->white_pieces.bishops & position)
-                printf("B ");
-            else if (board->white_pieces.rooks & position)
-                printf("R ");
-            else if (board->white_pieces.queens & position)
-                printf("Q ");
-            else if (board->white_pieces.king & position)
-                printf("K ");
-            else if (board->black_pieces.pawns & position)
-                printf("p ");
-            else if (board->black_pieces.knights & position)
-                printf("n ");
-            else if (board->black_pieces.bishops & position)
-                printf("b ");
-            else if (board->black_pieces.rooks & position)
-                printf("r ");
-            else if (board->black_pieces.queens & position)
-                printf("q ");
-            else if (board->black_pieces.king & position)
-                printf("k ");
-            else
-                printf(". ");
+                printf("P");
+            if (board->white_pieces.knights & position)
+                printf("N");
+            if (board->white_pieces.bishops & position)
+                printf("B");
+            if (board->white_pieces.rooks & position)
+                printf("R");
+            if (board->white_pieces.queens & position)
+                printf("Q");
+            if (board->white_pieces.king & position)
+                printf("K");
+            if (board->black_pieces.pawns & position)
+                printf("p");
+            if (board->black_pieces.knights & position)
+                printf("n");
+            if (board->black_pieces.bishops & position)
+                printf("b");
+            if (board->black_pieces.rooks & position)
+                printf("r");
+            if (board->black_pieces.queens & position)
+                printf("q");
+            if (board->black_pieces.king & position)
+                printf("k");
+            if (!((board->white_pieces.pawns | board->white_pieces.knights | board->white_pieces.bishops | board->white_pieces.rooks | board->white_pieces.queens | board->white_pieces.king | board->black_pieces.pawns | board->black_pieces.knights | board->black_pieces.bishops | board->black_pieces.rooks | board->black_pieces.queens | board->black_pieces.king) & position))
+                printf(".");
+            printf(" ");
         }
         printf("\n");
     }
