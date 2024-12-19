@@ -15,15 +15,22 @@ void init_board(BoardState *board_state)
         board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
     if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_u64(0, 7)) == 0)
         board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
+
+    generate_attacks(board_state);
+
+    board_state->white_check = board_state->black_attack & board_state->board.white_pieces.king;
+    board_state->black_check = board_state->white_attack & board_state->board.black_pieces.king;
 }
 void validate_white_move(BoardStack *stack)
 {
-    stack->count++;
+    if (!stack->boards[stack->count].white_check)
+        stack->count++;
 }
 
 void validate_black_move(BoardStack *stack)
 {
-    stack->count++;
+    if (!stack->boards[stack->count].black_check)
+        stack->count++;
 }
 
 void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
