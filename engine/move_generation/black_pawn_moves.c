@@ -126,6 +126,7 @@ void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
         copy_board(&board_state->board, &new_board_state->board);
         new_board_state->board.black_pieces.pawns &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.knights |= position_to_u64(x - 1, y - 1);
+        remove_white_piece(new_board_state, x - 1, y - 1);
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
@@ -136,6 +137,7 @@ void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
         copy_board(&board_state->board, &new_board_state->board);
         new_board_state->board.black_pieces.pawns &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.bishops |= position_to_u64(x - 1, y - 1);
+        remove_white_piece(new_board_state, x - 1, y - 1);
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
@@ -146,6 +148,7 @@ void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
         copy_board(&board_state->board, &new_board_state->board);
         new_board_state->board.black_pieces.pawns &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.rooks |= position_to_u64(x - 1, y - 1);
+        remove_white_piece(new_board_state, x - 1, y - 1);
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
@@ -156,6 +159,7 @@ void black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
         copy_board(&board_state->board, &new_board_state->board);
         new_board_state->board.black_pieces.pawns &= ~position_to_u64(x, y);
         new_board_state->board.black_pieces.queens |= position_to_u64(x - 1, y - 1);
+        remove_white_piece(new_board_state, x - 1, y - 1);
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
