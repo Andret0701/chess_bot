@@ -79,7 +79,7 @@ void run_count_tests()
 
         uint64_t result = count_recursive(&board_state, tests[i].depth, stack);
         if (result != tests[i].expected)
-            printf(":( Test %u failed. Expected %llu, got %llu. Of by %llu\n", i, tests[i].expected, result, result - tests[i].expected);
+            printf(":( Test %u failed. Expected %llu, got %llu. Off by %lld\n", i, tests[i].expected, result, ((int64_t)result) - ((int64_t)tests[i].expected));
         else
             printf(":) Test %u passed. Expected %llu, got %llu\n", i, tests[i].expected, result);
 
@@ -87,7 +87,7 @@ void run_count_tests()
         board_state = board_to_board_state(&board);
         result = count_recursive(&board_state, tests[i].depth, stack);
         if (result != tests[i].expected)
-            printf(":( Flipped %u failed. Expected %llu, got %llu. Of by %llu\n", i, tests[i].expected, result, result - tests[i].expected);
+            printf(":( Flipped %u failed. Expected %llu, got %llu. Off by %lld\n", i, tests[i].expected, result, ((int64_t)result) - ((int64_t)tests[i].expected));
         else
             printf(":) Flipped %u passed. Expected %llu, got %llu\n", i, tests[i].expected, result);
     }
