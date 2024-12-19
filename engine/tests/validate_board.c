@@ -104,19 +104,19 @@ void validate_no_duplicates(Board *board)
 
 void validate_en_passant(Board *board)
 {
-    // if (board->en_passant)
-    // {
-    //     if (board->side_to_move == WHITE)
-    //     {
-    //         if (!(board->black_pieces.pawns & (board->en_passant << 8)))
-    //             errorf(board, "No black pawn next to en passant square\n");
-    //     }
-    //     else
-    //     {
-    //         if (!(board->white_pieces.pawns & (board->en_passant >> 8)))
-    //             errorf(board, "No white pawn next to en passant square\n");
-    //     }
-    // }
+    if (board->en_passant)
+    {
+        if (board->side_to_move == WHITE)
+        {
+            if (!(board->black_pieces.pawns & (board->en_passant >> 8)))
+                errorf(board, "No black pawn next to en passant square\n");
+        }
+        else
+        {
+            if (!(board->white_pieces.pawns & (board->en_passant << 8)))
+                errorf(board, "No white pawn next to en passant square\n");
+        }
+    }
 }
 
 void validate_check(Board *board)
