@@ -142,7 +142,7 @@ void validate_board(Board *board)
     validate_kings(board);
     validate_pawns(board);
     validate_castling_rights(board);
-    // validate_no_duplicates(board);
+    validate_no_duplicates(board);
     validate_en_passant(board);
     validate_check(board);
 }

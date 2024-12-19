@@ -11,25 +11,25 @@ typedef struct
 
 Test tests[] = {
     // Normal chess board
-    // {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 1, 20},
-    // {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 2, 400},
-    // {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 3, 8902},
-    // {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 4, 197281},
-    // {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 5, 4865609},
-
-    // //
-    // {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 1, 48},
-    // {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 2, 2039},
-    // {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 3, 97862},
-    // {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 4, 4085603},
-    //{"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 5, 193690690},
+    {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 1, 20},
+    {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 2, 400},
+    {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 3, 8902},
+    {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 4, 197281},
+    {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 5, 4865609},
 
     //
-    // {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 1, 14},
-    // {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 2, 191},
-    // {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 3, 2812},
-    // {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 4, 43238},
-    // {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 5, 674624},
+    {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 1, 48},
+    {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 2, 2039},
+    {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 3, 97862},
+    {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 4, 4085603},
+    // {"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ", 5, 193690690},
+
+    //
+    {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 1, 14},
+    {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 2, 191},
+    {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 3, 2812},
+    {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 4, 43238},
+    {"8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ", 5, 674624},
 
     //
     {"r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 1, 6},
@@ -49,28 +49,6 @@ Test tests[] = {
 
 uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
-    print_board(&board_state->board);
-    printf("\n");
-    print_bitboard(board_state->black_attack);
-    printf("\n");
-    print_bitboard(board_state->white_attack);
-    printf("\n");
-
-    // print if in check
-    if (board_state->board.side_to_move == WHITE)
-    {
-        if (board_state->white_check)
-        {
-            printf("White king is in check\n");
-        }
-    }
-    else
-    {
-        if (board_state->black_check)
-        {
-            printf("Black king is in check\n");
-        }
-    }
     validate_board(&board_state->board);
     if (depth == 0)
         return 1;
@@ -106,7 +84,6 @@ void run_count_tests()
         else
             printf(":) Test %u passed. Expected %llu, got %llu\n", i, tests[i].expected, result);
 
-        exit(0);
         board = flip_board(&board);
         board_state = board_to_board_state(&board);
         result = count_recursive(&board_state, tests[i].depth, stack);
