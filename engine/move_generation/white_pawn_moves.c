@@ -78,6 +78,7 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.pawns &= ~position_to_u64(x, y);
     new_board_state->board.white_pieces.knights |= position_to_u64(x, y);
     new_board_state->board.side_to_move = BLACK;
+    new_board_state->board.en_passant = 0;
     init_board(new_board_state);
     validate_white_move(stack);
 
@@ -87,6 +88,7 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.pawns &= ~position_to_u64(x, y);
     new_board_state->board.white_pieces.bishops |= position_to_u64(x, y);
     new_board_state->board.side_to_move = BLACK;
+    new_board_state->board.en_passant = 0;
     init_board(new_board_state);
     validate_white_move(stack);
 
@@ -96,6 +98,7 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.pawns &= ~position_to_u64(x, y);
     new_board_state->board.white_pieces.rooks |= position_to_u64(x, y);
     new_board_state->board.side_to_move = BLACK;
+    new_board_state->board.en_passant = 0;
     init_board(new_board_state);
     validate_white_move(stack);
 
@@ -105,6 +108,7 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.pawns &= ~position_to_u64(x, y);
     new_board_state->board.white_pieces.queens |= position_to_u64(x, y);
     new_board_state->board.side_to_move = BLACK;
+    new_board_state->board.en_passant = 0;
     init_board(new_board_state);
     validate_white_move(stack);
 }
@@ -123,6 +127,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x - 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -134,6 +139,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x - 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -145,6 +151,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x - 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -156,6 +163,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x - 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
         }
@@ -173,6 +181,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x + 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -184,6 +193,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x + 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -195,6 +205,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x + 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
 
@@ -206,6 +217,7 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
             remove_black_piece(new_board_state, x + 1, y + 1);
 
             new_board_state->board.side_to_move = BLACK;
+            new_board_state->board.en_passant = 0;
             init_board(new_board_state);
             validate_white_move(stack);
         }
