@@ -18,7 +18,7 @@ void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 {
                     BoardState *new_board_state = &stack->boards[stack->count];
                     copy_board(&board_state->board, &new_board_state->board);
-                    remove_white_piece(board_state, new_x, new_y);
+                    remove_white_piece(new_board_state, new_x, new_y);
                     new_board_state->board.black_pieces.knights &= ~position_to_u64(x, y);
                     new_board_state->board.black_pieces.knights |= position_to_u64(new_x, new_y);
                     new_board_state->board.side_to_move = WHITE;
