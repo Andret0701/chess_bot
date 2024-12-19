@@ -10,11 +10,7 @@ uint64_t generate_rook_attacks(BoardState *board_state, uint8_t x, uint8_t y)
         uint64_t target_pos = position_to_u64(x, i);
         if (board_state->occupied & target_pos)
         {
-            if (board_state->black_pieces & target_pos)
-            {
-                attacks |= target_pos;
-            }
-
+            attacks |= target_pos;
             break;
         }
 
@@ -27,11 +23,7 @@ uint64_t generate_rook_attacks(BoardState *board_state, uint8_t x, uint8_t y)
         uint64_t target_pos = position_to_u64(x, i);
         if (board_state->occupied & target_pos)
         {
-            if (board_state->black_pieces & target_pos)
-            {
-                attacks |= target_pos;
-            }
-
+            attacks |= target_pos;
             break;
         }
 
@@ -44,11 +36,7 @@ uint64_t generate_rook_attacks(BoardState *board_state, uint8_t x, uint8_t y)
         uint64_t target_pos = position_to_u64(i, y);
         if (board_state->occupied & target_pos)
         {
-            if (board_state->black_pieces & target_pos)
-            {
-                attacks |= target_pos;
-            }
-
+            attacks |= target_pos;
             break;
         }
 
@@ -61,11 +49,7 @@ uint64_t generate_rook_attacks(BoardState *board_state, uint8_t x, uint8_t y)
         uint64_t target_pos = position_to_u64(i, y);
         if (board_state->occupied & target_pos)
         {
-            if (board_state->black_pieces & target_pos)
-            {
-                attacks |= target_pos;
-            }
-
+            attacks |= target_pos;
             break;
         }
 
