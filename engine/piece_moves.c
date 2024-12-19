@@ -5,6 +5,16 @@ void init_board(BoardState *board_state)
     board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
     board_state->black_pieces = board_state->board.black_pieces.pawns | board_state->board.black_pieces.knights | board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens | board_state->board.black_pieces.king;
     board_state->occupied = board_state->white_pieces | board_state->black_pieces;
+
+    // check for castling rights
+    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_u64(7, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_u64(0, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_u64(7, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_u64(0, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
 }
 void validate_white_move(BoardStack *stack)
 {
