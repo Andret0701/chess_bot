@@ -73,6 +73,9 @@ void black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack
 
 void black_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
+    if (board_state->occupied & position_to_u64(x, y - 1))
+        return;
+
     // Promote to knight
     BoardState *new_board_state = &stack->boards[stack->count];
     copy_board(&board_state->board, &new_board_state->board);

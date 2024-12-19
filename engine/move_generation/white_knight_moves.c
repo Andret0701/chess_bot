@@ -1,5 +1,4 @@
 #include "piece_moves.h"
-#include "piece_moves.h"
 
 void generate_white_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
