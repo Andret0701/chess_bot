@@ -6,6 +6,7 @@
 
 uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
+    validate_board(&board_state->board);
     if (depth == 0)
         return 1;
 
