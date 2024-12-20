@@ -30,6 +30,7 @@ void run_count_benchmark()
     Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
     BoardState board_state = board_to_board_state(&board);
 
+    printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
     for (uint8_t i = 1; i <= 7; i++)
     {
         clock_t start = clock();
@@ -37,6 +38,7 @@ void run_count_benchmark()
         clock_t end = clock();
         double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
         double million_boards_per_second = result / (time_spent * 1e6);
-        printf("Depth %u: %llu, Time: %.3f seconds, Million boards per second: %.3f\n", i, result, time_spent, million_boards_per_second);
+        double microseconds_per_board = (time_spent * 1e6) / result;
+        printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n", i, result, time_spent, million_boards_per_second, microseconds_per_board);
     }
 }
