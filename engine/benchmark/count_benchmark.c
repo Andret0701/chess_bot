@@ -24,6 +24,15 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
     return total;
 }
 
+// Benchmark results v1:
+// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
+// 1       20            0.000       inf               0.000
+// 2       400           0.001       0.400             2.500
+// 3       8902          0.002       4.451             0.225
+// 4       197281        0.062       3.182             0.314
+// 5       4865609       1.290       3.772             0.265
+// 6       119060324     32.686      3.643             0.275
+
 void run_count_benchmark()
 {
     BoardStack *stack = create_board_stack(65535);
@@ -31,7 +40,7 @@ void run_count_benchmark()
     BoardState board_state = board_to_board_state(&board);
 
     printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
-    for (uint8_t i = 1; i <= 7; i++)
+    for (uint8_t i = 1; i <= 6; i++)
     {
         clock_t start = clock();
         uint64_t result = count_recursive(&board_state, i, stack);

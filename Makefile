@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O3 -march=native -flto -funroll-loops -Iengine
+CFLAGS = -Wall -Wextra -std=c11 -O3 -march=native -flto -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
 TARGET = main.exe
 BUILD_DIR = build
 UNITY_SRC = $(BUILD_DIR)/unity.c
@@ -15,7 +15,6 @@ all: $(UNITY_SRC)
 
 $(UNITY_SRC): $(SRCS)
 
-# Clean target for Windows
 clean:
 	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 	@if exist $(TARGET) del $(TARGET)
