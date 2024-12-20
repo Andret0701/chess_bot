@@ -4,7 +4,7 @@
 #include "../piece_moves.h"
 #include "count_tests.h"
 
-uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
+uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
     validate_board(&board_state->board);
     if (depth == 0)

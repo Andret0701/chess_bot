@@ -4,5 +4,5 @@
 #include "../../board.h"
 #include "../board_stack.h"
 
-uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack);
+uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack *stack);
 void run_count_tests();
