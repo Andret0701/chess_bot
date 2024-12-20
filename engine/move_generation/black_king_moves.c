@@ -42,8 +42,7 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
             {
                 if ((board_state->occupied & position_to_u64(5, 7)) == 0 &&
                     (board_state->occupied & position_to_u64(6, 7)) == 0 &&
-                    (board_state->white_attack & position_to_u64(5, 7)) == 0 &&
-                    (board_state->white_attack & position_to_u64(6, 7)) == 0)
+                    (board_state->white_attack & position_to_u64(5, 7)) == 0)
                 {
                     BoardState *new_board_state = &stack->boards[stack->count];
                     copy_board(&board_state->board, &new_board_state->board);
@@ -67,7 +66,6 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 if ((board_state->occupied & position_to_u64(1, 7)) == 0 &&
                     (board_state->occupied & position_to_u64(2, 7)) == 0 &&
                     (board_state->occupied & position_to_u64(3, 7)) == 0 &&
-                    (board_state->white_attack & position_to_u64(1, 7)) == 0 &&
                     (board_state->white_attack & position_to_u64(2, 7)) == 0 &&
                     (board_state->white_attack & position_to_u64(3, 7)) == 0)
                 {
