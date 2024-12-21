@@ -19,7 +19,7 @@ int main()
     clock_t start = clock();
     BoardScore alpha = get_worst_score(WHITE);
     BoardScore beta = get_worst_score(BLACK);
-    SearchResult search_result = min_max(&board_state, stack, 12, 0, alpha, beta, start, 100.0);
+    SearchResult search_result = min_max(&board_state, stack, 11, 0, alpha, beta, start, 300.0);
     print_search_result(search_result);
 
 
