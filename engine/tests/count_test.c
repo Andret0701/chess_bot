@@ -11,7 +11,7 @@ uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack
         return 1;
 
     uint32_t base = stack->count;
-    generate_moves(&board_state->board, stack);
+    generate_moves(board_state, stack);
 
     if (stack->count == base)
         return 0;

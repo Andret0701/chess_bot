@@ -9,7 +9,7 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
         return 1;
 
     uint32_t base = stack->count;
-    generate_moves(&board_state->board, stack);
+    generate_moves(board_state, stack);
 
     if (stack->count == base)
         return 0;
@@ -42,6 +42,15 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
 // 5       4865609       0.664       7.322             0.137
 // 6       119060324     16.248      7.328             0.136
 
+// Benchmark results v3 (Improved attack generation):
+// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
+// 1       20            0.000       inf               0.000
+// 2       400           0.000       1.600             0.625
+// 3       8902          0.001       11.869            0.084
+// 4       197281        0.022       8.768             0.114
+// 5       4865609       0.537       9.065             0.110
+// 6       119060324     13.611      8.748             0.114
+
 
 void run_count_benchmark()
 {
@@ -54,11 +63,8 @@ void run_count_benchmark()
     {
         clock_t start = clock();
         uint64_t result = count_recursive(&board_state, i, stack);
-        result = count_recursive(&board_state, i, stack);
-        result = count_recursive(&board_state, i, stack);
-        result = count_recursive(&board_state, i, stack);
         clock_t end = clock();
-        double time_spent = (double)(end - start) / (CLOCKS_PER_SEC*4);
+        double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
         double million_boards_per_second = result / (time_spent * 1e6);
         double microseconds_per_board = (time_spent * 1e6) / result;
         printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n", i, result, time_spent, million_boards_per_second, microseconds_per_board);
