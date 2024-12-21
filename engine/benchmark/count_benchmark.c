@@ -33,6 +33,16 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
 // 5       4865609       1.290       3.772             0.265
 // 6       119060324     32.686      3.643             0.275
 
+// Benchmark results v2 (Added magic bitboards):
+// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
+// 1       20            0.000       inf               0.000
+// 2       400           0.000       1.600             0.625
+// 3       8902          0.001       8.902             0.112
+// 4       197281        0.028       7.109             0.141
+// 5       4865609       0.664       7.322             0.137
+// 6       119060324     16.248      7.328             0.136
+
+
 void run_count_benchmark()
 {
     BoardStack *stack = create_board_stack(65535);
@@ -44,8 +54,11 @@ void run_count_benchmark()
     {
         clock_t start = clock();
         uint64_t result = count_recursive(&board_state, i, stack);
+        result = count_recursive(&board_state, i, stack);
+        result = count_recursive(&board_state, i, stack);
+        result = count_recursive(&board_state, i, stack);
         clock_t end = clock();
-        double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+        double time_spent = (double)(end - start) / (CLOCKS_PER_SEC*4);
         double million_boards_per_second = result / (time_spent * 1e6);
         double microseconds_per_board = (time_spent * 1e6) / result;
         printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n", i, result, time_spent, million_boards_per_second, microseconds_per_board);

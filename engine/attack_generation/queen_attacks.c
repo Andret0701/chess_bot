@@ -1,6 +1,6 @@
 #include "attack_generation.h"
 
-uint64_t generate_queen_attacks(BoardState *board_state, uint8_t x, uint8_t y)
+uint64_t generate_queen_attacks(uint64_t occupied, uint8_t i)
 {
-    return generate_bishop_attacks(board_state, x, y) | generate_rook_attacks(board_state, x, y);
+    return generate_bishop_attacks(occupied, i) | generate_rook_attacks(occupied, i);
 }

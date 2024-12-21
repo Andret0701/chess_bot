@@ -1,60 +1,10 @@
 #include "attack_generation.h"
-
-uint64_t generate_bishop_attacks(BoardState *board_state, uint8_t x, uint8_t y)
+#include "bishop_magic_numbers.h"
+uint64_t generate_bishop_attacks(uint64_t occupied, uint8_t i)
 {
-    uint64_t attacks = 0;
-
-    // Loop to check moves in the NE direction
-    for (uint8_t i = 1; x + i < 8 && y + i < 8; i++)
-    {
-        uint64_t target_pos = position_to_u64(x + i, y + i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the SE direction
-    for (uint8_t i = 1; x + i < 8 && y - i >= 0; i++)
-    {
-        uint64_t target_pos = position_to_u64(x + i, y - i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the NW direction
-    for (uint8_t i = 1; x - i >= 0 && y + i < 8; i++)
-    {
-        uint64_t target_pos = position_to_u64(x - i, y + i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the SW direction
-    for (uint8_t i = 1; x - i >= 0 && y - i >= 0; i++)
-    {
-        uint64_t target_pos = position_to_u64(x - i, y - i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    return attacks;
+    uint64_t mask = bishop_attack_masks[i];
+    uint64_t magic = bishop_magic_numbers[i];
+    uint8_t shift = bishop_magic_shifts[i];
+    uint64_t magic_index = ((occupied & mask) * magic) >> shift;
+    return bishop_attack_tables[i][magic_index];
 }

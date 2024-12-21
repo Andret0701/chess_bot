@@ -1,60 +1,10 @@
 #include "attack_generation.h"
-
-uint64_t generate_rook_attacks(BoardState *board_state, uint8_t x, uint8_t y)
+#include "rook_magic_numbers.h"
+uint64_t generate_rook_attacks(uint64_t occupied, uint8_t i)
 {
-    uint64_t attacks = 0;
-
-    // Loop to check moves in the N direction
-    for (uint8_t i = y + 1; i < 8; i++)
-    {
-        uint64_t target_pos = position_to_u64(x, i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the S direction
-    for (uint8_t i = y - 1; i < 8; i--)
-    {
-        uint64_t target_pos = position_to_u64(x, i);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the E direction
-    for (uint8_t i = x + 1; i < 8; i++)
-    {
-        uint64_t target_pos = position_to_u64(i, y);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    // Loop to check moves in the W direction
-    for (uint8_t i = x - 1; i < 8; i--)
-    {
-        uint64_t target_pos = position_to_u64(i, y);
-        if (board_state->occupied & target_pos)
-        {
-            attacks |= target_pos;
-            break;
-        }
-
-        attacks |= target_pos;
-    }
-
-    return attacks;
+    uint64_t mask = rook_attack_masks[i];
+    uint64_t magic = rook_magic_numbers[i];
+    uint8_t shift = rook_magic_shifts[i];
+    uint64_t magic_index = ((occupied & mask) * magic) >> shift;
+    return rook_attack_tables[i][magic_index];
 }

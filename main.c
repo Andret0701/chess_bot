@@ -9,6 +9,7 @@
 
 int main()
 {
+    run_count_tests();
     run_count_benchmark();
     return 0;
 }
