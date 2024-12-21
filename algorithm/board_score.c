@@ -121,3 +121,9 @@ BoardScore max_score(BoardScore a, BoardScore b, Color color)
         return a;
     return b;
 }
+
+void print_score(BoardScore score)
+{
+    const char *results[] = {"White won", "Black won", "Draw", "Unknown"};
+    printf("Score: %d, Result: %s, Depth: %d\n", score.score, results[score.result], score.depth);
+}

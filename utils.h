@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <time.h>
+#include <stdbool.h>
 
 static inline uint8_t popcountll(uint64_t x) {
     return (uint8_t)__builtin_popcountll(x);
@@ -26,3 +28,4 @@ static inline uint64_t file_mask(uint8_t x)
 
 uint64_t flip_bitmap(uint64_t bitmap);
 void print_bitboard(uint64_t bitboard);
+bool has_timed_out(clock_t start, double seconds);

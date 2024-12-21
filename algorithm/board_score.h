@@ -1,6 +1,6 @@
 #pragma once
 
-#include "board.h"
+#include "../board.h"
 #include <stdint.h>
 
 typedef enum
@@ -26,3 +26,5 @@ BoardScore get_worst_score(Color color);
 bool is_better_score(BoardScore a, BoardScore b, Color color);
 bool is_better_equal(BoardScore a, BoardScore b, Color color);
 BoardScore max_score(BoardScore a, BoardScore b, Color color);
+
+void print_score(BoardScore score);
