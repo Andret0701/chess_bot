@@ -4,6 +4,7 @@ void generate_attacks(BoardState *board_state)
 {
     board_state->black_attacks = (Pieces){0};
     board_state->white_attacks = (Pieces){0};
+    
     for (uint8_t i = 0; i < 64; i++){
             uint64_t position = 1ULL << i;
             if ((board_state->occupied & position))
