@@ -28,7 +28,6 @@ int main()
     char command[256];
     fflush(stdout); // Ensure output is sent immediately
 
-    printf("Chess engine started [bot, new, print, move, test, benchmark]\n");
     new_game();
     while (1)
     {
@@ -55,11 +54,7 @@ int main()
             // Example: Process "bot <fen> <seconds>"
             char fen[128];
             double seconds;
-            if (sscanf(command + 4, "%127s %lf", fen, &seconds) != 2)
-            {
-                printf("Invalid bot command format. Usage: bot <fen> <seconds>\n");
-                continue;
-            }
+            sscanf(command + 4, "\"%127[^\"]\" %lf", fen, &seconds);
             BotResult result = run_bot(fen, seconds);
             printf("%s\n", result.move);          // Move in UCI format
             printf("%.3d\n", result.score.score); // Score of the position
@@ -76,7 +71,6 @@ int main()
         else if (strcmp(command, "new") == 0)
         {
             new_game();
-            printf("New game started\n");
         }
         else if (strcmp(command, "print") == 0)
         {
@@ -92,7 +86,6 @@ int main()
             {
                 current_board = apply_move(&current_board, move);
                 push_game_history(current_board);
-                print_board(&current_board);
             }
             else
             {
