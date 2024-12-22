@@ -1,4 +1,5 @@
 #include "move.h"
+#include <string.h>
 
 char *board_to_move(Board* from, Board* to)
 {
