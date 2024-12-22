@@ -15,7 +15,6 @@
 #include "algorithm/game_history.h"
 #include "move.h"
 
-
 Board current_board;
 void new_game()
 {
@@ -24,50 +23,84 @@ void new_game()
     push_game_history(current_board);
 }
 
-int main() {
+int main()
+{
     char command[256];
     fflush(stdout); // Ensure output is sent immediately
 
     printf("Chess engine started [bot, new, print, move, test, benchmark]\n");
     new_game();
-    while (1) {
-        if (fgets(command, sizeof(command), stdin) == NULL) {
+    while (1)
+    {
+        if (fgets(command, sizeof(command), stdin) == NULL)
+        {
             break; // Exit if no input (EOF)
         }
 
         // Remove newline character
         command[strcspn(command, "\n")] = 0;
 
-        if (strcmp(command, "test") == 0) {
+        if (strcmp(command, "test") == 0)
+        {
             printf("Running tests\n");
             run_count_tests();
-        } else if (strcmp(command, "benchmark") == 0) {
+        }
+        else if (strcmp(command, "benchmark") == 0)
+        {
             printf("Running benchmark\n");
             run_count_benchmark();
-        } else if (strncmp(command, "bot", 3) == 0) {
+        }
+        else if (strncmp(command, "bot", 3) == 0)
+        {
             // Example: Process "bot <fen> <seconds>"
             char fen[128];
             double seconds;
-            sscanf(command + 4, "%127s %lf", fen, &seconds);
-            printf("Received bot command. FEN: %s, Time: %.2f\n", fen, seconds);
-        } else if (strcmp(command, "new") == 0) {
+            if (sscanf(command + 4, "%127s %lf", fen, &seconds) != 2)
+            {
+                printf("Invalid bot command format. Usage: bot <fen> <seconds>\n");
+                continue;
+            }
+            BotResult result = run_bot(fen, seconds);
+            printf("%s\n", result.move);          // Move in UCI format
+            printf("%.3d\n", result.score.score); // Score of the position
+            printf("%d\n", result.score.depth);   // Search depth
+            if (result.score.result == WHITE_WON)
+                printf("White won\n");
+            else if (result.score.result == BLACK_WON)
+                printf("Black won\n");
+            else if (result.score.result == DRAW)
+                printf("Draw\n");
+            else
+                printf("Unknown\n");
+        }
+        else if (strcmp(command, "new") == 0)
+        {
             new_game();
             printf("New game started\n");
-        } else if (strcmp(command, "print") == 0) {
+        }
+        else if (strcmp(command, "print") == 0)
+        {
             print_board(&current_board);
-        } else if (strncmp(command, "move", 4) == 0) {
+        }
+        else if (strncmp(command, "move", 4) == 0)
+        {
             // Example: Process "move e2e4"
             char move[6];
             memset(move, 0, sizeof(move));
             sscanf(command + 5, "%5s", move);
-            if (can_move(&current_board, move)) {
+            if (can_move(&current_board, move))
+            {
                 current_board = apply_move(&current_board, move);
                 push_game_history(current_board);
                 print_board(&current_board);
-            } else {
+            }
+            else
+            {
                 printf("Invalid move: %s\n", move);
             }
-        } else {
+        }
+        else
+        {
             printf("Unknown command: %s\n", command);
         }
         fflush(stdout);
