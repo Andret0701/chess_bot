@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include "utils.h"
 
+
+uint64_t pieces_to_bitmap(Pieces *pieces)
+{
+    return pieces->pawns | pieces->knights | pieces->bishops | pieces->rooks | pieces->queens | pieces->king;
+}
+
 bool pieces_equals(Pieces *a, Pieces *b)
 {
     return a->bishops == b->bishops &&
