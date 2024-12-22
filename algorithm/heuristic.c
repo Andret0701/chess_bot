@@ -55,12 +55,13 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     int32_t score = 0;
     Result result = get_result(board_state, is_finished);
 
+    const int piece_values[5] = {100, 320, 330, 500, 900}; // Pawn, Knight, Bishop, Rook, Queen
     uint64_t white_pieces[] = {board_state->board.white_pieces.pawns, board_state->board.white_pieces.knights, board_state->board.white_pieces.bishops, board_state->board.white_pieces.rooks, board_state->board.white_pieces.queens};
     uint64_t black_pieces[] = {board_state->board.black_pieces.pawns, board_state->board.black_pieces.knights, board_state->board.black_pieces.bishops, board_state->board.black_pieces.rooks, board_state->board.black_pieces.queens};
 
     // Add piece values
     for (int i = 0; i < 5; i++)
-        score = __builtin_popcountll(white_pieces[i]) * piece_values[i] - __builtin_popcountll(black_pieces[i]) * piece_values[i];
+        score += __builtin_popcountll(white_pieces[i]) * piece_values[i] - __builtin_popcountll(black_pieces[i]) * piece_values[i];
 
     return (BoardScore){score, result, depth};
 }
