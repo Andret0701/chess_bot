@@ -22,14 +22,14 @@ void pop_game_history()
 
 bool threefold_repetition()
 {
-    if (game_history_index < 4)  // Fewer than 4 positions mean no threefold repetition
+    if (game_history_index < 6) // Fewer than 4 positions mean no threefold repetition
         return false;
 
     Board *current = &game_history[game_history_index - 1];
     int repetitions = 1;
 
     // Iterate only through earlier positions
-    for (int i = game_history_index - 2; i >= 0; i--)
+    for (int i = game_history_index - 3; i >= 0; i -= 2)
     {
         if (board_equals(current, &game_history[i]))
         {
@@ -41,4 +41,3 @@ bool threefold_repetition()
 
     return false;
 }
-
