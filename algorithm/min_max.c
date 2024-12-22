@@ -5,6 +5,13 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
 {
     if (has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
+    push_game_history(board_state->board);
+    if(threefold_repetition())
+    {
+        BoardScore score = score_board(board_state, depth, false);
+        pop_game_history();
+        return (SearchResult){(BoardScore){score.score, DRAW, score.depth}, true};
+    }
 
     uint16_t base = stack->count;
     generate_moves(board_state, stack);
@@ -16,6 +23,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     {
         stack->count = base;
         BoardScore score = score_board(board_state, depth, is_finished);
+        pop_game_history();
         return (SearchResult){score, true};
     }
 
@@ -27,6 +35,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         if (!search_result.valid)
         {
             stack->count = base;
+            pop_game_history();
             return (SearchResult){best_score, false};
         }
 
@@ -34,6 +43,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         if (has_won(score.result, board_state->board.side_to_move))
         {
             stack->count = base;
+            pop_game_history();
             return (SearchResult){score, true};
         }
 
@@ -46,11 +56,13 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         if (is_better_equal(alpha, beta, WHITE)) // alpha >= beta
         {
             stack->count = base;
+            pop_game_history();
             return (SearchResult){best_score, true};
         }
     }
 
     stack->count = base;
+    pop_game_history();
     return (SearchResult){best_score, true};
 }
 

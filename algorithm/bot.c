@@ -29,12 +29,15 @@ BotResult run_bot(char *fen, double seconds){
         BoardScore best_score = get_worst_score(board.side_to_move);
         for (uint16_t i = 0; i < stack->count; i++)
         {
+            push_game_history(stack->boards[i].board);
+
             BoardState *current_board_state = &stack->boards[i];
             SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds);
             if (!search_result.valid)
             {
                 BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
                 destroy_board_stack(stack);
+                pop_game_history();
                 return result;
             }
 
@@ -50,6 +53,8 @@ BotResult run_bot(char *fen, double seconds){
                 else
                     beta = max_score(beta, score, board.side_to_move);
             }
+
+            pop_game_history();
         }
 
         if (has_won(best_score.result, board.side_to_move))
