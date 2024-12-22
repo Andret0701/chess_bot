@@ -28,6 +28,7 @@ int main() {
     char command[256];
     fflush(stdout); // Ensure output is sent immediately
 
+    printf("Chess engine started [bot, new, print, move, test, benchmark]\n");
     new_game();
     while (1) {
         if (fgets(command, sizeof(command), stdin) == NULL) {
@@ -38,8 +39,10 @@ int main() {
         command[strcspn(command, "\n")] = 0;
 
         if (strcmp(command, "test") == 0) {
+            printf("Running tests\n");
             run_count_tests();
         } else if (strcmp(command, "benchmark") == 0) {
+            printf("Running benchmark\n");
             run_count_benchmark();
         } else if (strncmp(command, "bot", 3) == 0) {
             // Example: Process "bot <fen> <seconds>"
@@ -49,6 +52,7 @@ int main() {
             printf("Received bot command. FEN: %s, Time: %.2f\n", fen, seconds);
         } else if (strcmp(command, "new") == 0) {
             new_game();
+            printf("New game started\n");
         } else if (strcmp(command, "print") == 0) {
             print_board(&current_board);
         } else if (strncmp(command, "move", 4) == 0) {
@@ -59,6 +63,7 @@ int main() {
             if (can_move(&current_board, move)) {
                 current_board = apply_move(&current_board, move);
                 push_game_history(current_board);
+                print_board(&current_board);
             } else {
                 printf("Invalid move: %s\n", move);
             }
