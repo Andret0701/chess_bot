@@ -56,6 +56,8 @@ int main()
             double seconds;
             sscanf(command + 4, "\"%127[^\"]\" %lf", fen, &seconds);
             BotResult result = run_bot(fen, seconds);
+            current_board = fen_to_board(fen);
+
             printf("%s\n", result.move);          // Move in UCI format
             printf("%.3d\n", result.score.score); // Score of the position
             printf("%d\n", result.score.depth);   // Search depth
@@ -86,10 +88,6 @@ int main()
             {
                 current_board = apply_move(&current_board, move);
                 push_game_history(current_board);
-            }
-            else
-            {
-                printf("Invalid move: %s\n", move);
             }
         }
         else
