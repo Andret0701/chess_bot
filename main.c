@@ -12,47 +12,60 @@
 #include "algorithm/bot.h"
 #include <string.h>
 #include <stdlib.h>
+#include "algorithm/game_history.h"
+#include "move.h"
 
-int main(int argc, char *argv[] )
+
+Board current_board;
+void new_game()
 {
-    if (argc == 1)
-    {
-        printf("Usage: %s test|benchmark|bot <fen> <seconds>\n", argv[0]);
-        return 0;
+    current_board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+    reset_game_history();
+    push_game_history(current_board);
+}
+
+int main() {
+    char command[256];
+    fflush(stdout); // Ensure output is sent immediately
+
+    new_game();
+    while (1) {
+        if (fgets(command, sizeof(command), stdin) == NULL) {
+            break; // Exit if no input (EOF)
+        }
+
+        // Remove newline character
+        command[strcspn(command, "\n")] = 0;
+
+        if (strcmp(command, "test") == 0) {
+            run_count_tests();
+        } else if (strcmp(command, "benchmark") == 0) {
+            run_count_benchmark();
+        } else if (strncmp(command, "bot", 3) == 0) {
+            // Example: Process "bot <fen> <seconds>"
+            char fen[128];
+            double seconds;
+            sscanf(command + 4, "%127s %lf", fen, &seconds);
+            printf("Received bot command. FEN: %s, Time: %.2f\n", fen, seconds);
+        } else if (strcmp(command, "new") == 0) {
+            new_game();
+        } else if (strcmp(command, "print") == 0) {
+            print_board(&current_board);
+        } else if (strncmp(command, "move", 4) == 0) {
+            // Example: Process "move e2e4"
+            char move[6];
+            memset(move, 0, sizeof(move));
+            sscanf(command + 5, "%5s", move);
+            if (can_move(&current_board, move)) {
+                current_board = apply_move(&current_board, move);
+                push_game_history(current_board);
+            } else {
+                printf("Invalid move: %s\n", move);
+            }
+        } else {
+            printf("Unknown command: %s\n", command);
+        }
+        fflush(stdout);
     }
-
-    if (argc > 1 && strcmp(argv[1], "test") == 0)
-    {
-        run_count_tests();
-        return 0;
-    }
-
-    if (argc > 1 && strcmp(argv[1], "benchmark") == 0)
-    {
-        run_count_benchmark();
-        return 0;
-    }
-
-    if (argc > 3 && strcmp(argv[1], "bot") == 0)
-    {
-        char *fen = argv[2];
-        double seconds = atof(argv[3]);
-        BotResult bot_result = run_bot(fen, seconds);
-        printf("%s\n", bot_result.move);
-        printf("%d\n", bot_result.score.score);
-        printf("%d\n", bot_result.depth);
-        if (has_won(bot_result.score.result, WHITE))
-            printf("White won\n");
-        else if (has_won(bot_result.score.result, BLACK))
-            printf("Black won\n");
-        else if (bot_result.score.result == DRAW)
-            printf("Draw\n");
-        else
-            printf("Unknown\n");
-        return 0;
-    }
-
-
-
     return 0;
 }
