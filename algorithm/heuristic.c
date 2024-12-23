@@ -29,7 +29,7 @@ bool has_insufficient_material(Board *board)
         bool black_bishop_on_light = (board->black_pieces.bishops & 0b0101010101010101010101010101010101010101010101010101010101010101) > 0;
         return white_bishop_on_light == black_bishop_on_light;
     }
-    
+
     return false;
 }
 
@@ -50,18 +50,153 @@ Result get_result(BoardState *board_state, bool is_finished)
     return result;
 }
 
+// Define piece-square tables for each piece type
+static const int16_t PAWN_TABLE[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    100, 100, 100, 100, 100, 100, 100, 100,
+    20, 20, 30, 40, 40, 30, 20, 20,
+    5, 5, 10, 25, 25, 10, 5, 5,
+    0, 0, 0, 20, 20, 0, 0, 0,
+    5, -5, -10, 0, 0, -10, -5, 5,
+    5, 10, 10, -20, -20, 10, 10, 5,
+    0, 0, 0, 0, 0, 0, 0, 0};
+
+static const int16_t KNIGHT_TABLE[64] = {
+    -50, -40, -30, -30, -30, -30, -40, -50,
+    -40, -20, 0, 0, 0, 0, -20, -40,
+    -30, 0, 10, 15, 15, 10, 0, -30,
+    -30, 5, 15, 20, 20, 15, 5, -30,
+    -30, 0, 15, 20, 20, 15, 0, -30,
+    -30, 5, 10, 15, 15, 10, 5, -30,
+    -40, -20, 0, 5, 5, 0, -20, -40,
+    -50, -40, -30, -30, -30, -30, -40, -50};
+
+static const int16_t BISHOP_TABLE[64] = {
+    -20, -10, -10, -10, -10, -10, -10, -20,
+    -10, 0, 0, 0, 0, 0, 0, -10,
+    -10, 0, 5, 10, 10, 5, 0, -10,
+    -10, 5, 5, 10, 10, 5, 5, -10,
+    -10, 0, 10, 10, 10, 10, 0, -10,
+    -10, 10, 10, 10, 10, 10, 10, -10,
+    -10, 5, 0, 0, 0, 0, 5, -10,
+    -20, -10, -10, -10, -10, -10, -10, -20};
+
+static const int16_t ROOK_TABLE[64] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    5, 10, 10, 10, 10, 10, 10, 5,
+    -5, 0, 0, 0, 0, 0, 0, -5,
+    -5, 0, 0, 0, 0, 0, 0, -5,
+    -5, 0, 0, 0, 0, 0, 0, -5,
+    -5, 0, 0, 0, 0, 0, 0, -5,
+    -5, 0, 0, 0, 0, 0, 0, -5,
+    0, 0, 0, 5, 5, 0, 0, 0};
+
+static const int16_t QUEEN_TABLE[64] = {
+    -20, -10, -10, -5, -5, -10, -10, -20,
+    -10, 0, 0, 0, 0, 0, 0, -10,
+    -10, 0, 5, 5, 5, 5, 0, -10,
+    -5, 0, 5, 5, 5, 5, 0, -5,
+    0, 0, 5, 5, 5, 5, 0, -5,
+    -10, 5, 5, 5, 5, 5, 0, -10,
+    -10, 0, 5, 0, 0, 0, 0, -10,
+    -20, -10, -10, -5, -5, -10, -10, -20};
+
+static const int16_t KING_MG_TABLE[64] = { // Middle game king table
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -20, -30, -30, -40, -40, -30, -30, -20,
+    -10, -20, -20, -20, -20, -20, -20, -10,
+    20, 20, -15, -15, -15, -15, 20, 20,
+    20, 30, 10, 0, 0, 10, 30, 20};
+
+static const int16_t KING_EG_TABLE[64] = { // Endgame king table
+    -50, -40, -30, -20, -20, -30, -40, -50,
+    -30, -20, -10, 0, 0, -10, -20, -30,
+    -30, -10, 20, 30, 30, 20, -10, -30,
+    -30, -10, 30, 40, 40, 30, -10, -30,
+    -30, -10, 30, 40, 40, 30, -10, -30,
+    -30, -10, 20, 30, 30, 20, -10, -30,
+    -30, -30, 0, 0, 0, 0, -30, -30,
+    -50, -30, -30, -30, -30, -30, -30, -50};
+
+// Flip table for getting white's perspective
+static const int FLIP[64] = {
+    56, 57, 58, 59, 60, 61, 62, 63,
+    48, 49, 50, 51, 52, 53, 54, 55,
+    40, 41, 42, 43, 44, 45, 46, 47,
+    32, 33, 34, 35, 36, 37, 38, 39,
+    24, 25, 26, 27, 28, 29, 30, 31,
+    16, 17, 18, 19, 20, 21, 22, 23,
+    8, 9, 10, 11, 12, 13, 14, 15,
+    0, 1, 2, 3, 4, 5, 6, 7};
+
+// Base piece values remain the same
+const int PAWN_VALUE = 100;
+const int KNIGHT_VALUE = 320;
+const int BISHOP_VALUE = 330;
+const int ROOK_VALUE = 500;
+const int QUEEN_VALUE = 900;
+
+// Evaluate a single piece's position
+static int evaluate_piece_position(uint64_t pieces, const int16_t *table, bool is_white)
+{
+    int score = 0;
+    while (pieces)
+    {
+        int square = __builtin_ctzll(pieces);
+        score += table[is_white ? FLIP[square] : square];
+        pieces &= pieces - 1;
+    }
+    return score;
+}
+
+// Check if we're in endgame (simplified)
+static bool is_endgame(const BoardState *board_state)
+{
+    // Consider it endgame if:
+    // 1. No queens or
+    // 2. Both sides have <= 1 minor piece besides king and pawns
+    int total_pieces = __builtin_popcountll(board_state->occupied);
+    return total_pieces <= 4;
+}
+
 BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
 {
-    int32_t score = 0;
+    int score = 0;
     Result result = get_result(board_state, is_finished);
 
-    const int piece_values[5] = {100, 320, 330, 500, 900}; // Pawn, Knight, Bishop, Rook, Queen
-    uint64_t white_pieces[] = {board_state->board.white_pieces.pawns, board_state->board.white_pieces.knights, board_state->board.white_pieces.bishops, board_state->board.white_pieces.rooks, board_state->board.white_pieces.queens};
-    uint64_t black_pieces[] = {board_state->board.black_pieces.pawns, board_state->board.black_pieces.knights, board_state->board.black_pieces.bishops, board_state->board.black_pieces.rooks, board_state->board.black_pieces.queens};
+    bool endgame = is_endgame(board_state);
 
-    // Add piece values
-    for (int i = 0; i < 5; i++)
-        score += __builtin_popcountll(white_pieces[i]) * piece_values[i] - __builtin_popcountll(black_pieces[i]) * piece_values[i];
+    // Material counting
+    score += __builtin_popcountll(board_state->board.white_pieces.pawns) * PAWN_VALUE;
+    score -= __builtin_popcountll(board_state->board.black_pieces.pawns) * PAWN_VALUE;
+    score += __builtin_popcountll(board_state->board.white_pieces.knights) * KNIGHT_VALUE;
+    score -= __builtin_popcountll(board_state->board.black_pieces.knights) * KNIGHT_VALUE;
+    score += __builtin_popcountll(board_state->board.white_pieces.bishops) * BISHOP_VALUE;
+    score -= __builtin_popcountll(board_state->board.black_pieces.bishops) * BISHOP_VALUE;
+    score += __builtin_popcountll(board_state->board.white_pieces.rooks) * ROOK_VALUE;
+    score -= __builtin_popcountll(board_state->board.black_pieces.rooks) * ROOK_VALUE;
+    score += __builtin_popcountll(board_state->board.white_pieces.queens) * QUEEN_VALUE;
+    score -= __builtin_popcountll(board_state->board.black_pieces.queens) * QUEEN_VALUE;
+
+    // Positional scoring
+    score += evaluate_piece_position(board_state->board.white_pieces.pawns, PAWN_TABLE, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.pawns, PAWN_TABLE, false);
+    score += evaluate_piece_position(board_state->board.white_pieces.knights, KNIGHT_TABLE, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.knights, KNIGHT_TABLE, false);
+    score += evaluate_piece_position(board_state->board.white_pieces.bishops, BISHOP_TABLE, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.bishops, BISHOP_TABLE, false);
+    score += evaluate_piece_position(board_state->board.white_pieces.rooks, ROOK_TABLE, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.rooks, ROOK_TABLE, false);
+    score += evaluate_piece_position(board_state->board.white_pieces.queens, QUEEN_TABLE, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.queens, QUEEN_TABLE, false);
+
+    // King positioning (different for middlegame/endgame)
+    const int16_t *king_table = endgame ? KING_EG_TABLE : KING_MG_TABLE;
+    score += evaluate_piece_position(board_state->board.white_pieces.king, king_table, true);
+    score -= evaluate_piece_position(board_state->board.black_pieces.king, king_table, false);
 
     return (BoardScore){score, result, depth};
 }
