@@ -23,8 +23,15 @@ void new_game()
     push_game_history(current_board);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    if (argc >= 2 && strcmp(argv[1], "profile") == 0)
+    {
+        BotResult result = run_bot("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", 20);
+        printf("%s\n", result.move);
+        exit(0);
+    }
+
     char command[256];
     fflush(stdout); // Ensure output is sent immediately
 
