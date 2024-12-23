@@ -41,3 +41,20 @@ bool threefold_repetition()
 
     return false;
 }
+
+bool has_repeated_position()
+{
+    if (game_history_index < 3)
+        return false;
+
+    Board *current = &game_history[game_history_index - 1];
+
+    // Iterate only through earlier positions
+    for (int i = game_history_index - 3; i >= 0; i -= 2)
+    {
+        if (board_equals(current, &game_history[i]))
+            return true;
+    }
+
+    return false;
+}

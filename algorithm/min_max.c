@@ -10,7 +10,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     if (has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
     push_game_history(board_state->board);
-    if (threefold_repetition())
+    if (has_repeated_position())
     {
         BoardScore score = score_board(board_state, depth, false);
         pop_game_history();
