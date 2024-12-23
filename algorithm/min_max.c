@@ -1,12 +1,16 @@
 #include "min_max.h"
 #include "heuristic.h"
+#include "game_history.h"
+#include "../utils.h"
+#include "../engine/piece_moves.h"
+#include <stdio.h>
 
 SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
     if (has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
     push_game_history(board_state->board);
-    if(threefold_repetition())
+    if (threefold_repetition())
     {
         BoardScore score = score_board(board_state, depth, false);
         pop_game_history();

@@ -1,4 +1,4 @@
-#include "piece_moves.h"
+#include "../piece_moves.h"
 
 void generate_black_queen_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {

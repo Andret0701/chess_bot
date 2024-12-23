@@ -4,12 +4,15 @@
 #include "../fen.h"
 #include "min_max.h"
 #include "../engine/piece_moves.h"
+#include "../move.h"
+#include "game_history.h"
 
 #define BOARD_STACK_SIZE 65535
 
-BotResult run_bot(char *fen, double seconds){
+BotResult run_bot(char *fen, double seconds)
+{
     clock_t start = clock();
-    
+
     Board board = fen_to_board(fen);
     BoardState board_state = board_to_board_state(&board);
 
@@ -78,7 +81,7 @@ BotResult run_bot(char *fen, double seconds){
             return result;
         }
 
-        //Sort the stack by score
+        // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)
         {
             for (uint16_t j = i + 1; j < stack->count; j++)

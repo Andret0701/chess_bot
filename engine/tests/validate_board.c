@@ -3,6 +3,8 @@
 #include "../board_state.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include "../../board.h"
+#include "../piece_moves.h"
 
 void errorf(Board *board, const char *format, ...)
 {

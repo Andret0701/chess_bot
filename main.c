@@ -58,9 +58,9 @@ int main()
             BotResult result = run_bot(fen, seconds);
             current_board = fen_to_board(fen);
 
-            printf("%s\n", result.move);          // Move in UCI format
-            printf("%.3d\n", result.score.score); // Score of the position
-            printf("%d\n", result.score.depth);   // Search depth
+            printf("%s\n", result.move);        // Move in UCI format
+            printf("%d\n", result.score.score); // Score of the position
+            printf("%d\n", result.score.depth); // Search depth
             if (result.score.result == WHITE_WON)
                 printf("White won\n");
             else if (result.score.result == BLACK_WON)
@@ -89,6 +89,10 @@ int main()
                 current_board = apply_move(&current_board, move);
                 push_game_history(current_board);
             }
+        }
+        else if (strcmp(command, "exit") == 0)
+        {
+            break;
         }
         else
         {

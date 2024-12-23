@@ -2,6 +2,8 @@
 
 #include "../../fen.h"
 #include <time.h>
+#include <stdio.h>
+#include "../piece_moves.h"
 
 uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
@@ -50,7 +52,6 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
 // 4       197281        0.022       8.768             0.114
 // 5       4865609       0.537       9.065             0.110
 // 6       119060324     13.611      8.748             0.114
-
 
 void run_count_benchmark()
 {

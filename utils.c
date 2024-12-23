@@ -1,4 +1,6 @@
 #include "utils.h"
+#include <stdio.h>
+
 uint64_t flip_bitmap(uint64_t bitmap)
 { // only y should be flipped
     uint64_t result = 0;

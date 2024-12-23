@@ -3,6 +3,7 @@
 #include "../../fen.h"
 #include "../piece_moves.h"
 #include "count_tests.h"
+#include <stdio.h>
 
 uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
@@ -19,7 +20,7 @@ uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack
     uint64_t total = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
-        total += count_recursive(&stack->boards[i], depth - 1, stack);
+        total += count_recursive_test(&stack->boards[i], depth - 1, stack);
     }
 
     stack->count = base;
@@ -37,7 +38,7 @@ void run_count_tests()
         Board board = fen_to_board(tests[i].fen);
         BoardState board_state = board_to_board_state(&board);
 
-        uint64_t result = count_recursive(&board_state, tests[i].depth, stack);
+        uint64_t result = count_recursive_test(&board_state, tests[i].depth, stack);
         if (result != tests[i].expected)
         {
             printf(":( Test %u failed. Expected %llu, got %llu. Off by %lld:\n", i, tests[i].expected, result, ((int64_t)result) - ((int64_t)tests[i].expected));
@@ -51,7 +52,7 @@ void run_count_tests()
 
         board = flip_board(&board);
         board_state = board_to_board_state(&board);
-        result = count_recursive(&board_state, tests[i].depth, stack);
+        result = count_recursive_test(&board_state, tests[i].depth, stack);
         if (result != tests[i].expected)
         {
             printf(":( Flipped %u failed. Expected %llu, got %llu. Off by %lld\n", i, tests[i].expected, result, ((int64_t)result) - ((int64_t)tests[i].expected));

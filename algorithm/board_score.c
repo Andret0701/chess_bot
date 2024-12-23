@@ -1,4 +1,5 @@
 #include "board_score.h"
+#include <stdio.h>
 
 bool has_won(Result result, Color color)
 {

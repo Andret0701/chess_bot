@@ -1,4 +1,4 @@
-#include "piece_moves.h"
+#include "../piece_moves.h"
 
 void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
