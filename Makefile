@@ -7,11 +7,16 @@ UNITY_SRC = $(BUILD_DIR)/unity.c
 # Include all .c files in all directories except the build directory
 SRCS = $(shell dir /s /b *.c | findstr /v /i /c:"\\$(BUILD_DIR)\\")
 
+profile: CFLAGS = -pg -no-pie -fno-builtin -O2
+profile: clean all
+
+
 all: $(UNITY_SRC)
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	@echo /* Unity Build File */ > $(UNITY_SRC)
 	@for %%i in ($(SRCS)) do @echo #include "%%i" >> $(UNITY_SRC)
 	$(CC) $(CFLAGS) -o $(TARGET) $(UNITY_SRC)
+
 
 $(UNITY_SRC): $(SRCS)
 
@@ -19,4 +24,4 @@ clean:
 	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 	@if exist $(TARGET) del $(TARGET)
 
-.PHONY: all clean
+.PHONY: all clean profile

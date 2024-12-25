@@ -28,7 +28,17 @@ int main(int argc, char *argv[])
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
         BotResult result = run_bot("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", 20);
-        printf("%s\n", result.move);
+        printf("Move: %s\n", result.move);
+        printf("Score: %d\n", result.score.score);
+        printf("Depth: %d\n", result.score.depth);
+        if (result.score.result == WHITE_WON)
+            printf("White won\n");
+        else if (result.score.result == BLACK_WON)
+            printf("Black won\n");
+        else if (result.score.result == DRAW)
+            printf("Draw\n");
+        else
+            printf("Unknown\n");
         exit(0);
     }
 

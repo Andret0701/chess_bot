@@ -44,7 +44,7 @@ bool threefold_repetition()
 
 bool has_repeated_position()
 {
-    if (game_history_index < 3)
+    if (game_history_index < 6) // Fewer than 4 positions mean no repeated position
         return false;
 
     Board *current = &game_history[game_history_index - 1];
