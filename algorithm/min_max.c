@@ -24,23 +24,21 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     Result result = get_result(board_state, is_finished);
     is_finished |= result != UNKNOWN;
 
-    // if (depth == max_depth && max_depth < 6 && depth >= 4)
-    // {
-    //     if (board_state->board.side_to_move == WHITE)
-    //     {
-    //         if (board_state->white_check || board_state->white_attack & board_state->black_pieces)
-    //             max_depth++;
-    //     }
-    //     else
-    //     {
-    //         if (board_state->black_check || board_state->black_attack & board_state->white_pieces)
-    //             max_depth++;
-    //     }
-    // }
-
     if (depth == max_depth || is_finished)
     {
         stack->count = base;
+        if (!is_finished)
+        {
+            SearchResult q_result = quiesce(board_state, stack, alpha, beta, depth, start, seconds);
+            if (!q_result.valid)
+            {
+                pop_game_history();
+                return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
+            }
+            pop_game_history();
+            q_result.board_score.depth = depth;
+            return q_result;
+        }
         BoardScore score = score_board(board_state, depth, is_finished);
         pop_game_history();
         return (SearchResult){score, true};

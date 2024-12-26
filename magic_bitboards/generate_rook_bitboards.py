@@ -117,10 +117,6 @@ def occupied_position_to_attack_pattern(x, y, occupied):
 def get_random_magic_number():
     return random.getrandbits(64)
 
-table = generate_rook_attack_table()
-for i in range(len(table)):
-    print_bitboard(table[i])
-    print()
 
 best_magic_numbers = [0] * 64
 best_shifts = [50] * 64

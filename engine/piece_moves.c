@@ -106,3 +106,57 @@ void generate_moves(BoardState *board_state, BoardStack *stack)
         }
     }
 }
+
+void generate_captures(BoardState *board_state, BoardStack *stack)
+{
+    if (board_state->board.side_to_move == WHITE)
+    {
+        for (uint8_t y = 0; y < 8; y++)
+        {
+            for (uint8_t x = 0; x < 8; x++)
+            {
+                uint64_t position = position_to_u64(x, y);
+                if (board_state->white_pieces & position)
+                {
+                    if (board_state->board.white_pieces.pawns & position)
+                        generate_white_pawn_captures(board_state, x, y, stack);
+                    else if (board_state->board.white_pieces.knights & position)
+                        generate_white_knight_captures(board_state, x, y, stack);
+                    else if (board_state->board.white_pieces.bishops & position)
+                        generate_white_bishop_captures(board_state, x, y, stack);
+                    else if (board_state->board.white_pieces.rooks & position)
+                        generate_white_rook_captures(board_state, x, y, stack);
+                    else if (board_state->board.white_pieces.queens & position)
+                        generate_white_queen_captures(board_state, x, y, stack);
+                    else
+                        generate_white_king_captures(board_state, x, y, stack);
+                }
+            }
+        }
+    }
+    else if (board_state->board.side_to_move == BLACK)
+    {
+        for (uint8_t y = 0; y < 8; y++)
+        {
+            for (uint8_t x = 0; x < 8; x++)
+            {
+                uint64_t position = position_to_u64(x, y);
+                if (board_state->black_pieces & position)
+                {
+                    if (board_state->board.black_pieces.pawns & position)
+                        generate_black_pawn_captures(board_state, x, y, stack);
+                    else if (board_state->board.black_pieces.knights & position)
+                        generate_black_knight_captures(board_state, x, y, stack);
+                    else if (board_state->board.black_pieces.bishops & position)
+                        generate_black_bishop_captures(board_state, x, y, stack);
+                    else if (board_state->board.black_pieces.rooks & position)
+                        generate_black_rook_captures(board_state, x, y, stack);
+                    else if (board_state->board.black_pieces.queens & position)
+                        generate_black_queen_captures(board_state, x, y, stack);
+                    else
+                        generate_black_king_captures(board_state, x, y, stack);
+                }
+            }
+        }
+    }
+}

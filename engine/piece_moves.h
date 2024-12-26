@@ -13,6 +13,7 @@ void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
 void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
 
 void generate_moves(BoardState *board_state, BoardStack *stack);
+void generate_captures(BoardState *board_state, BoardStack *stack);
 
 void generate_white_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 void generate_black_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
@@ -26,3 +27,16 @@ void generate_white_queen_moves(BoardState *board_state, uint8_t x, uint8_t y, B
 void generate_black_queen_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+
+void generate_white_pawn_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_pawn_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_white_knight_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_knight_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_white_bishop_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_bishop_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_white_rook_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_rook_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_white_queen_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_white_king_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
+void generate_black_king_captures(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
