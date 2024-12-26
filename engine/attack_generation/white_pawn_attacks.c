@@ -1,6 +1,11 @@
 #include "attack_generation.h"
-#include "white_pawn_attack_tables.h"
-uint64_t generate_white_pawn_attacks(uint8_t i)
+
+#define NOT_A_FILE 0xfefefefefefefefeULL // Mask to clear the A-file
+#define NOT_H_FILE 0x7f7f7f7f7f7f7f7fULL // Mask to clear the H-file
+
+uint64_t generate_white_pawn_attacks(uint64_t pawns)
 {
-    return white_pawn_attack_table[i];
+    uint64_t west_attacks = (pawns & NOT_A_FILE) << 7; // Left diagonal
+    uint64_t east_attacks = (pawns & NOT_H_FILE) << 9; // Right diagonal
+    return west_attacks | east_attacks;
 }

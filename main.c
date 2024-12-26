@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 {
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
+        printf("Profiling\n");
         BotResult result = run_bot("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", 20);
         printf("Move: %s\n", result.move);
         printf("Score: %d\n", result.score.score);
@@ -39,6 +40,18 @@ int main(int argc, char *argv[])
             printf("Draw\n");
         else
             printf("Unknown\n");
+        exit(0);
+    }
+    else if (argc >= 2 && strcmp(argv[1], "test") == 0)
+    {
+        printf("Running tests\n");
+        run_count_tests();
+        exit(0);
+    }
+    else if (argc >= 2 && strcmp(argv[1], "benchmark") == 0)
+    {
+        printf("Running benchmark\n");
+        run_count_benchmark();
         exit(0);
     }
 

@@ -53,6 +53,15 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
 // 5       4865609       0.537       9.065             0.110
 // 6       119060324     13.611      8.748             0.114
 
+// Benchmark results v4 (Improved attack generation):
+// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
+// 1       20            0.000       inf               0.000
+// 2       400           0.000       inf               0.000
+// 3       8902          0.000       inf               0.000
+// 4       197281        0.014       14.091            0.071
+// 5       4865609       0.347       14.022            0.071
+// 6       119060324     8.449       14.092            0.071
+
 void run_count_benchmark()
 {
     BoardStack *stack = create_board_stack(65535);
