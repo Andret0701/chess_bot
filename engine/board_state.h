@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../board.h"
+#include "../algorithm/board_score.h"
 
 typedef struct
 {
@@ -21,3 +22,4 @@ typedef struct
 } BoardState;
 
 BoardState board_to_board_state(Board *board);
+Result get_game_result(BoardState *board_state);

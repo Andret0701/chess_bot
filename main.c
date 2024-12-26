@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "algorithm/game_history.h"
 #include "move.h"
+#include "profile.h"
 
 Board current_board;
 void new_game()
@@ -27,19 +28,7 @@ int main(int argc, char *argv[])
 {
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
-        printf("Profiling\n");
-        BotResult result = run_bot("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", 20);
-        printf("Move: %s\n", result.move);
-        printf("Score: %d\n", result.score.score);
-        printf("Depth: %d\n", result.score.depth);
-        if (result.score.result == WHITE_WON)
-            printf("White won\n");
-        else if (result.score.result == BLACK_WON)
-            printf("Black won\n");
-        else if (result.score.result == DRAW)
-            printf("Draw\n");
-        else
-            printf("Unknown\n");
+        play_game(1.0);
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
