@@ -193,7 +193,7 @@ def get_random_magic_number():
 table = generate_bishop_attack_table()
 
 best_magic_numbers = [0] * 64
-best_shifts = [0] * 64
+best_shifts = [50] * 64
 sizes = [None] * 64
 attack_tables = [[]] * 64
 
@@ -205,7 +205,7 @@ while True:
             attack = table[index]
             occupied_positions = possible_occupied_positions(attack)
             magic_number = get_random_magic_number()
-            for shift in range(50, 64):
+            for shift in range(best_shifts[index], 63):
                 indices = [(((occupied_positions[i] * magic_number) & 0xFFFFFFFFFFFFFFFF) >> shift) for i in range(len(occupied_positions))]
                 max_index = max(indices)
                 if (sizes[index] is not None and max_index >= sizes[index]) or max_index >= max_table_size:
