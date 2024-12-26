@@ -69,7 +69,7 @@ void run_count_benchmark()
     BoardState board_state = board_to_board_state(&board);
 
     printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
-    for (uint8_t i = 1; i <= 6; i++)
+    for (uint8_t i = 1; i <= 7; i++)
     {
         clock_t start = clock();
         uint64_t result = count_recursive(&board_state, i, stack);
