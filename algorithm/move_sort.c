@@ -1,4 +1,5 @@
 #include "move_sort.h"
+#include <stdio.h>
 
 uint16_t get_mvvlva(BoardState *from, BoardState *to)
 {
@@ -84,28 +85,16 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
     return piece_values[captured_piece_index] - piece_values[moved_piece_index] + 10000;
 }
 
-uint16_t scores[300];
+int compare_boards(const void *left, const void *right)
+{
+    return ((BoardState *)right)->mvvlva_score - ((BoardState *)left)->mvvlva_score;
+}
+
 void sort_moves(BoardState *from, BoardStack *stack, uint16_t base)
 {
     for (uint16_t i = base; i < stack->count; i++)
-    {
-        scores[i - base] = get_mvvlva(from, &stack->boards[i]);
-    }
+        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
 
-    for (uint16_t i = base; i < stack->count; i++)
-    {
-        for (uint16_t j = i + 1; j < stack->count; j++)
-        {
-            if (scores[j - base] > scores[i - base])
-            {
-                BoardState temp = stack->boards[i];
-                stack->boards[i] = stack->boards[j];
-                stack->boards[j] = temp;
-
-                uint16_t temp_score = scores[i - base];
-                scores[i - base] = scores[j - base];
-                scores[j - base] = temp_score;
-            }
-        }
-    }
+    //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));
+    qsort(&stack->boards[base], stack->count - base, sizeof(BoardState), compare_boards);
 }

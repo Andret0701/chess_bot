@@ -19,6 +19,8 @@ typedef struct
 
     bool white_check;
     bool black_check;
+
+    uint16_t mvvlva_score; // for sorting moves
 } BoardState;
 
 BoardState board_to_board_state(Board *board);

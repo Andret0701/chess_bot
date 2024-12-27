@@ -20,6 +20,26 @@ BoardScore get_worst_score(Color color)
     return score;
 }
 
+bool is_better_result(Result a, Result b, Color color)
+{
+    const Result white_scores[] = {WHITE_WON, UNKNOWN, DRAW, BLACK_WON};
+    const Result black_scores[] = {BLACK_WON, UNKNOWN, DRAW, WHITE_WON};
+    Result *scores = (color == WHITE) ? white_scores : black_scores;
+
+    uint8_t a_index = 0;
+    uint8_t b_index = 0;
+
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (a == scores[i])
+            a_index = i;
+        if (b == scores[i])
+            b_index = i;
+    }
+
+    return a_index < b_index;
+}
+
 bool is_better_score(BoardScore a, BoardScore b, Color color)
 {
     if (color == WHITE)
@@ -27,44 +47,14 @@ bool is_better_score(BoardScore a, BoardScore b, Color color)
         if (a.result == b.result)
             return a.score > b.score;
 
-        if (a.result == WHITE_WON)
-            return true;
-
-        if (b.result == WHITE_WON)
-            return false;
-
-        if (a.result == UNKNOWN)
-            return true;
-
-        if (b.result == UNKNOWN)
-            return false;
-
-        if (a.result == DRAW)
-            return true;
-
-        return false;
+        return is_better_result(a.result, b.result, color);
     }
     else
     {
         if (a.result == b.result)
             return a.score < b.score;
 
-        if (a.result == BLACK_WON)
-            return true;
-
-        if (b.result == BLACK_WON)
-            return false;
-
-        if (a.result == UNKNOWN)
-            return true;
-
-        if (b.result == UNKNOWN)
-            return false;
-
-        if (a.result == DRAW)
-            return true;
-
-        return false;
+        return is_better_result(a.result, b.result, color);
     }
 }
 

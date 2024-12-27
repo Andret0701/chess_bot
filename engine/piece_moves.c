@@ -22,6 +22,7 @@ void init_board(BoardState *board_state)
     board_state->white_check = board_state->black_attack & board_state->board.white_pieces.king;
     board_state->black_check = board_state->white_attack & board_state->board.black_pieces.king;
 }
+
 void validate_white_move(BoardStack *stack)
 {
     if (!stack->boards[stack->count].white_check)
