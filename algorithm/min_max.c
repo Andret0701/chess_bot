@@ -26,6 +26,10 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     Result result = get_result(board_state, is_finished);
     is_finished |= result != UNKNOWN;
 
+    // if in check - extend search
+    if (depth == max_depth && (board_state->white_check || board_state->black_check))
+        max_depth++;
+
     if (depth == max_depth || is_finished)
     {
         stack->count = base;
