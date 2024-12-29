@@ -20,7 +20,7 @@ BoardScore get_worst_score(Color color)
     return score;
 }
 
-bool is_better_result(Result a, Result b, Color color)
+bool is_better_result(Result a, Result b, Color color, Color bot_color)
 {
     const Result white_scores[] = {WHITE_WON, UNKNOWN, DRAW, BLACK_WON};
     const Result black_scores[] = {BLACK_WON, UNKNOWN, DRAW, WHITE_WON};
@@ -37,38 +37,55 @@ bool is_better_result(Result a, Result b, Color color)
             b_index = i;
     }
 
+    if (color == bot_color)
+    {
+        // If color is the bot's color, UNKNOWN is better than DRAW
+        if (a == UNKNOWN && b == DRAW)
+            return true;
+        if (a == DRAW && b == UNKNOWN)
+            return false;
+    }
+    else
+    {
+        // If color is not the bot's color, DRAW is better than UNKNOWN
+        if (a == UNKNOWN && b == DRAW)
+            return false;
+        if (a == DRAW && b == UNKNOWN)
+            return true;
+    }
+
     return a_index < b_index;
 }
 
-bool is_better_score(BoardScore a, BoardScore b, Color color)
+bool is_better_score(BoardScore a, BoardScore b, Color color, Color bot_color)
 {
     if (color == WHITE)
     {
         if (a.result == b.result)
             return a.score > b.score;
 
-        return is_better_result(a.result, b.result, color);
+        return is_better_result(a.result, b.result, color, bot_color);
     }
     else
     {
         if (a.result == b.result)
             return a.score < b.score;
 
-        return is_better_result(a.result, b.result, color);
+        return is_better_result(a.result, b.result, color, bot_color);
     }
 }
 
-bool is_better_equal(BoardScore a, BoardScore b, Color color)
+bool is_better_equal(BoardScore a, BoardScore b, Color color, Color bot_color)
 {
     if (a.result == b.result && a.score == b.score)
         return true;
 
-    return is_better_score(a, b, color);
+    return is_better_score(a, b, color, bot_color);
 }
 
-BoardScore max_score(BoardScore a, BoardScore b, Color color)
+BoardScore max_score(BoardScore a, BoardScore b, Color color, Color bot_color)
 {
-    if (is_better_score(a, b, color))
+    if (is_better_score(a, b, color, bot_color))
         return a;
     return b;
 }

@@ -58,7 +58,7 @@ BotResult run_bot(char *fen, double seconds)
         for (uint16_t i = 0; i < stack->count; i++)
         {
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds);
+            SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds, board.side_to_move);
             if (!search_result.valid)
             {
 
@@ -74,14 +74,14 @@ BotResult run_bot(char *fen, double seconds)
             BoardScore score = search_result.board_score;
             scores[i] = score;
 
-            if (is_better_score(score, best_score, board.side_to_move))
+            if (is_better_score(score, best_score, board.side_to_move, board.side_to_move))
             {
                 best_index = i;
                 best_score = score;
                 if (board.side_to_move == WHITE)
-                    alpha = max_score(alpha, score, board.side_to_move);
+                    alpha = max_score(alpha, score, board.side_to_move, board.side_to_move);
                 else
-                    beta = max_score(beta, score, board.side_to_move);
+                    beta = max_score(beta, score, board.side_to_move, board.side_to_move);
             }
         }
 
@@ -116,7 +116,7 @@ BotResult run_bot(char *fen, double seconds)
         {
             for (uint16_t j = i + 1; j < stack->count; j++)
             {
-                if (is_better_score(scores[j], scores[i], board.side_to_move))
+                if (is_better_score(scores[j], scores[i], board.side_to_move, board.side_to_move))
                 {
                     BoardState temp = stack->boards[i];
                     stack->boards[i] = stack->boards[j];
