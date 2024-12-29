@@ -15,7 +15,8 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     {
         BoardScore score = score_board(board_state, depth, false);
         pop_game_history();
-        return (SearchResult){(BoardScore){score.score, DRAW, score.depth}, true};
+        score.result = DRAW;
+        return (SearchResult){score, true};
     }
 
     uint16_t base = stack->count;

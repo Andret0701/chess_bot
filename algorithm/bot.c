@@ -1,13 +1,38 @@
 #include "bot.h"
+#include <stdio.h>
 #include "../board.h"
 #include "../engine/board_stack.h"
 #include "../fen.h"
 #include "min_max.h"
 #include "../engine/piece_moves.h"
 #include "../move.h"
-#include "game_history.h"
 
 #define BOARD_STACK_SIZE 65535
+
+void print_out_search_info(BoardStack *stack, Board *board, BoardScore *scores, uint16_t best_index, uint8_t depth, uint16_t cancelled_index)
+{
+    FILE *file = fopen("search_info.txt", "a");
+    if (file == NULL)
+    {
+        perror("Failed to open file");
+        return;
+    }
+
+    fprintf(file, "It is %s's turn\n", board->side_to_move == WHITE ? "White" : "Black");
+    fprintf(file, "The best move is %s with a score of %d\n", board_to_move(board, &stack->boards[best_index].board), scores[best_index].score);
+    fprintf(file, "Depth %d\n", depth);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        if (i == cancelled_index)
+            fprintf(file, "---\n");
+        fprintf(file, "%s %d %s\n", board_to_move(board, &stack->boards[i].board), scores[i].score, scores[i].result == WHITE_WON ? "White won" : scores[i].result == BLACK_WON ? "Black won"
+                                                                                                                                              : scores[i].result == DRAW        ? "Draw"
+                                                                                                                                                                                : "Unknown");
+    }
+    fprintf(file, "\n");
+
+    fclose(file);
+}
 
 BotResult run_bot(char *fen, double seconds)
 {
@@ -32,15 +57,17 @@ BotResult run_bot(char *fen, double seconds)
         BoardScore best_score = get_worst_score(board.side_to_move);
         for (uint16_t i = 0; i < stack->count; i++)
         {
-            push_game_history(stack->boards[i].board);
-
             BoardState *current_board_state = &stack->boards[i];
             SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds);
             if (!search_result.valid)
             {
+
+                print_out_search_info(stack, &board, scores, best_index, depth, i);
+
+                if (i == 0)
+                    depth--;
                 BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
                 destroy_board_stack(stack);
-                pop_game_history();
                 return result;
             }
 
@@ -56,12 +83,12 @@ BotResult run_bot(char *fen, double seconds)
                 else
                     beta = max_score(beta, score, board.side_to_move);
             }
-
-            pop_game_history();
         }
 
         if (has_won(best_score.result, board.side_to_move))
         {
+            print_out_search_info(stack, &board, scores, best_index, depth, -1);
+
             BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
             destroy_board_stack(stack);
             return result;
@@ -76,8 +103,11 @@ BotResult run_bot(char *fen, double seconds)
 
         if (games_remaining <= 1)
         {
+            print_out_search_info(stack, &board, scores, best_index, depth, -1);
+
             BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
             destroy_board_stack(stack);
+
             return result;
         }
 

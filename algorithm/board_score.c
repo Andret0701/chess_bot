@@ -60,50 +60,10 @@ bool is_better_score(BoardScore a, BoardScore b, Color color)
 
 bool is_better_equal(BoardScore a, BoardScore b, Color color)
 {
-    if (color == WHITE)
-    {
-        if (a.result == b.result)
-            return a.score >= b.score;
+    if (a.result == b.result && a.score == b.score)
+        return true;
 
-        if (a.result == WHITE_WON)
-            return true;
-
-        if (b.result == WHITE_WON)
-            return false;
-
-        if (a.result == UNKNOWN)
-            return true;
-
-        if (b.result == UNKNOWN)
-            return false;
-
-        if (a.result == DRAW)
-            return true;
-
-        return false;
-    }
-    else
-    {
-        if (a.result == b.result)
-            return a.score <= b.score;
-
-        if (a.result == BLACK_WON)
-            return true;
-
-        if (b.result == BLACK_WON)
-            return false;
-
-        if (a.result == UNKNOWN)
-            return true;
-
-        if (b.result == UNKNOWN)
-            return false;
-
-        if (a.result == DRAW)
-            return true;
-
-        return false;
-    }
+    return is_better_score(a, b, color);
 }
 
 BoardScore max_score(BoardScore a, BoardScore b, Color color)

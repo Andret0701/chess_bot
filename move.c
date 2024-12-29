@@ -4,90 +4,102 @@
 #include "engine/board_stack.h"
 #include "engine/piece_moves.h"
 
-char *board_to_move(Board* from, Board* to)
+char *board_to_move(Board *from, Board *to)
 {
     static char move[6];
-    move[5] = '\0'; // Ensure the string is null-terminated.
+    move[5] = '\0'; // Ensure null termination
 
-    // Handle castling (simplified for clarity)
-    if (from->white_pieces.king == (1ULL << 4) && to->white_pieces.king == (1ULL << 6)) // White king-side castling
+    // Handle castling first - it's a special case where the king moves two squares
+    if (from->white_pieces.king == (1ULL << 4))
     {
-        strcpy(move, "e1g1\0");
+        if (to->white_pieces.king == (1ULL << 6))
+        {
+            return strcpy(move, "e1g1"); // White kingside
+        }
+        if (to->white_pieces.king == (1ULL << 2))
+        {
+            return strcpy(move, "e1c1"); // White queenside
+        }
+    }
+    if (from->black_pieces.king == (1ULL << 60))
+    {
+        if (to->black_pieces.king == (1ULL << 62))
+        {
+            return strcpy(move, "e8g8"); // Black kingside
+        }
+        if (to->black_pieces.king == (1ULL << 58))
+        {
+            return strcpy(move, "e8c8"); // Black queenside
+        }
+    }
+
+    // Get all piece positions for each side
+    uint64_t from_white = pieces_to_bitmap(&from->white_pieces);
+    uint64_t from_black = pieces_to_bitmap(&from->black_pieces);
+    uint64_t to_white = pieces_to_bitmap(&to->white_pieces);
+    uint64_t to_black = pieces_to_bitmap(&to->black_pieces);
+
+    // Determine which side moved and get their piece bitmaps
+    bool is_white_move = (from->side_to_move == WHITE);
+    uint64_t moving_side_from = is_white_move ? from_white : from_black;
+    uint64_t moving_side_to = is_white_move ? to_white : to_black;
+
+    // Find source square (must be in 'from' position but not in 'to' position)
+    uint64_t source_squares = moving_side_from & ~moving_side_to;
+
+    // Find destination square (must be in 'to' position but not in 'from' position)
+    uint64_t dest_squares = moving_side_to & ~moving_side_from;
+
+    // Validate we found exactly one source and one destination
+    if (popcountll(source_squares) != 1 || popcountll(dest_squares) != 1)
+    {
+        // Something went wrong - shouldn't happen with valid moves
+        move[0] = '\0';
         return move;
     }
-    if (from->white_pieces.king == (1ULL << 4) && to->white_pieces.king == (1ULL << 2)) // White queen-side castling
+
+    // Get the square indices
+    int source_idx = ctzll(source_squares);
+    int dest_idx = ctzll(dest_squares);
+
+    // Convert to algebraic notation
+    move[0] = 'a' + (source_idx % 8);
+    move[1] = '1' + (source_idx / 8);
+    move[2] = 'a' + (dest_idx % 8);
+    move[3] = '1' + (dest_idx / 8);
+    move[4] = '\0';
+
+    // Check for pawn promotion
+    if (is_white_move && (source_squares & from->white_pieces.pawns))
     {
-        strcpy(move, "e1c1\0");
-        return move;
+        // White pawn reaching 8th rank
+        if (dest_idx >= 56 && dest_idx <= 63)
+        {
+            if (to->white_pieces.queens & (1ULL << dest_idx))
+                move[4] = 'q';
+            else if (to->white_pieces.rooks & (1ULL << dest_idx))
+                move[4] = 'r';
+            else if (to->white_pieces.bishops & (1ULL << dest_idx))
+                move[4] = 'b';
+            else if (to->white_pieces.knights & (1ULL << dest_idx))
+                move[4] = 'n';
+        }
     }
-    if (from->black_pieces.king == (1ULL << 60) && to->black_pieces.king == (1ULL << 62)) // Black king-side castling
+    else if (!is_white_move && (source_squares & from->black_pieces.pawns))
     {
-        strcpy(move, "e8g8\0");
-        return move;
+        // Black pawn reaching 1st rank
+        if (dest_idx >= 0 && dest_idx <= 7)
+        {
+            if (to->black_pieces.queens & (1ULL << dest_idx))
+                move[4] = 'q';
+            else if (to->black_pieces.rooks & (1ULL << dest_idx))
+                move[4] = 'r';
+            else if (to->black_pieces.bishops & (1ULL << dest_idx))
+                move[4] = 'b';
+            else if (to->black_pieces.knights & (1ULL << dest_idx))
+                move[4] = 'n';
+        }
     }
-    if (from->black_pieces.king == (1ULL << 60) && to->black_pieces.king == (1ULL << 58)) // Black queen-side castling
-    {
-        strcpy(move, "e8c8\0");
-        return move;
-    }
-
-    uint64_t from_white_pieces = from->white_pieces.pawns | from->white_pieces.knights | from->white_pieces.bishops | from->white_pieces.rooks | from->white_pieces.queens | from->white_pieces.king;
-    uint64_t from_black_pieces = from->black_pieces.pawns | from->black_pieces.knights | from->black_pieces.bishops | from->black_pieces.rooks | from->black_pieces.queens | from->black_pieces.king;
-
-    uint64_t from_occupied = from_white_pieces | from_black_pieces;
-
-    uint64_t to_white_pieces = to->white_pieces.pawns | to->white_pieces.knights | to->white_pieces.bishops | to->white_pieces.rooks | to->white_pieces.queens | to->white_pieces.king;
-    uint64_t to_black_pieces = to->black_pieces.pawns | to->black_pieces.knights | to->black_pieces.bishops | to->black_pieces.rooks | to->black_pieces.queens | to->black_pieces.king;
-
-    uint64_t to_occupied = to_white_pieces | to_black_pieces;
-
-
-    uint64_t moved_piece = from_occupied ^ to_occupied;
-    uint64_t source_square = from_occupied & ~to_occupied;
-
-    bool is_white_move = (moved_piece & from_white_pieces) != 0;
-    uint64_t destination_square = is_white_move ? to_white_pieces & ~from_white_pieces : to_black_pieces & ~from_black_pieces;
-    char promotion = '\0';
-
-    // Calculate source and destination squares
-    int source_square_index = ctzll(source_square);
-    int destination_square_index = ctzll(destination_square);
-
-    // Determine if a pawn promotion occurred
-    if ((source_square & from->white_pieces.pawns) && (destination_square_index >= 56 && destination_square_index <= 63))
-    {
-        if (to->white_pieces.queens & (1ULL << destination_square_index))
-            promotion = 'q';
-        else if (to->white_pieces.rooks & (1ULL << destination_square_index))
-            promotion = 'r';
-        else if (to->white_pieces.bishops & (1ULL << destination_square_index))
-            promotion = 'b';
-        else if (to->white_pieces.knights & (1ULL << destination_square_index))
-            promotion = 'n';
-    }
-    else if ((source_square & from->black_pieces.pawns) && (destination_square_index >= 0 && destination_square_index <= 7))
-    {
-        if (to->black_pieces.queens & (1ULL << destination_square_index))
-            promotion = 'q';
-        else if (to->black_pieces.rooks & (1ULL << destination_square_index))
-            promotion = 'r';
-        else if (to->black_pieces.bishops & (1ULL << destination_square_index))
-            promotion = 'b';
-        else if (to->black_pieces.knights & (1ULL << destination_square_index))
-            promotion = 'n';
-    }
-
-    // Convert indices to board notation (e.g., 0 -> 'a1', 63 -> 'h8')
-    move[0] = 'a' + (source_square_index % 8);
-    move[1] = '1' + (source_square_index / 8);
-    move[2] = 'a' + (destination_square_index % 8);
-    move[3] = '1' + (destination_square_index / 8);
-
-    // Add promotion piece if needed.
-    if (promotion != '\0')
-        move[4] = promotion;
-    else
-        move[4] = '\0';
 
     return move;
 }
@@ -118,17 +130,16 @@ bool move_valid(char *move)
     return true;
 }
 
-bool can_move(Board* board, char* move)
+bool can_move(Board *board, char *move)
 {
     if (!move_valid(move))
         return false;
 
     Board new_board = apply_move(board, move);
-    return !board_equals(board, &new_board);    
-
+    return !board_equals(board, &new_board);
 }
 
-Board apply_move(Board* board, char *move)
+Board apply_move(Board *board, char *move)
 {
     // Calculate the 'from' and 'to' positions from the move string
     int from = (move[0] - 'a') + (move[1] - '1') * 8;

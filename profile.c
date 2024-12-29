@@ -41,9 +41,6 @@ void play_game(double think_time)
         // else
         //     printf("Unknown\n");
 
-        if (result.score.result != UNKNOWN)
-            break;
-
         board = apply_move(&board, result.move);
         push_game_history(board);
         board_state = board_to_board_state(&board);

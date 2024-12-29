@@ -20,6 +20,17 @@ void pop_game_history()
     game_history_index--;
 }
 
+void print_game_history()
+{
+    printf("Game history:\n");
+    for (int i = 0; i < game_history_index; i++)
+    {
+        print_board(&game_history[i]);
+        printf("\n");
+    }
+    printf("---\n");
+}
+
 bool threefold_repetition()
 {
     if (game_history_index < 6) // Fewer than 4 positions mean no threefold repetition
@@ -28,8 +39,8 @@ bool threefold_repetition()
     Board *current = &game_history[game_history_index - 1];
     int repetitions = 1;
 
-    // Iterate only through earlier positions
-    for (int i = game_history_index - 3; i >= 0; i -= 2)
+    // Iterate through all earlier positions
+    for (int i = game_history_index - 2; i >= 0; i--)
     {
         if (board_equals(current, &game_history[i]))
         {
