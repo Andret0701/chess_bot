@@ -1,5 +1,47 @@
 #include "attack_generation.h"
 
+uint64_t generate_white_attacks(BoardState *board_state)
+{
+    uint64_t attacks = generate_white_pawn_attacks(board_state->board.white_pieces.pawns);
+    attacks |= generate_knight_attacks(board_state->board.white_pieces.knights);
+    attacks |= generate_king_attacks(board_state->board.white_pieces.king);
+    uint64_t white_sliding_pieces = board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens;
+    for (uint8_t i = 0; i < 64; i++)
+    {
+        uint64_t position = 1ULL << i;
+        if (white_sliding_pieces & position)
+        {
+            if (board_state->board.white_pieces.bishops & position)
+                attacks |= generate_bishop_attacks(board_state->occupied, i);
+            else if (board_state->board.white_pieces.rooks & position)
+                attacks |= generate_rook_attacks(board_state->occupied, i);
+            else
+                attacks |= generate_queen_attacks(board_state->occupied, i);
+        }
+    }
+}
+
+uint64_t generate_black_attacks(BoardState *board_state)
+{
+    uint64_t attacks = generate_black_pawn_attacks(board_state->board.black_pieces.pawns);
+    attacks |= generate_knight_attacks(board_state->board.black_pieces.knights);
+    attacks |= generate_king_attacks(board_state->board.black_pieces.king);
+    uint64_t black_sliding_pieces = board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens;
+    for (uint8_t i = 0; i < 64; i++)
+    {
+        uint64_t position = 1ULL << i;
+        if (black_sliding_pieces & position)
+        {
+            if (board_state->board.black_pieces.bishops & position)
+                attacks |= generate_bishop_attacks(board_state->occupied, i);
+            else if (board_state->board.black_pieces.rooks & position)
+                attacks |= generate_rook_attacks(board_state->occupied, i);
+            else
+                attacks |= generate_queen_attacks(board_state->occupied, i);
+        }
+    }
+}
+
 void generate_attacks(BoardState *board_state)
 {
     //        Each sample counts as 0.01 seconds.

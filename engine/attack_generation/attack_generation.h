@@ -12,3 +12,6 @@ uint64_t generate_queen_attacks(uint64_t occupied, uint8_t i);
 uint64_t generate_king_attacks(uint64_t kings);
 
 void generate_attacks(BoardState *board_state);
+
+uint64_t generate_white_attacks(BoardState *board_state);
+uint64_t generate_black_attacks(BoardState *board_state);

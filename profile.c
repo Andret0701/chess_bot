@@ -19,9 +19,17 @@ void play_game(double think_time)
     while (true)
     {
         // print_board(&board_state.board);
+        clock_t start = clock();
         BotResult result = run_bot(board_to_fen(&board_state.board), think_time);
+        clock_t end = clock();
+        double time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+        if (time_used > think_time)
+        {
+            printf("Used to long to think: %f\n", think_time);
+            printf("That was %f seconds to much.\n", time_used - think_time);
+        }
 
-        // printf("Move: %s\n", result.move);
+        printf("Move: %s\n", result.move);
         // printf("Score: %d\n", result.score.score);
         // printf("Depth: %d\n", result.score.depth);
         // if (result.score.result == WHITE_WON)
@@ -57,4 +65,6 @@ void play_game(double think_time)
 
         // printf("\n");
     }
+
+    print_board(&board);
 }

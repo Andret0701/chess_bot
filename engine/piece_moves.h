@@ -4,6 +4,7 @@
 #include "../board.h"
 #include "board_stack.h"
 #include "../utils.h"
+#include "attack_generation/attack_generation.h"
 
 void init_board(BoardState *board_state);
 void validate_white_move(BoardStack *stack);
