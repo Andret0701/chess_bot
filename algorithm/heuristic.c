@@ -198,5 +198,35 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     score += evaluate_piece_position(board_state->board.white_pieces.king, king_table, true);
     score -= evaluate_piece_position(board_state->board.black_pieces.king, king_table, false);
 
+    // Score for where different pieces can attack to
+    score += __builtin_popcountll(board_state->white_attacks.pawns) * 2;
+    score -= __builtin_popcountll(board_state->black_attacks.pawns) * 2;
+    score += __builtin_popcountll(board_state->white_attacks.knights) * 4;
+    score -= __builtin_popcountll(board_state->black_attacks.knights) * 4;
+    score += __builtin_popcountll(board_state->white_attacks.bishops) * 4;
+    score -= __builtin_popcountll(board_state->black_attacks.bishops) * 4;
+    score += __builtin_popcountll(board_state->white_attacks.rooks) * 6;
+    score -= __builtin_popcountll(board_state->black_attacks.rooks) * 6;
+    score += __builtin_popcountll(board_state->white_attacks.queens) * 10;
+    score -= __builtin_popcountll(board_state->black_attacks.queens) * 10;
+
+    // At the top with other constants:
+    static const uint64_t CENTER_SQUARES = 0x0000001818000000ULL;  // e4,d4,e5,d5
+    static const uint64_t EXTENDED_CENTER = 0x00003C3C3C3C0000ULL; // c3-f3 to c6-f6
+
+    // In score_board():
+    score += __builtin_popcountll(board_state->white_pieces & CENTER_SQUARES) * 20;
+    score -= __builtin_popcountll(board_state->black_pieces & CENTER_SQUARES) * 20;
+    score += __builtin_popcountll(board_state->white_pieces & EXTENDED_CENTER) * 10;
+    score -= __builtin_popcountll(board_state->black_pieces & EXTENDED_CENTER) * 10;
+
+    // Add this near the pawn evaluation:
+    uint64_t white_pawn_attacks = board_state->white_attacks.pawns;
+    uint64_t black_pawn_attacks = board_state->black_attacks.pawns;
+
+    // Bonus for pawns protected by other pawns
+    score += __builtin_popcountll(board_state->board.white_pieces.pawns & white_pawn_attacks) * 15;
+    score -= __builtin_popcountll(board_state->board.black_pieces.pawns & black_pawn_attacks) * 15;
+
     return (BoardScore){score, result, depth};
 }
