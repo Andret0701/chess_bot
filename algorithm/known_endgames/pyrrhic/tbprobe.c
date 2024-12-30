@@ -293,6 +293,7 @@ enum
   RANK_ENC
 };
 
+// Attack and move generation code
 /*
  * (c) 2015 basil, all rights reserved,
  * Modifications Copyright (c) 2016-2019 by Jon Dart
@@ -2277,24 +2278,6 @@ static int probe_wdl_table(const PyrrhicPosition *pos, int *success)
 static int probe_dtz_table(const PyrrhicPosition *pos, int wdl, int *success)
 {
   return probe_table(pos, wdl, success, DTZ);
-}
-
-unsigned get_wdl(
-    uint64_t white, uint64_t black,
-    uint64_t kings, uint64_t queens,
-    uint64_t rooks, uint64_t bishops,
-    uint64_t knights, uint64_t pawns,
-    unsigned ep, bool turn)
-{
-
-  PyrrhicPosition pos = {
-      white, black, kings,
-      queens, rooks, bishops,
-      knights, pawns, 0,
-      (uint8_t)ep, turn};
-
-  int success = 0;
-  return probe_wdl_table(&pos, &success);
 }
 
 // probe_ab() is not called for positions with en passant captures.

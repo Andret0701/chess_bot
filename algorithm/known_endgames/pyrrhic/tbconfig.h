@@ -38,6 +38,8 @@
  * to define White as 0 and Black as 1.
  */
 
+#include "../../../engine/attack_generation/attack_generation.h"
+
 int popcount(uint64_t x)
 {
     return __builtin_popcountll(x);
