@@ -57,7 +57,7 @@ bool is_better_result(Result a, Result b, Color color, Color bot_color)
     return a_index < b_index;
 }
 
-bool is_better_score(BoardScore a, BoardScore b, Color color, Color bot_color)
+bool is_better_score(BoardScore a, BoardScore b, Color color, Color bot_color) // this should use depth. draw should be desired if loosing
 {
     if (color == WHITE)
     {
@@ -77,7 +77,7 @@ bool is_better_score(BoardScore a, BoardScore b, Color color, Color bot_color)
 
 bool is_better_equal(BoardScore a, BoardScore b, Color color, Color bot_color)
 {
-    if (a.result == b.result && a.score == b.score)
+    if (a.result == b.result && a.score == b.score && a.depth == b.depth)
         return true;
 
     return is_better_score(a, b, color, bot_color);
