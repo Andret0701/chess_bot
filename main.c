@@ -15,6 +15,7 @@
 #include "algorithm/game_history.h"
 #include "move.h"
 #include "profile.h"
+#include "algorithm/known_endgames/endgames.h"
 
 Board current_board;
 void new_game()
@@ -26,6 +27,15 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
+    // init_endgames();
+
+    // // 8/8/1r6/8/8/2k5/8/K7 w - - 0 1, -2
+    // Board empty_board = fen_to_board("8/8/1r6/8/8/2k5/8/K7 w - - 0 1");
+    // BoardState empty_board_state = board_to_board_state(&empty_board);
+    // BoardScore endscore = score_endgame(&empty_board_state);
+
+    // free_endgames();
+
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
         play_game(1.0);
