@@ -228,5 +228,48 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     score += __builtin_popcountll(board_state->board.white_pieces.pawns & white_pawn_attacks) * 15;
     score -= __builtin_popcountll(board_state->board.black_pieces.pawns & black_pawn_attacks) * 15;
 
+    // Bonus for protected pieces
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.queens) * 10;
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.rooks) * 5;
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.bishops) * 5;
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.knights) * 5;
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.pawns) * 2;
+
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.queens) * 10;
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.rooks) * 5;
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.bishops) * 5;
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.knights) * 5;
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.pawns) * 2;
+
+    // Bonus for attacking the king
+    score += __builtin_popcountll(board_state->white_attack & board_state->board.black_pieces.king) * 20;
+    score -= __builtin_popcountll(board_state->black_attack & board_state->board.white_pieces.king) * 20;
+
+    // Bonus for castling
+    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE)
+        score += 10;
+    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE)
+        score += 10;
+    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE)
+        score -= 10;
+    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE)
+        score -= 10;
+
+    // Bonus for having the move
+    if (board_state->board.side_to_move == WHITE)
+        score += 5;
+    else
+        score -= 5;
+
+    // Bonus for number of spaces attacked
+    score += __builtin_popcountll(board_state->white_attack) * 2;
+    score -= __builtin_popcountll(board_state->black_attack) * 2;
+
+    // Bonus for bishop pair
+    if (__builtin_popcountll(board_state->board.white_pieces.bishops) >= 2)
+        score += 20;
+    if (__builtin_popcountll(board_state->board.black_pieces.bishops) >= 2)
+        score -= 20;
+
     return (BoardScore){score, result, depth};
 }
