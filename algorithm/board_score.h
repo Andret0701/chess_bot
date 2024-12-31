@@ -22,8 +22,8 @@ bool has_won(Result result, Color color);
 bool has_lost(Result result, Color color);
 BoardScore get_worst_score(Color color);
 
-bool is_better_score(BoardScore a, BoardScore b, Color color, Color bot_color);
-bool is_better_equal(BoardScore a, BoardScore b, Color color, Color bot_color);
-BoardScore max_score(BoardScore a, BoardScore b, Color color, Color bot_color);
+bool is_better_score(BoardScore a, BoardScore b, Color color);
+bool is_better_equal(BoardScore a, BoardScore b, Color color);
+BoardScore max_score(BoardScore a, BoardScore b, Color color);
 
 void print_score(BoardScore score);

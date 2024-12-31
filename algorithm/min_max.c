@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "move_sort.h"
 
-SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds, Color bot_color)
+SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
     if (has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
@@ -35,7 +35,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         stack->count = base;
         if (!is_finished)
         {
-            SearchResult q_result = quiesce(board_state, stack, alpha, beta, depth, start, seconds, bot_color);
+            SearchResult q_result = quiesce(board_state, stack, alpha, beta, depth, start, seconds);
             if (!q_result.valid)
             {
                 pop_game_history();
@@ -55,7 +55,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
-        SearchResult search_result = min_max(next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds, bot_color);
+        SearchResult search_result = min_max(next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds);
         if (!search_result.valid)
         {
             stack->count = base;
@@ -71,13 +71,13 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
             return (SearchResult){score, true};
         }
 
-        best_score = max_score(best_score, score, board_state->board.side_to_move, bot_color);
+        best_score = max_score(best_score, score, board_state->board.side_to_move);
         if (board_state->board.side_to_move == WHITE)
-            alpha = max_score(alpha, score, WHITE, bot_color);
+            alpha = max_score(alpha, score, WHITE);
         else
-            beta = max_score(beta, score, BLACK, bot_color);
+            beta = max_score(beta, score, BLACK);
 
-        if (is_better_equal(alpha, beta, WHITE, bot_color)) // alpha >= beta
+        if (is_better_equal(alpha, beta, WHITE)) // alpha >= beta
         {
             stack->count = base;
             pop_game_history();
