@@ -42,7 +42,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
                 return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
             }
             pop_game_history();
-            return (SearchResult){(BoardScore){result, q_result.board_score.result, depth}, true};
+            return (SearchResult){(BoardScore){q_result.board_score.score, result, depth}, true};
         }
         BoardScore score = score_board(board_state, depth, is_finished);
         pop_game_history();
