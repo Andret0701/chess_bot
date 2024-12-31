@@ -23,7 +23,7 @@ BoardScore get_worst_score(Color color)
 
 bool is_better_score(BoardScore a, BoardScore b, Color color)
 {
-    bool has_better_score = color == WHITE ? a.score >= b.score : a.score <= b.score;
+    bool has_better_score = color == WHITE ? a.score > b.score : a.score < b.score;
     Result win_result = color == WHITE ? WHITE_WON : BLACK_WON;
     Result lost_result = color == WHITE ? BLACK_WON : WHITE_WON;
 
