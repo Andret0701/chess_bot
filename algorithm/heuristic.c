@@ -261,10 +261,6 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     else
         score -= 5;
 
-    // Bonus for number of spaces attacked
-    score += __builtin_popcountll(board_state->white_attack) * 2;
-    score -= __builtin_popcountll(board_state->black_attack) * 2;
-
     // Bonus for bishop pair
     if (__builtin_popcountll(board_state->board.white_pieces.bishops) >= 2)
         score += 20;
