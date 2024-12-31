@@ -40,7 +40,13 @@ BoardScore score_endgame(BoardState *board_state)
     unsigned ep = board_state->board.en_passant;
     unsigned ep_square = (ep != 0) ? __builtin_ctz(ep) : 0;
 
-    uint32_t result = get_wdl(
+    // unsigned tb_probe_wdl(
+    //     uint64_t white, uint64_t black,
+    //     uint64_t kings, uint64_t queens,
+    //     uint64_t rooks, uint64_t bishops,
+    //     uint64_t knights, uint64_t pawns,
+    //     unsigned ep, bool turn)
+    uint32_t result = tb_probe_wdl(
         board_state->white_pieces, board_state->black_pieces,
         board_state->board.white_pieces.king | board_state->board.black_pieces.king,
         board_state->board.white_pieces.queens | board_state->board.black_pieces.queens,
@@ -48,7 +54,7 @@ BoardScore score_endgame(BoardState *board_state)
         board_state->board.white_pieces.bishops | board_state->board.black_pieces.bishops,
         board_state->board.white_pieces.knights | board_state->board.black_pieces.knights,
         board_state->board.white_pieces.pawns | board_state->board.black_pieces.pawns,
-        ep_square, 0);
+        ep_square, board_state->board.side_to_move == WHITE);
 
     if (result == TB_RESULT_FAILED)
     {

@@ -59,32 +59,38 @@ int poplsb(uint64_t *x)
 
 uint64_t pawnAttacks(int c, int sq)
 {
-    return 0;
+    uint64_t position = 1ULL << sq;
+    if (c == WHITE)
+        return generate_white_pawn_attacks(position);
+    else
+        return generate_black_pawn_attacks(position);
 }
 
 uint64_t knightAttacks(int sq)
 {
-    return 0;
+    uint64_t position = 1ULL << sq;
+    return generate_knight_attacks(position);
 }
 
 uint64_t bishopAttacks(int sq, uint64_t occ)
 {
-    return 0;
+    return generate_bishop_attacks(occ, sq);
 }
 
 uint64_t rookAttacks(int sq, uint64_t occ)
 {
-    return 0;
+    return generate_rook_attacks(occ, sq);
 }
 
 uint64_t queenAttacks(int sq, uint64_t occ)
 {
-    return 0;
+    return generate_queen_attacks(occ, sq);
 }
 
 uint64_t kingAttacks(int sq)
 {
-    return 0;
+    uint64_t position = 1ULL << sq;
+    return generate_king_attacks(position);
 }
 
 #define PYRRHIC_POPCOUNT(x) (popcount(x))
