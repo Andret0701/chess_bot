@@ -19,21 +19,16 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         return (SearchResult){score, true};
     }
 
-    uint16_t base = stack->count;
-    generate_moves(board_state, stack);
-    bool is_finished = stack->count == base;
-
-    Result result = get_result(board_state, is_finished);
-    is_finished |= result != UNKNOWN;
-
     // if in check - extend search
     if (depth == max_depth && (board_state->white_check || board_state->black_check))
         max_depth++;
 
-    if (depth == max_depth || is_finished)
+    if (depth == max_depth)
     {
-        stack->count = base;
-        if (!is_finished)
+        bool finished = is_finished(board_state);
+        Result result = get_result(board_state, finished);
+        finished |= result != UNKNOWN;
+        if (!finished)
         {
             SearchResult q_result = quiesce(board_state, stack, alpha, beta, depth, start, seconds);
             if (!q_result.valid)
@@ -44,7 +39,21 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
             pop_game_history();
             return (SearchResult){(BoardScore){q_result.board_score.score, result, depth}, true};
         }
-        BoardScore score = score_board(board_state, depth, is_finished);
+        BoardScore score = score_board(board_state, depth, finished);
+        pop_game_history();
+        return (SearchResult){score, true};
+    }
+
+    uint16_t base = stack->count;
+    generate_moves(board_state, stack);
+
+    bool finished = base == stack->count;
+    Result result = get_result(board_state, finished);
+    finished |= result != UNKNOWN;
+    if (finished)
+    {
+        BoardScore score = score_board(board_state, depth, finished);
+        stack->count = base;
         pop_game_history();
         return (SearchResult){score, true};
     }

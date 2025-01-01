@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     {
         play_game(1.0);
         play_game(2.0);
-        play_game(3.0);
+        // play_game(3.0);
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
