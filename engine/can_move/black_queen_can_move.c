@@ -1,6 +1,6 @@
 #include "../piece_moves.h"
 
-bool generate_black_queen_can_move(BoardState *board_state, uint8_t x, uint8_t y)
+bool black_queen_can_move(BoardState *board_state, uint8_t x, uint8_t y)
 {
     // Right
     for (uint8_t i = x + 1; i < 8; i++)

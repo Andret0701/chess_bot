@@ -1,6 +1,6 @@
 #include "../piece_moves.h"
 
-bool generate_black_knight_can_move(BoardState *board_state, uint8_t x, uint8_t y)
+bool black_knight_can_move(BoardState *board_state, uint8_t x, uint8_t y)
 {
     BoardState new_board_state = {0};
     static const int knight_moves[8][2] = {

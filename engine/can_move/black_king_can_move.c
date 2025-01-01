@@ -1,6 +1,6 @@
 #include "../piece_moves.h"
 
-bool generate_black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y)
+bool black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y)
 {
     BoardState new_board_state = {0};
     for (int dy = -1; dy <= 1; dy++)

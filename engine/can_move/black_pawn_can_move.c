@@ -161,7 +161,7 @@ bool black_pawn_en_passant_can_move(BoardState *board_state, uint8_t x, uint8_t 
     return false;
 }
 
-bool generate_black_pawn_can_move(BoardState *board_state, uint8_t x, uint8_t y)
+bool black_pawn_can_move(BoardState *board_state, uint8_t x, uint8_t y)
 {
     if (y == 1)
     {
