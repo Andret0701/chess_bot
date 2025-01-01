@@ -267,5 +267,27 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     if (__builtin_popcountll(board_state->board.black_pieces.bishops) >= 2)
         score -= 20;
 
+    // Bonus for rooks on open files
+    uint64_t white_rooks = board_state->board.white_pieces.rooks;
+    uint64_t black_rooks = board_state->board.black_pieces.rooks;
+    uint64_t white_open_files = 0;
+    uint64_t black_open_files = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        uint64_t file = 0x0101010101010101ULL << i;
+        if ((white_rooks & file) == 0)
+            white_open_files |= file;
+        if ((black_rooks & file) == 0)
+            black_open_files |= file;
+    }
+    score += __builtin_popcountll(white_open_files & board_state->white_attack & board_state->board.white_pieces.rooks) * 10;
+    score -= __builtin_popcountll(black_open_files & board_state->black_attack & board_state->board.black_pieces.rooks) * 10;
+
+    // Bonus for connected rooks
+    if ((board_state->board.white_pieces.rooks & board_state->white_attacks.rooks) != 0)
+        score += 10;
+    if ((board_state->board.black_pieces.rooks & board_state->black_attacks.rooks) != 0)
+        score -= 10;
+
     return (BoardScore){score, result, depth};
 }
