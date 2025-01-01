@@ -40,7 +40,7 @@ bool threefold_repetition()
     int repetitions = 1;
 
     // Iterate through all earlier positions
-    for (int i = game_history_index - 2; i >= 0; i--)
+    for (int i = game_history_index - 3; i >= 0; i -= 2)
     {
         if (board_equals(current, &game_history[i]))
         {
