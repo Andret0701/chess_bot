@@ -7,8 +7,8 @@ UNITY_SRC = $(BUILD_DIR)/unity.c
 # Include all .c files in all directories except the build directory
 SRCS = $(shell dir /s /b *.c | findstr /v /i /c:"\\$(BUILD_DIR)\\")
 
-# profile: CFLAGS = -pg -no-pie -fno-builtin -O3 #-fno-inline -O2
-# profile: clean all
+profile: CFLAGS = -pg -no-pie -fno-builtin -O3 #-fno-inline -O2
+profile: clean all
 
 
 all: $(UNITY_SRC)

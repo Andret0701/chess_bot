@@ -19,6 +19,7 @@ uint64_t generate_white_attacks(BoardState *board_state)
                 attacks |= generate_queen_attacks(board_state->occupied, i);
         }
     }
+    return attacks;
 }
 
 uint64_t generate_black_attacks(BoardState *board_state)
@@ -40,6 +41,7 @@ uint64_t generate_black_attacks(BoardState *board_state)
                 attacks |= generate_queen_attacks(board_state->occupied, i);
         }
     }
+    return attacks;
 }
 
 void generate_attacks(BoardState *board_state)

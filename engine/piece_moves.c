@@ -161,3 +161,94 @@ void generate_captures(BoardState *board_state, BoardStack *stack)
         }
     }
 }
+
+bool is_finished(BoardState *board_state)
+{
+    if (board_state->board.side_to_move == WHITE)
+    {
+        for (uint8_t y = 0; y < 8; y++)
+        {
+            for (uint8_t x = 0; x < 8; x++)
+            {
+                uint64_t position = position_to_u64(x, y);
+                if (board_state->white_pieces & position)
+                {
+                    if (board_state->board.white_pieces.pawns & position)
+                    {
+                        if (white_pawn_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.white_pieces.knights & position)
+                    {
+                        if (white_knight_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.white_pieces.bishops & position)
+                    {
+                        if (white_bishop_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.white_pieces.rooks & position)
+                    {
+                        if (white_rook_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.white_pieces.queens & position)
+                    {
+                        if (white_queen_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else
+                    {
+                        if (white_king_can_move(board_state, x, y))
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+    else if (board_state->board.side_to_move == BLACK)
+    {
+        for (uint8_t y = 0; y < 8; y++)
+        {
+            for (uint8_t x = 0; x < 8; x++)
+            {
+                uint64_t position = position_to_u64(x, y);
+                if (board_state->black_pieces & position)
+                {
+                    if (board_state->board.black_pieces.pawns & position)
+                    {
+                        if (black_pawn_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.black_pieces.knights & position)
+                    {
+                        if (black_knight_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.black_pieces.bishops & position)
+                    {
+                        if (black_bishop_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.black_pieces.rooks & position)
+                    {
+                        if (black_rook_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else if (board_state->board.black_pieces.queens & position)
+                    {
+                        if (black_queen_can_move(board_state, x, y))
+                            return false;
+                    }
+                    else
+                    {
+                        if (black_king_can_move(board_state, x, y))
+                            return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
