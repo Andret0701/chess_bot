@@ -20,7 +20,7 @@ bool white_knight_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.white_pieces.knights &= ~position_to_u64(x, y);
                 new_board_state.board.white_pieces.knights |= position_to_u64(new_x, new_y);
 
-                uint64_t attacks = generate_black_attacks(&new_board_state);
+                uint64_t attacks = generate_black_attacks(&new_board_state.board);
                 if (!(attacks & new_board_state.board.white_pieces.king))
                     return true;
             }

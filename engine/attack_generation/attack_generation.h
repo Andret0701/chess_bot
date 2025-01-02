@@ -13,5 +13,5 @@ uint64_t generate_king_attacks(uint64_t kings);
 
 void generate_attacks(BoardState *board_state);
 
-uint64_t generate_white_attacks(BoardState *board_state);
-uint64_t generate_black_attacks(BoardState *board_state);
+uint64_t generate_white_attacks(Board *board);
+uint64_t generate_black_attacks(Board *board);

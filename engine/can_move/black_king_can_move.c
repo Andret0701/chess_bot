@@ -2,6 +2,7 @@
 
 bool black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y)
 {
+    BoardState new_board_state = {0};
     for (int dy = -1; dy <= 1; dy++)
     {
         for (int dx = -1; dx <= 1; dx++)
@@ -16,7 +17,14 @@ bool black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 if (board_state->black_pieces & position_to_u64(new_x, new_y))
                     continue;
 
-                if (!(board_state->white_attack & position_to_u64(new_x, new_y)))
+                copy_board(&board_state->board, &new_board_state.board);
+                remove_white_piece(&new_board_state, new_x, new_y);
+
+                new_board_state.board.black_pieces.king &= ~position_to_u64(x, y);
+                new_board_state.board.black_pieces.king |= position_to_u64(new_x, new_y);
+
+                uint64_t attacks = generate_white_attacks(&new_board_state.board);
+                if (!(attacks & new_board_state.board.black_pieces.king))
                     return true;
             }
         }
