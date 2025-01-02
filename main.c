@@ -16,6 +16,7 @@
 #include "move.h"
 #include "profile.h"
 #include "algorithm/known_endgames/endgames.h"
+#include "engine/tests/can_move_test.h"
 
 Board current_board;
 void new_game()
@@ -56,8 +57,10 @@ int main(int argc, char *argv[])
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
     {
-        printf("Running tests\n");
+        printf("Running count tests\n");
         run_count_tests();
+        printf("Running can move tests\n");
+        run_can_move_tests();
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "benchmark") == 0)
