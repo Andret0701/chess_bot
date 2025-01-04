@@ -29,17 +29,10 @@ void play_game(double think_time)
             printf("That was %f seconds to much.\n", time_used - think_time);
         }
 
-        printf("Move: %s\n", result.move);
-        // printf("Score: %d\n", result.score.score);
-        // printf("Depth: %d\n", result.score.depth);
-        // if (result.score.result == WHITE_WON)
-        //     printf("White won\n");
-        // else if (result.score.result == BLACK_WON)
-        //     printf("Black won\n");
-        // else if (result.score.result == DRAW)
-        //     printf("Draw\n");
-        // else
-        //     printf("Unknown\n");
+        printf("Move: %s, Score: %d, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth,
+               result.score.result == WHITE_WON ? "White won" : result.score.result == BLACK_WON ? "Black won"
+                                                            : result.score.result == DRAW        ? "Draw"
+                                                                                                 : "Unknown");
 
         board = apply_move(&board, result.move);
         push_game_history(board);

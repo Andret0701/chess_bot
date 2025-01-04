@@ -17,6 +17,7 @@
 #include "profile.h"
 #include "algorithm/known_endgames/endgames.h"
 #include "engine/tests/can_move_test.h"
+#include "algorithm/transposition_table.h"
 
 Board current_board;
 void new_game()
@@ -28,6 +29,8 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
+    init_zobrist_keys();
+
     // init_endgames();
 
     // // 8/8/1r6/8/8/2k5/8/K7 w - - 0 1, -2
@@ -52,7 +55,7 @@ int main(int argc, char *argv[])
     {
         play_game(1.0);
         play_game(2.0);
-        // play_game(3.0);
+        play_game(3.0);
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
