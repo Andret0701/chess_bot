@@ -23,39 +23,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         return (SearchResult){score, true};
     }
 
-    TT_Entry entry = check_tt_entry(&board_state->board, max_depth - depth); // Threefold repetition might be wrong because of this
-    if (entry.valid)
-    {
-        hit++;
-        if (entry.type == EXACT)
-        {
-            pop_game_history();
-            return (SearchResult){entry.score, true};
-        }
-        else
-        {
-            if (board_state->board.side_to_move == WHITE)
-                alpha = max_score(alpha, entry.score, WHITE);
-            else
-                beta = max_score(beta, entry.score, BLACK);
-
-            if (is_better_equal(alpha, beta, WHITE))
-            {
-                pop_game_history();
-                return (SearchResult){entry.score, true};
-            }
-        }
-    }
-    else
-    {
-        miss++;
-    }
-    // if ((hit + miss) % 100000 == 0)
-    // {
-    //     printf("Hit: %d, Miss: %d\n", hit, miss);
-    //     printf("Hit: %f, Miss: %f\n\n", (float)hit / (hit + miss) * 100, (float)miss / (hit + miss) * 100);
-    // }
-
     // if in check - extend search
     if (depth == max_depth && (board_state->white_check || board_state->black_check))
         max_depth++;
@@ -81,8 +48,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         else
             score = score_board(board_state, depth, finished);
 
-        update_tt_entry(&board_state->board, score, 0, EXACT);
-
         pop_game_history();
         return (SearchResult){score, true};
     }
@@ -98,7 +63,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         BoardScore score = score_board(board_state, depth, finished);
         stack->count = base;
         pop_game_history();
-        update_tt_entry(&board_state->board, score, max_depth - depth, EXACT);
         return (SearchResult){score, true};
     }
 
@@ -114,7 +78,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         {
             stack->count = base;
             pop_game_history();
-            update_tt_entry(&board_state->board, best_score, depth_remaining, NOT_EXACT);
             return (SearchResult){best_score, false};
         }
 
@@ -123,7 +86,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         {
             stack->count = base;
             pop_game_history();
-            update_tt_entry(&board_state->board, score, depth_remaining, EXACT);
             return (SearchResult){score, true};
         }
 
@@ -137,14 +99,12 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         {
             stack->count = base;
             pop_game_history();
-            update_tt_entry(&board_state->board, best_score, depth_remaining, NOT_EXACT);
             return (SearchResult){best_score, true};
         }
     }
 
     stack->count = base;
     pop_game_history();
-    update_tt_entry(&board_state->board, best_score, depth_remaining, EXACT);
     return (SearchResult){best_score, true};
 }
 
