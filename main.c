@@ -29,15 +29,13 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
-    // init_endgames();
+    init_endgames();
 
     // // 8/8/1r6/8/8/2k5/8/K7 w - - 0 1, -2
     // Board empty_board = fen_to_board("8/8/8/8/8/2k5/P7/K7 w - - 0 1");
     // BoardState empty_board_state = board_to_board_state(&empty_board);
     // BoardScore endscore = score_endgame(&empty_board_state);
-
-    // printf("%d\n", endscore.score); // Score of the position
-    // printf("%d\n", endscore.depth); // Search depth
+    // printf("Score: %d, Depth: %d, Result: ", endscore.score, endscore.depth);
     // if (endscore.result == WHITE_WON)
     //     printf("White won\n");
     // else if (endscore.result == BLACK_WON)
@@ -46,8 +44,6 @@ int main(int argc, char *argv[])
     //     printf("Draw\n");
     // else
     //     printf("Unknown\n");
-
-    // free_endgames();
 
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
@@ -146,5 +142,7 @@ int main(int argc, char *argv[])
         }
         fflush(stdout);
     }
+
+    free_endgames();
     return 0;
 }

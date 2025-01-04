@@ -5,10 +5,7 @@
 #include "../engine/piece_moves.h"
 #include <stdio.h>
 #include "move_sort.h"
-#include "transposition_table.h"
-
-int hit = 0;
-int miss = 0;
+#include "known_endgames/endgames.h"
 
 SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
@@ -20,6 +17,15 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         BoardScore score = score_board(board_state, depth, false);
         pop_game_history();
         score.result = DRAW;
+        return (SearchResult){score, true};
+    }
+
+    if (is_known_endgame(board_state))
+    {
+        BoardScore score = score_endgame(board_state);
+        score.depth += depth;
+        pop_game_history();
+        // print_score(score);
         return (SearchResult){score, true};
     }
 
