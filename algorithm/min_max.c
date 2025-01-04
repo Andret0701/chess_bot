@@ -68,7 +68,6 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
 
     sort_moves(board_state, stack, base);
 
-    uint8_t depth_remaining = max_depth - depth;
     BoardScore best_score = get_worst_score(board_state->board.side_to_move);
     for (uint16_t i = base; i < stack->count; i++)
     {

@@ -29,8 +29,6 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
-    init_zobrist_keys();
-
     // init_endgames();
 
     // // 8/8/1r6/8/8/2k5/8/K7 w - - 0 1, -2
