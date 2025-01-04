@@ -1,6 +1,6 @@
 #include "game_history.h"
 
-#define MAX_GAME_HISTORY 1000
+#define MAX_GAME_HISTORY 10000
 
 Board game_history[MAX_GAME_HISTORY];
 uint16_t game_history_index = 0;
