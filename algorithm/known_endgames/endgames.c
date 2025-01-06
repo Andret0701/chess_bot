@@ -1,4 +1,5 @@
 #include "endgames.h"
+#include "../game_history.h"
 #include "./pyrrhic/tbprobe.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,7 +121,7 @@ BoardScore score_endgame(BoardState *board_state)
     // First get WDL (Win/Draw/Loss)
     int wdl = TB_GET_WDL(result);
 
-    uint8_t rule50 = 0; // Implement 50-move rule
+    uint8_t rule50 = get_50_move_count();
 
     // Now probe for DTZ specifically using tb_probe_root
     unsigned results[TB_MAX_MOVES];

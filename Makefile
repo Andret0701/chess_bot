@@ -1,6 +1,6 @@
 # Compiler and Flags
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O3 -march=native -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
+CFLAGS = -Wall -Wextra -std=c11 -O3 -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
 PROFILE_FLAGS = -pg -no-pie -fno-builtin -O3 -fno-inline
 TARGET = main.exe
 BUILD_DIR = build

@@ -2,30 +2,60 @@
 
 #define MAX_GAME_HISTORY 10000
 
-Board game_history[MAX_GAME_HISTORY];
-uint16_t game_history_index = 0;
+uint8_t moves_since_permanent_change[MAX_GAME_HISTORY];
+Board board_history[MAX_GAME_HISTORY];
+uint16_t move_count = 0;
+
+bool has_50_move_reset_occurred(Board from, Board to)
+{
+    // Check for pawn moves or promotions (different positions or counts)
+    if (from.white_pieces.pawns != to.white_pieces.pawns ||
+        from.black_pieces.pawns != to.black_pieces.pawns)
+        return true;
+
+    // Check for captures by comparing piece counts for all types
+    if (__builtin_popcountll(from.white_pieces.knights) != __builtin_popcountll(to.white_pieces.knights) ||
+        __builtin_popcountll(from.white_pieces.bishops) != __builtin_popcountll(to.white_pieces.bishops) ||
+        __builtin_popcountll(from.white_pieces.rooks) != __builtin_popcountll(to.white_pieces.rooks) ||
+        __builtin_popcountll(from.white_pieces.queens) != __builtin_popcountll(to.white_pieces.queens) ||
+        __builtin_popcountll(from.black_pieces.knights) != __builtin_popcountll(to.black_pieces.knights) ||
+        __builtin_popcountll(from.black_pieces.bishops) != __builtin_popcountll(to.black_pieces.bishops) ||
+        __builtin_popcountll(from.black_pieces.rooks) != __builtin_popcountll(to.black_pieces.rooks) ||
+        __builtin_popcountll(from.black_pieces.queens) != __builtin_popcountll(to.black_pieces.queens))
+        return true;
+
+    return false;
+}
 
 void reset_game_history()
 {
-    game_history_index = 0;
+    move_count = 0;
 }
-
 void push_game_history(Board board)
 {
-    game_history[game_history_index++] = board;
+    board_history[move_count] = board;
+    if (move_count == 0)
+        moves_since_permanent_change[0] = 0;
+    else
+    {
+        if (has_50_move_reset_occurred(board_history[move_count - 1], board))
+            moves_since_permanent_change[move_count] = 0;
+        else
+            moves_since_permanent_change[move_count] = moves_since_permanent_change[move_count - 1] + 1;
+    }
+    move_count++;
 }
 
 void pop_game_history()
 {
-    game_history_index--;
+    move_count--;
 }
 
 void print_game_history()
 {
-    printf("Game history:\n");
-    for (int i = 0; i < game_history_index; i++)
+    for (int i = 0; i < move_count; i++)
     {
-        print_board(&game_history[i]);
+        print_board(&board_history[i]);
         printf("\n");
     }
     printf("---\n");
@@ -33,16 +63,16 @@ void print_game_history()
 
 bool threefold_repetition()
 {
-    if (game_history_index < 6) // Fewer than 4 positions mean no threefold repetition
+    if (move_count < 6) // Fewer than 4 positions mean no threefold repetition
         return false;
 
-    Board *current = &game_history[game_history_index - 1];
+    Board *current = &board_history[move_count - 1];
     int repetitions = 1;
 
     // Iterate through all earlier positions
-    for (int i = game_history_index - 3; i >= 0; i -= 2)
+    for (int i = move_count - 3; i >= 0; i -= 2)
     {
-        if (board_equals(current, &game_history[i]))
+        if (board_equals(current, &board_history[i]))
         {
             repetitions++;
             if (repetitions >= 3)
@@ -53,19 +83,17 @@ bool threefold_repetition()
     return false;
 }
 
-bool has_repeated_position()
+bool has_50_move_rule_occurred()
 {
-    if (game_history_index < 6) // Fewer than 4 positions mean no repeated position
+    if (move_count < 100)
         return false;
 
-    Board *current = &game_history[game_history_index - 1];
+    return moves_since_permanent_change[move_count - 1] >= 100;
+}
 
-    // Iterate only through earlier positions
-    for (int i = game_history_index - 3; i >= 0; i -= 2)
-    {
-        if (board_equals(current, &game_history[i]))
-            return true;
-    }
-
-    return false;
+uint8_t get_50_move_count()
+{
+    if (move_count <= 0)
+        return 0;
+    return moves_since_permanent_change[move_count - 1];
 }

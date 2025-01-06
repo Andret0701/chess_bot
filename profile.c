@@ -13,12 +13,11 @@
 void play_game(double think_time)
 {
     Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+    reset_game_history();
     push_game_history(board);
     BoardState board_state = board_to_board_state(&board);
-    reset_game_history();
     while (true)
     {
-        // print_board(&board_state.board);
         clock_t start = clock();
         BotResult result = run_bot(board_to_fen(&board_state.board), think_time);
         clock_t end = clock();
