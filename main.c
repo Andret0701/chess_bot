@@ -31,6 +31,25 @@ int main(int argc, char *argv[])
 {
     init_endgames();
 
+    // 6k1/P7/8/1n6/8/3R4/4r3/2K5 b - - 1 1
+    // Board board = fen_to_board("6k1/P7/8/1n6/8/3R4/4r3/2K5 b - - 1 1");
+    // // board = apply_move(&board, "e2e8");
+    // print_board(&board);
+    // BoardState board_state = board_to_board_state(&board);
+    // // print checks
+    // printf("White check: %d\n", board_state.white_check);
+    // printf("Black check: %d\n", board_state.black_check);
+    // BotResult result = run_bot(board_to_fen(&board_state.board), 2.0);
+    // printf("Move: %s, Score: %d, Depth: %d, Result: ", result.move, result.score.score, result.score.depth);
+    // if (result.score.result == WHITE_WON)
+    //     printf("White won\n");
+    // else if (result.score.result == BLACK_WON)
+    //     printf("Black won\n");
+    // else if (result.score.result == DRAW)
+    //     printf("Draw\n");
+    // else
+    //     printf("Unknown\n");
+
     // // 8/8/1r6/8/8/2k5/8/K7 w - - 0 1, -2
     // Board empty_board = fen_to_board("8/8/8/8/8/2k5/P7/K7 w - - 0 1");
     // BoardState empty_board_state = board_to_board_state(&empty_board);

@@ -6,10 +6,14 @@
 #include "min_max.h"
 #include "../engine/piece_moves.h"
 #include "../move.h"
+#include "game_history.h"
 
 #define BOARD_STACK_SIZE 65535
+#define MAX_DEPTH 100
+#define MAX_MOVES 300
 
-void print_out_search_info(BoardStack *stack, Board *board, BoardScore *scores, uint16_t best_index, uint8_t depth, uint16_t cancelled_index)
+BoardScore move_scores[MAX_DEPTH][MAX_MOVES];
+void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index, uint8_t depth, uint16_t cancelled_index)
 {
     FILE *file = fopen("search_info.txt", "a");
     if (file == NULL)
@@ -18,21 +22,76 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardScore *scores, 
         return;
     }
 
+    if (cancelled_index == 0)
+    {
+        depth--;
+        cancelled_index = stack->count + 1;
+    }
+
+    fprintf(file, "Move: %d\n", get_full_move_count());
+    fprintf(file, "Fen: %s\n", board_to_fen(board));
+    if (stack->boards[best_index].white_check)
+        fprintf(file, "White is in check\n");
+    if (stack->boards[best_index].black_check)
+        fprintf(file, "Black is in check\n");
     fprintf(file, "It is %s's turn\n", board->side_to_move == WHITE ? "White" : "Black");
-    fprintf(file, "The best move is %s with a score of %d\n", board_to_move(board, &stack->boards[best_index].board), scores[best_index].score);
-    fprintf(file, "Depth %d\n", depth);
+    fprintf(file, "The best move is %s with a score of %d, depth of %d, and result %s\n",
+            board_to_move(board, &stack->boards[best_index].board),
+            move_scores[depth][best_index].score,
+            move_scores[depth][best_index].depth,
+            move_scores[depth][best_index].result == WHITE_WON ? "White won" : move_scores[depth][best_index].result == BLACK_WON ? "Black won"
+                                                                           : move_scores[depth][best_index].result == DRAW        ? "Draw"
+                                                                                                                                  : "Unknown");
+
+    fprintf(file, "Move: | ");
+    for (int16_t d = depth; d >= 0; d--)
+    {
+        fprintf(file, "Depth: %-19d", d);
+        if (d != 0)
+            fprintf(file, " | ");
+    }
+    fprintf(file, "\n");
+
     for (uint16_t i = 0; i < stack->count; i++)
     {
-        if (i == cancelled_index)
-            fprintf(file, "---\n");
-        fprintf(file, "%s %d %s Depth: %d\n", board_to_move(board, &stack->boards[i].board), scores[i].score, scores[i].result == WHITE_WON ? "White won" : scores[i].result == BLACK_WON ? "Black won"
-                                                                                                                                                        : scores[i].result == DRAW        ? "Draw"
-                                                                                                                                                                                          : "Unknown",
-                depth);
+        fprintf(file, "%-5s | ", board_to_move(board, &stack->boards[i].board));
+        for (int16_t d = depth; d >= 0; d--)
+        {
+            if (i == cancelled_index && d == depth)
+                fprintf(file, "---                       ");
+            else if (i >= cancelled_index && d == depth)
+                fprintf(file, "                          ");
+            else
+            {
+                fprintf(file, "%-5d %-9s Depth: %-3d",
+                        move_scores[d][i].score,
+                        move_scores[d][i].result == WHITE_WON ? "White won" : move_scores[d][i].result == BLACK_WON ? "Black won"
+                                                                          : move_scores[d][i].result == DRAW        ? "Draw"
+                                                                                                                    : "Unknown",
+                        move_scores[d][i].depth);
+            }
+            if (d != 0)
+                fprintf(file, " | ");
+        }
+        fprintf(file, "\n");
     }
     fprintf(file, "\n");
 
     fclose(file);
+}
+
+bool is_move_better(uint16_t i, uint16_t j, uint8_t depth, Color side_to_move)
+{
+    if (is_better_score(move_scores[depth][j], move_scores[depth][i], side_to_move))
+        return true;
+
+    if (depth != 0)
+    {
+        if (is_equal_score(move_scores[depth][j], move_scores[depth][i]))
+            return is_move_better(i, j, depth - 1, side_to_move);
+    }
+
+    return false;
 }
 
 BotResult run_bot(char *fen, double seconds)
@@ -43,10 +102,6 @@ BotResult run_bot(char *fen, double seconds)
     BoardState board_state = board_to_board_state(&board);
 
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
-    BoardScore scores[BOARD_STACK_SIZE];
-    for (uint16_t i = 0; i < BOARD_STACK_SIZE; i++)
-        scores[i] = get_worst_score(board.side_to_move);
-
     generate_moves(&board_state, stack);
 
     uint8_t depth = 0;
@@ -63,17 +118,17 @@ BotResult run_bot(char *fen, double seconds)
             if (!search_result.valid)
             {
 
-                print_out_search_info(stack, &board, scores, best_index, depth, i);
+                print_out_search_info(stack, &board, best_index, depth, i);
 
                 if (i == 0)
                     depth--;
-                BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
+                BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
                 destroy_board_stack(stack);
                 return result;
             }
 
             BoardScore score = search_result.board_score;
-            scores[i] = score;
+            move_scores[depth][i] = score;
 
             if (is_better_score(score, best_score, board.side_to_move))
             {
@@ -88,9 +143,9 @@ BotResult run_bot(char *fen, double seconds)
 
         if (has_won(best_score.result, board.side_to_move))
         {
-            print_out_search_info(stack, &board, scores, best_index, depth, -1);
+            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
 
-            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
+            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
             destroy_board_stack(stack);
             return result;
         }
@@ -100,15 +155,15 @@ BotResult run_bot(char *fen, double seconds)
         {
             for (uint16_t j = i + 1; j < stack->count; j++)
             {
-                if (is_better_score(scores[j], scores[i], board.side_to_move))
+                if (is_move_better(i, j, depth, board.side_to_move))
                 {
                     BoardState temp = stack->boards[i];
                     stack->boards[i] = stack->boards[j];
                     stack->boards[j] = temp;
 
-                    BoardScore temp_score = scores[i];
-                    scores[i] = scores[j];
-                    scores[j] = temp_score;
+                    BoardScore temp_score = move_scores[depth][i];
+                    move_scores[depth][i] = move_scores[depth][j];
+                    move_scores[depth][j] = temp_score;
                 }
             }
         }

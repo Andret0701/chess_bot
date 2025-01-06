@@ -91,9 +91,14 @@ bool is_better_score(BoardScore a, BoardScore b, Color color)
     // l-w l-u l-d l-l
 }
 
+bool is_equal_score(BoardScore a, BoardScore b)
+{
+    return a.result == b.result && a.score == b.score && a.depth == b.depth;
+}
+
 bool is_better_equal(BoardScore a, BoardScore b, Color color)
 {
-    if (a.result == b.result && a.score == b.score && a.depth == b.depth)
+    if (is_equal_score(a, b))
         return true;
 
     return is_better_score(a, b, color);

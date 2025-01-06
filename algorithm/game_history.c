@@ -97,3 +97,13 @@ uint8_t get_50_move_count()
         return 0;
     return moves_since_permanent_change[move_count - 1];
 }
+
+uint8_t get_full_move_count()
+{
+    return move_count / 2 + 1;
+}
+
+uint8_t get_half_move_count()
+{
+    return move_count;
+}

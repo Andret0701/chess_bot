@@ -11,3 +11,6 @@ void print_game_history();
 bool threefold_repetition();
 bool has_50_move_rule_occurred();
 uint8_t get_50_move_count();
+
+uint8_t get_full_move_count();
+uint8_t get_half_move_count();
