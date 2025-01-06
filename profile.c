@@ -43,6 +43,12 @@ void play_game(double think_time)
             break;
         }
 
+        if (has_50_move_rule_occurred())
+        {
+            printf("Draw by 50 move rule\n");
+            break;
+        }
+
         if (has_insufficient_material(&board))
         {
             printf("Draw by insufficient material\n");
