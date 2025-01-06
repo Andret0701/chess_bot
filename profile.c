@@ -28,6 +28,7 @@ void play_game(double think_time)
             printf("That was %f seconds to much.\n", time_used - think_time);
         }
 
+        print_board(&board);
         printf("Move: %s, Score: %d, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth,
                result.score.result == WHITE_WON ? "White won" : result.score.result == BLACK_WON ? "Black won"
                                                             : result.score.result == DRAW        ? "Draw"
@@ -55,10 +56,15 @@ void play_game(double think_time)
             break;
         }
 
-        if (get_game_result(&board_state) != UNKNOWN)
+        Result game_result = get_game_result(&board_state);
+        if (game_result != UNKNOWN)
+        {
+            printf("Game over: %s\n", game_result == WHITE_WON ? "White won" : game_result == BLACK_WON ? "Black won"
+                                                                                                        : "Draw");
             break;
+        }
 
-        // printf("\n");
+        printf("\n");
     }
 
     print_board(&board);

@@ -25,9 +25,10 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardScore *scores, 
     {
         if (i == cancelled_index)
             fprintf(file, "---\n");
-        fprintf(file, "%s %d %s\n", board_to_move(board, &stack->boards[i].board), scores[i].score, scores[i].result == WHITE_WON ? "White won" : scores[i].result == BLACK_WON ? "Black won"
-                                                                                                                                              : scores[i].result == DRAW        ? "Draw"
-                                                                                                                                                                                : "Unknown");
+        fprintf(file, "%s %d %s Depth: %d\n", board_to_move(board, &stack->boards[i].board), scores[i].score, scores[i].result == WHITE_WON ? "White won" : scores[i].result == BLACK_WON ? "Black won"
+                                                                                                                                                        : scores[i].result == DRAW        ? "Draw"
+                                                                                                                                                                                          : "Unknown",
+                depth);
     }
     fprintf(file, "\n");
 
@@ -94,23 +95,6 @@ BotResult run_bot(char *fen, double seconds)
             return result;
         }
 
-        uint16_t games_remaining = 0;
-        for (uint16_t i = 0; i < stack->count; i++)
-        {
-            if (scores[i].result == UNKNOWN)
-                games_remaining++;
-        }
-
-        if (games_remaining <= 1)
-        {
-            print_out_search_info(stack, &board, scores, best_index, depth, -1);
-
-            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), scores[best_index], depth};
-            destroy_board_stack(stack);
-
-            return result;
-        }
-
         // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)
         {
@@ -128,8 +112,6 @@ BotResult run_bot(char *fen, double seconds)
                 }
             }
         }
-
-        stack->count = games_remaining;
         depth++;
     }
 }

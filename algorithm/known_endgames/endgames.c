@@ -73,9 +73,6 @@ bool is_known_endgame(BoardState *board_state)
         return false;
     }
 
-    // Additional validation could be added here
-    // For example, checking specific piece configurations
-
     return true;
 }
 
