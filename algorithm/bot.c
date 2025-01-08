@@ -12,6 +12,18 @@
 #define MAX_DEPTH 100
 #define MAX_MOVES 300
 
+void print_bot_result(BotResult result)
+{
+    printf("Move: %s, Depth: %d (Score: %d, Depth: %d, Result: %s)\n",
+           result.move,
+           result.depth,
+           result.score.score,
+           result.score.depth,
+           result.score.result == WHITE_WON ? "White won" : result.score.result == BLACK_WON ? "Black won"
+                                                        : result.score.result == DRAW        ? "Draw"
+                                                                                             : "Unknown");
+}
+
 BoardScore move_scores[MAX_DEPTH][MAX_MOVES];
 void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index, uint8_t depth, uint16_t cancelled_index)
 {
@@ -82,12 +94,12 @@ void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index,
 
 bool is_move_better(uint16_t i, uint16_t j, uint8_t depth, Color side_to_move)
 {
-    if (is_better_score(move_scores[depth][j], move_scores[depth][i], side_to_move))
+    if (is_better_score(move_scores[depth][i], move_scores[depth][j], side_to_move))
         return true;
 
-    if (depth != 0)
+    if (depth > 0)
     {
-        if (is_equal_score(move_scores[depth][j], move_scores[depth][i]))
+        if (is_equal_score(move_scores[depth][i], move_scores[depth][j]))
             return is_move_better(i, j, depth - 1, side_to_move);
     }
 
@@ -122,6 +134,7 @@ BotResult run_bot(char *fen, double seconds)
 
                 if (i == 0)
                     depth--;
+
                 BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
                 destroy_board_stack(stack);
                 return result;
@@ -130,7 +143,7 @@ BotResult run_bot(char *fen, double seconds)
             BoardScore score = search_result.board_score;
             move_scores[depth][i] = score;
 
-            if (is_better_score(score, best_score, board.side_to_move))
+            if (i == 0 || is_move_better(i, best_index, depth, board.side_to_move))
             {
                 best_index = i;
                 best_score = score;
@@ -155,18 +168,42 @@ BotResult run_bot(char *fen, double seconds)
         {
             for (uint16_t j = i + 1; j < stack->count; j++)
             {
-                if (is_move_better(i, j, depth, board.side_to_move))
+                if (is_move_better(j, i, depth, board.side_to_move))
                 {
                     BoardState temp = stack->boards[i];
                     stack->boards[i] = stack->boards[j];
                     stack->boards[j] = temp;
 
-                    BoardScore temp_score = move_scores[depth][i];
-                    move_scores[depth][i] = move_scores[depth][j];
-                    move_scores[depth][j] = temp_score;
+                    for (uint8_t d = 0; d <= depth; d++)
+                    {
+                        BoardScore temp_score = move_scores[d][i];
+                        move_scores[d][i] = move_scores[d][j];
+                        move_scores[d][j] = temp_score;
+                    }
                 }
             }
         }
+
+        // if no move is unknown
+        bool all_moves_known = true;
+        for (uint16_t i = 0; i < stack->count; i++)
+        {
+            if (move_scores[depth][i].result == UNKNOWN)
+            {
+                all_moves_known = false;
+                break;
+            }
+        }
+
+        if (all_moves_known)
+        {
+            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
+
+            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
+            destroy_board_stack(stack);
+            return result;
+        }
+
         depth++;
     }
 }

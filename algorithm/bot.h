@@ -8,4 +8,5 @@ typedef struct
     uint8_t depth;
 } BotResult;
 
+void print_bot_result(BotResult result);
 BotResult run_bot(char *fen, double seconds);

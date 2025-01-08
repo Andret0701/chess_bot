@@ -75,7 +75,6 @@ bool is_known_endgame(BoardState *board_state)
 
     return true;
 }
-
 BoardScore score_endgame(BoardState *board_state)
 {
     if (!tablebases_initialized)
@@ -94,35 +93,12 @@ BoardScore score_endgame(BoardState *board_state)
     unsigned ep = board_state->board.en_passant;
     unsigned ep_square = (ep != 0) ? __builtin_ctz(ep) : 0;
 
-    // Probe the tablebase
-    uint32_t result = tb_probe_wdl(
-        board_state->white_pieces, board_state->black_pieces,
-        board_state->board.white_pieces.king | board_state->board.black_pieces.king,
-        board_state->board.white_pieces.queens | board_state->board.black_pieces.queens,
-        board_state->board.white_pieces.rooks | board_state->board.black_pieces.rooks,
-        board_state->board.white_pieces.bishops | board_state->board.black_pieces.bishops,
-        board_state->board.white_pieces.knights | board_state->board.black_pieces.knights,
-        board_state->board.white_pieces.pawns | board_state->board.black_pieces.pawns,
-        ep_square, board_state->board.side_to_move == WHITE);
-
-    if (result == TB_RESULT_FAILED)
-    {
-        // Provide more detailed error information
-        fprintf(stderr, "Failed to probe endgame tablebase\n");
-        fprintf(stderr, "Piece count: %d\n", popcountll(board_state->occupied));
-        fprintf(stderr, "EP square: %u\n", ep_square);
-        fprintf(stderr, "Side to move: %s\n", board_state->board.side_to_move == WHITE ? "white" : "black");
-        exit(EXIT_FAILURE);
-    }
-
-    // First get WDL (Win/Draw/Loss)
-    int wdl = TB_GET_WDL(result);
-
+    // Get current 50-move counter
     uint8_t rule50 = get_50_move_count();
 
-    // Now probe for DTZ specifically using tb_probe_root
     unsigned results[TB_MAX_MOVES];
-    result = tb_probe_root(
+
+    unsigned result = tb_probe_root(
         board_state->white_pieces, board_state->black_pieces,
         board_state->board.white_pieces.king | board_state->board.black_pieces.king,
         board_state->board.white_pieces.queens | board_state->board.black_pieces.queens,
@@ -135,26 +111,31 @@ BoardScore score_endgame(BoardState *board_state)
 
     if (result == TB_RESULT_FAILED)
     {
-        fprintf(stderr, "Failed to probe endgame tablebase for DTZ\n");
+        fprintf(stderr, "Failed to probe tablebase\n");
         exit(EXIT_FAILURE);
     }
 
-    Result game_result = DRAW;
-    if (wdl == TB_WIN)
+    if (result == TB_RESULT_STALEMATE)
+        return (BoardScore){0, DRAW, 0};
+
+    if (result == TB_RESULT_CHECKMATE)
+        return (BoardScore){0, board_state->board.side_to_move == WHITE ? BLACK_WON : WHITE_WON, 0};
+
+    // Get WDL and DTZ from the result
+    int wdl = TB_GET_WDL(result);
+    int dtz = TB_GET_DTZ(result);
+
+    Result game_result;
+    if (wdl == TB_WIN) // TB WIN
         game_result = board_state->board.side_to_move == WHITE ? WHITE_WON : BLACK_WON;
-    else if (wdl == TB_LOSS)
+    else if (wdl == TB_CURSED_WIN) // TB CURSED WIN - drawn by 50-move rule
+        game_result = DRAW;
+    else if (wdl == TB_DRAW) // TB DRAW
+        game_result = DRAW;
+    else if (wdl == TB_BLESSED_LOSS) // TB BLESSED LOSS - drawn by 50-move rule
+        game_result = DRAW;
+    else // TB LOSS
         game_result = board_state->board.side_to_move == WHITE ? BLACK_WON : WHITE_WON;
 
-    uint8_t dtz = TB_GET_DTZ(result);
     return (BoardScore){0, game_result, dtz};
-}
-
-// Helper function to print board state for debugging
-void print_board_state(BoardState *board_state)
-{
-    fprintf(stderr, "Board State:\n");
-    fprintf(stderr, "White pieces: 0x%llx\n", (unsigned long long)board_state->white_pieces);
-    fprintf(stderr, "Black pieces: 0x%llx\n", (unsigned long long)board_state->black_pieces);
-    fprintf(stderr, "Occupied squares: 0x%llx\n", (unsigned long long)board_state->occupied);
-    // Add more debug information as needed
 }
