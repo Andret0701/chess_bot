@@ -25,14 +25,27 @@ static int evaluate_piece_position(uint64_t pieces, const int16_t *table, bool i
     return score;
 }
 
-int32_t get_position_score(Board *board, GamePhase game_phase)
+bool is_endgame(Board *board)
+{
+    return popcountll(board->white_pieces.queens) + popcountll(board->black_pieces.queens) <= 1;
+}
+
+int32_t get_position_score(Board *board)
 {
     int32_t score = 0;
+    bool endgame = is_endgame(board);
 
-    // Positional scoring
-    const int16_t *pawn_table = (game_phase == ENDGAME) ? pawn_table_end : pawn_table;
+    // Pawn positioning (different for middlegame/endgame)
+    const int16_t *pawn_table = endgame ? pawn_table_end : pawn_table;
     score += evaluate_piece_position(board->white_pieces.pawns, pawn_table, true);
     score -= evaluate_piece_position(board->black_pieces.pawns, pawn_table, false);
+
+    // King positioning (different for middlegame/endgame)
+    const int16_t *king_table = endgame ? king_table_end : king_table;
+    score += evaluate_piece_position(board->white_pieces.king, king_table, true);
+    score -= evaluate_piece_position(board->black_pieces.king, king_table, false);
+
+    // Positional scoring
     score += evaluate_piece_position(board->white_pieces.knights, knight_table, true);
     score -= evaluate_piece_position(board->black_pieces.knights, knight_table, false);
     score += evaluate_piece_position(board->white_pieces.bishops, bishop_table, true);
@@ -41,11 +54,6 @@ int32_t get_position_score(Board *board, GamePhase game_phase)
     score -= evaluate_piece_position(board->black_pieces.rooks, rook_table, false);
     score += evaluate_piece_position(board->white_pieces.queens, queen_table, true);
     score -= evaluate_piece_position(board->black_pieces.queens, queen_table, false);
-
-    // King positioning (different for middlegame/endgame)
-    const int16_t *king_table = (game_phase == ENDGAME) ? king_table_end : king_table;
-    score += evaluate_piece_position(board->white_pieces.king, king_table, true);
-    score -= evaluate_piece_position(board->black_pieces.king, king_table, false);
 
     return score;
 }

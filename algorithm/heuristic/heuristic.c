@@ -1,5 +1,6 @@
 #include "heuristic.h"
 #include "position_score.h"
+#include "material_score.h"
 
 bool has_insufficient_material(Board *board)
 {
@@ -51,34 +52,16 @@ Result get_result(BoardState *board_state, bool is_finished)
     return result;
 }
 
-// Base piece values remain the same
-const int PAWN_VALUE = 100;
-const int KNIGHT_VALUE = 320;
-const int BISHOP_VALUE = 330;
-const int ROOK_VALUE = 500;
-const int QUEEN_VALUE = 900;
-
 BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
 {
     int score = 0;
     Result result = get_result(board_state, is_finished);
 
-    GamePhase game_phase = get_game_phase(&board_state->board);
-
     // Material counting
-    score += __builtin_popcountll(board_state->board.white_pieces.pawns) * PAWN_VALUE;
-    score -= __builtin_popcountll(board_state->board.black_pieces.pawns) * PAWN_VALUE;
-    score += __builtin_popcountll(board_state->board.white_pieces.knights) * KNIGHT_VALUE;
-    score -= __builtin_popcountll(board_state->board.black_pieces.knights) * KNIGHT_VALUE;
-    score += __builtin_popcountll(board_state->board.white_pieces.bishops) * BISHOP_VALUE;
-    score -= __builtin_popcountll(board_state->board.black_pieces.bishops) * BISHOP_VALUE;
-    score += __builtin_popcountll(board_state->board.white_pieces.rooks) * ROOK_VALUE;
-    score -= __builtin_popcountll(board_state->board.black_pieces.rooks) * ROOK_VALUE;
-    score += __builtin_popcountll(board_state->board.white_pieces.queens) * QUEEN_VALUE;
-    score -= __builtin_popcountll(board_state->board.black_pieces.queens) * QUEEN_VALUE;
+    score += get_material_score(&board_state->board);
 
     // Positional scoring
-    score += get_position_score(&board_state->board, game_phase);
+    score += get_position_score(&board_state->board);
 
     // Score for where different pieces can attack to
     score += __builtin_popcountll(board_state->white_attacks.pawns) * 2;
@@ -142,12 +125,6 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
         score += 5;
     else
         score -= 5;
-
-    // Bonus for bishop pair
-    if (__builtin_popcountll(board_state->board.white_pieces.bishops) >= 2)
-        score += 20;
-    if (__builtin_popcountll(board_state->board.black_pieces.bishops) >= 2)
-        score -= 20;
 
     // Bonus for rooks on open files
     uint64_t white_rooks = board_state->board.white_pieces.rooks;
