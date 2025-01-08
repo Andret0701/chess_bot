@@ -73,6 +73,10 @@ bool is_known_endgame(BoardState *board_state)
         return false;
     }
 
+    // If any player has castling rights, it's not an endgame
+    if (board_state->board.castling_rights != 0)
+        return false;
+
     return true;
 }
 BoardScore score_endgame(BoardState *board_state)
