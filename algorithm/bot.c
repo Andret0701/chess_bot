@@ -122,9 +122,14 @@ BotResult run_bot(char *fen, double seconds)
         BoardScore alpha = get_worst_score(WHITE);
         BoardScore beta = get_worst_score(BLACK);
         uint16_t best_index = 0;
-        BoardScore best_score = get_worst_score(board.side_to_move);
         for (uint16_t i = 0; i < stack->count; i++)
         {
+            if (depth != 0 && has_lost(move_scores[depth - 1][i].result, board.side_to_move))
+            {
+                move_scores[depth][i] = move_scores[depth - 1][i];
+                continue;
+            }
+
             BoardState *current_board_state = &stack->boards[i];
             SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds);
             if (!search_result.valid)
@@ -146,21 +151,11 @@ BotResult run_bot(char *fen, double seconds)
             if (i == 0 || is_move_better(i, best_index, depth, board.side_to_move))
             {
                 best_index = i;
-                best_score = score;
                 if (board.side_to_move == WHITE)
                     alpha = max_score(alpha, score, board.side_to_move);
                 else
                     beta = max_score(beta, score, board.side_to_move);
             }
-        }
-
-        if (has_won(best_score.result, board.side_to_move))
-        {
-            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
-
-            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
-            destroy_board_stack(stack);
-            return result;
         }
 
         // Sort the stack by score
