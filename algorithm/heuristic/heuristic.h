@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../board.h"
-#include "board_score.h"
-#include "../engine/board_state.h"
+#include "../../board.h"
+#include "../board_score.h"
+#include "../../engine/board_state.h"
 
 bool has_insufficient_material(Board *board);
 Result get_result(BoardState *board_state, bool is_finished);

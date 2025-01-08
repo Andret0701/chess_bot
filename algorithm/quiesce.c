@@ -1,5 +1,5 @@
 #include "min_max.h"
-#include "heuristic.h"
+#include "heuristic/heuristic.h"
 
 SearchResult quiesce(BoardState *board_state, BoardStack *stack, BoardScore alpha, BoardScore beta,
                      uint8_t depth, clock_t start, double seconds)

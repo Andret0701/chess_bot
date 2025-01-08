@@ -8,7 +8,7 @@
 #include "algorithm/min_max.h"
 #include "move.h"
 #include "algorithm/game_history.h"
-#include "algorithm/heuristic.h"
+#include "algorithm/heuristic/heuristic.h"
 
 void play_game(double think_time)
 {

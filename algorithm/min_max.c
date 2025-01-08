@@ -1,5 +1,5 @@
 #include "min_max.h"
-#include "heuristic.h"
+#include "heuristic/heuristic.h"
 #include "game_history.h"
 #include "../utils.h"
 #include "../engine/piece_moves.h"

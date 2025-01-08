@@ -289,5 +289,13 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     if ((board_state->board.black_pieces.rooks & board_state->black_attacks.rooks) != 0)
         score -= 10;
 
+    // King safety
+    // - Bonus for pawn shelter in front of the king
+    // - Penalty for open files or half-open file next to king
+    // Bonus for number of moves for sliding pieces
+    // Taxicab (Distance from queen to king)
+    // Pawn storm
+    // Attacking squares around the king
+
     return (BoardScore){score, result, depth};
 }
