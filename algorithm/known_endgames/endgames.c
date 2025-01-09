@@ -141,5 +141,5 @@ BoardScore score_endgame(BoardState *board_state)
     else // TB LOSS
         game_result = board_state->board.side_to_move == WHITE ? BLACK_WON : WHITE_WON;
 
-    return (BoardScore){0, game_result, dtz};
+    return (BoardScore){0, game_result, (uint8_t)abs(dtz)};
 }

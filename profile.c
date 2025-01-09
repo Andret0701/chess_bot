@@ -13,6 +13,7 @@
 void play_game(double think_time)
 {
     Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+
     print_board(&board);
     reset_game_history();
     push_game_history(board);
