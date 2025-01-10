@@ -1,6 +1,7 @@
 #include "heuristic.h"
 #include "position_score.h"
 #include "material_score.h"
+#include "king_safety_score.h"
 
 bool has_insufficient_material(Board *board)
 {
@@ -63,6 +64,9 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     // Positional scoring
     score += get_position_score(&board_state->board);
 
+    // King safety scoring
+    score += get_king_safety_score(board_state);
+
     // Score for where different pieces can attack to
     score += __builtin_popcountll(board_state->white_attacks.pawns) * 2;
     score -= __builtin_popcountll(board_state->black_attacks.pawns) * 2;
@@ -109,17 +113,6 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     // Bonus for attacking the king
     score += __builtin_popcountll(board_state->white_attack & board_state->board.black_pieces.king) * 20;
     score -= __builtin_popcountll(board_state->black_attack & board_state->board.white_pieces.king) * 20;
-
-    // Bonus for castling
-    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE)
-        score += 10;
-    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE)
-        score += 10;
-    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE)
-        score -= 10;
-    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE)
-        score -= 10;
-
     // Bonus for having the move
     if (board_state->board.side_to_move == WHITE)
         score += 5;

@@ -29,6 +29,7 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
+
     init_endgames();
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
