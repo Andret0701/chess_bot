@@ -20,13 +20,13 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         return (SearchResult){score, true};
     }
 
-    // if (depth != 0 && is_known_endgame(board_state))
-    // {
-    //     BoardScore score = score_endgame(board_state);
-    //     score.depth += depth;
-    //     pop_game_history();
-    //     return (SearchResult){score, true};
-    // }
+    if (depth != 0 && is_known_endgame(board_state))
+    {
+        BoardScore score = score_endgame(board_state);
+        score.depth += depth;
+        pop_game_history();
+        return (SearchResult){score, true};
+    }
 
     // if in check - extend search
     if (board_state->white_check || board_state->black_check)

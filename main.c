@@ -29,8 +29,6 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
-
-    init_endgames();
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
         // play_game(0.1);
@@ -133,6 +131,5 @@ int main(int argc, char *argv[])
         fflush(stdout);
     }
 
-    free_endgames();
     return 0;
 }
