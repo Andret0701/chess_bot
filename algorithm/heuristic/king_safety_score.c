@@ -145,7 +145,7 @@ int32_t get_king_safety_score(BoardState *board_state)
     score += get_pawn_shelter_score(&board_state->board);
     score += get_open_file_penalty(&board_state->board);
     score += get_pawn_storm_score(&board_state->board);
-    score += get_attacking_king_squares_score(&board_state->board);
+    score += get_attacking_king_squares_score(&board_state);
     score += get_weak_back_rank_penalty(&board_state->board);
     return score;
 }
