@@ -102,9 +102,31 @@ int32_t get_pawn_storm_score(Board *board) // Having pawns storming the enemy ki
     return score;
 }
 
-int32_t get_attacking_king_squares_score(Board *board) // Having pieces attacking squares around the enemy king is good
+int32_t get_attacking_king_squares_score(BoardState *board_state)
 {
     int32_t score = 0;
+
+    // Calculate squares adjacent to the kings, excluding the squares they currently occupy
+    uint64_t white_king_squares = expand_bitboard(board_state->board.white_pieces.king) & ~board_state->board.white_pieces.king;
+    uint64_t black_king_squares = expand_bitboard(board_state->board.black_pieces.king) & ~board_state->board.black_pieces.king;
+
+    // Count the number of squares attacked by the opposing pieces
+    uint8_t attacked_white_king_squares = __builtin_popcountll(white_king_squares & board_state->black_attack);
+    uint8_t attacked_black_king_squares = __builtin_popcountll(black_king_squares & board_state->white_attack);
+
+    // Cap the number of attacked squares to 4
+    if (attacked_white_king_squares > 4)
+        attacked_white_king_squares = 4;
+
+    if (attacked_black_king_squares > 4)
+        attacked_black_king_squares = 4;
+
+    // Apply exponential scoring for attacking squares around the enemy king
+    if (attacked_black_king_squares > 0)
+        score += 1 << (attacked_black_king_squares - 1);
+
+    if (attacked_white_king_squares > 0)
+        score -= 1 << (attacked_white_king_squares - 1);
 
     return score;
 }
