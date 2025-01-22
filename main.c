@@ -17,7 +17,8 @@
 #include "profile.h"
 #include "algorithm/known_endgames/endgames.h"
 #include "engine/tests/can_move_test.h"
-#include "algorithm/transposition_table.h"
+
+#include "bitboard.h"
 
 Board current_board;
 void new_game()
@@ -29,6 +30,7 @@ void new_game()
 
 int main(int argc, char *argv[])
 {
+
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
         // play_game(0.1);

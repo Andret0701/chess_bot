@@ -1,9 +1,5 @@
 #include "king_safety_score.h"
-
-#define FILE_A 0x0101010101010101
-#define FILE_H 0x8080808080808080
-#define RANK_1 0x00000000000000FF
-#define RANK_8 0xFF00000000000000
+#include "../../bitboard.h"
 
 int get_file(int square)
 {
@@ -40,16 +36,16 @@ int32_t get_pawn_shelter_score(Board *board)
     int32_t score = 0;
 
     // White king shelter
-    uint64_t front_of_white_king_mask = (board->white_pieces.king & ~RANK_8) << 8;
-    uint64_t ahead_of_white_king_mask = (front_of_white_king_mask & ~RANK_8) << 8;
-    uint64_t left_of_white_king_mask = (front_of_white_king_mask & ~FILE_A) << 1;
-    uint64_t right_of_white_king_mask = (front_of_white_king_mask & ~FILE_H) >> 1;
+    uint64_t front_of_white_king_mask = move_bitboard_up(board->white_pieces.king);
+    uint64_t ahead_of_white_king_mask = move_bitboard_up(front_of_white_king_mask);
+    uint64_t left_of_white_king_mask = move_bitboard_left(front_of_white_king_mask);
+    uint64_t right_of_white_king_mask = move_bitboard_right(front_of_white_king_mask);
 
     // Black king shelter
-    uint64_t front_of_black_king_mask = (board->black_pieces.king & ~RANK_1) >> 8;
-    uint64_t ahead_of_black_king_mask = (front_of_black_king_mask & ~RANK_1) >> 8;
-    uint64_t left_of_black_king_mask = (front_of_black_king_mask & ~FILE_A) << 1;
-    uint64_t right_of_black_king_mask = (front_of_black_king_mask & ~FILE_H) >> 1;
+    uint64_t front_of_black_king_mask = move_bitboard_down(board->black_pieces.king);
+    uint64_t ahead_of_black_king_mask = move_bitboard_down(front_of_black_king_mask);
+    uint64_t left_of_black_king_mask = move_bitboard_left(front_of_black_king_mask);
+    uint64_t right_of_black_king_mask = move_bitboard_right(front_of_black_king_mask);
 
     // Check white pawn shelter
     bool has_white_front_pawn = (board->white_pieces.pawns & front_of_white_king_mask) != 0;
@@ -76,12 +72,6 @@ int32_t get_pawn_shelter_score(Board *board)
     if (has_white_right_pawn)
         score += 8;
 
-    // Bonus for connected pawns
-    if (has_white_left_pawn && has_white_front_pawn)
-        score += 3;
-    if (has_white_right_pawn && has_white_front_pawn)
-        score += 3;
-
     // Score black pawn shelter (mirror of white scoring)
     if (has_black_front_pawn)
         score -= 10;
@@ -94,12 +84,6 @@ int32_t get_pawn_shelter_score(Board *board)
         score -= 8;
     if (has_black_right_pawn)
         score -= 8;
-
-    // Bonus for connected pawns
-    if (has_black_left_pawn && has_black_front_pawn)
-        score -= 3;
-    if (has_black_right_pawn && has_black_front_pawn)
-        score -= 3;
 
     return score;
 }

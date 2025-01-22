@@ -1,9 +1,8 @@
 #include "board.h"
 #include <stdio.h>
-#include "utils.h"
+#include "bitboard.h"
 
-
-uint64_t pieces_to_bitmap(Pieces *pieces)
+uint64_t pieces_to_bitboard(Pieces *pieces)
 {
     return pieces->pawns | pieces->knights | pieces->bishops | pieces->rooks | pieces->queens | pieces->king;
 }
@@ -35,21 +34,21 @@ void copy_board(Board *from, Board *to)
 Board flip_board(Board *board)
 {
     Board flipped = {0};
-    flipped.white_pieces.pawns = flip_bitmap(board->black_pieces.pawns);
-    flipped.white_pieces.knights = flip_bitmap(board->black_pieces.knights);
-    flipped.white_pieces.bishops = flip_bitmap(board->black_pieces.bishops);
-    flipped.white_pieces.rooks = flip_bitmap(board->black_pieces.rooks);
-    flipped.white_pieces.queens = flip_bitmap(board->black_pieces.queens);
-    flipped.white_pieces.king = flip_bitmap(board->black_pieces.king);
+    flipped.white_pieces.pawns = flip_bitboard(board->black_pieces.pawns);
+    flipped.white_pieces.knights = flip_bitboard(board->black_pieces.knights);
+    flipped.white_pieces.bishops = flip_bitboard(board->black_pieces.bishops);
+    flipped.white_pieces.rooks = flip_bitboard(board->black_pieces.rooks);
+    flipped.white_pieces.queens = flip_bitboard(board->black_pieces.queens);
+    flipped.white_pieces.king = flip_bitboard(board->black_pieces.king);
 
-    flipped.black_pieces.pawns = flip_bitmap(board->white_pieces.pawns);
-    flipped.black_pieces.knights = flip_bitmap(board->white_pieces.knights);
-    flipped.black_pieces.bishops = flip_bitmap(board->white_pieces.bishops);
-    flipped.black_pieces.rooks = flip_bitmap(board->white_pieces.rooks);
-    flipped.black_pieces.queens = flip_bitmap(board->white_pieces.queens);
-    flipped.black_pieces.king = flip_bitmap(board->white_pieces.king);
+    flipped.black_pieces.pawns = flip_bitboard(board->white_pieces.pawns);
+    flipped.black_pieces.knights = flip_bitboard(board->white_pieces.knights);
+    flipped.black_pieces.bishops = flip_bitboard(board->white_pieces.bishops);
+    flipped.black_pieces.rooks = flip_bitboard(board->white_pieces.rooks);
+    flipped.black_pieces.queens = flip_bitboard(board->white_pieces.queens);
+    flipped.black_pieces.king = flip_bitboard(board->white_pieces.king);
 
-    flipped.en_passant = flip_bitmap(board->en_passant);
+    flipped.en_passant = flip_bitboard(board->en_passant);
 
     flipped.castling_rights = 0;
     if (board->castling_rights & WHITE_KINGSIDE_CASTLE)
@@ -71,7 +70,7 @@ void print_board(Board *board)
     {
         for (int x = 0; x < 8; x++)
         {
-            uint64_t position = position_to_u64(x, y);
+            uint64_t position = position_to_bitboard(x, y);
             if (board->white_pieces.pawns & position)
                 printf("P");
             if (board->white_pieces.knights & position)

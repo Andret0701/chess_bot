@@ -13,9 +13,9 @@ void find_false_move(BoardState *board_state)
         {
             if (board_state->board.side_to_move == WHITE)
             {
-                if (board_state->white_pieces & position_to_u64(x, y))
+                if (board_state->white_pieces & position_to_bitboard(x, y))
                 {
-                    if (board_state->board.white_pieces.pawns & position_to_u64(x, y))
+                    if (board_state->board.white_pieces.pawns & position_to_bitboard(x, y))
                     {
                         if (white_pawn_can_move(board_state, x, y))
                         {
@@ -23,7 +23,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.white_pieces.knights & position_to_u64(x, y))
+                    else if (board_state->board.white_pieces.knights & position_to_bitboard(x, y))
                     {
                         if (white_knight_can_move(board_state, x, y))
                         {
@@ -31,7 +31,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.white_pieces.bishops & position_to_u64(x, y))
+                    else if (board_state->board.white_pieces.bishops & position_to_bitboard(x, y))
                     {
                         if (white_bishop_can_move(board_state, x, y))
                         {
@@ -39,7 +39,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.white_pieces.rooks & position_to_u64(x, y))
+                    else if (board_state->board.white_pieces.rooks & position_to_bitboard(x, y))
                     {
                         if (white_rook_can_move(board_state, x, y))
                         {
@@ -47,7 +47,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.white_pieces.queens & position_to_u64(x, y))
+                    else if (board_state->board.white_pieces.queens & position_to_bitboard(x, y))
                     {
                         if (white_queen_can_move(board_state, x, y))
                         {
@@ -67,9 +67,9 @@ void find_false_move(BoardState *board_state)
             }
             else
             {
-                if (board_state->black_pieces & position_to_u64(x, y))
+                if (board_state->black_pieces & position_to_bitboard(x, y))
                 {
-                    if (board_state->board.black_pieces.pawns & position_to_u64(x, y))
+                    if (board_state->board.black_pieces.pawns & position_to_bitboard(x, y))
                     {
                         if (black_pawn_can_move(board_state, x, y))
                         {
@@ -77,7 +77,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.black_pieces.knights & position_to_u64(x, y))
+                    else if (board_state->board.black_pieces.knights & position_to_bitboard(x, y))
                     {
                         if (black_knight_can_move(board_state, x, y))
                         {
@@ -85,7 +85,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.black_pieces.bishops & position_to_u64(x, y))
+                    else if (board_state->board.black_pieces.bishops & position_to_bitboard(x, y))
                     {
                         if (black_bishop_can_move(board_state, x, y))
                         {
@@ -93,7 +93,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.black_pieces.rooks & position_to_u64(x, y))
+                    else if (board_state->board.black_pieces.rooks & position_to_bitboard(x, y))
                     {
                         if (black_rook_can_move(board_state, x, y))
                         {
@@ -101,7 +101,7 @@ void find_false_move(BoardState *board_state)
                             return;
                         }
                     }
-                    else if (board_state->board.black_pieces.queens & position_to_u64(x, y))
+                    else if (board_state->board.black_pieces.queens & position_to_bitboard(x, y))
                     {
                         if (black_queen_can_move(board_state, x, y))
                         {

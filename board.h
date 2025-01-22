@@ -34,8 +34,7 @@ typedef struct
     Color side_to_move;
 } Board;
 
-
-uint64_t pieces_to_bitmap(Pieces *pieces);
+uint64_t pieces_to_bitboard(Pieces *pieces);
 bool pieces_equals(Pieces *a, Pieces *b);
 bool board_equals(Board *a, Board *b);
 void copy_board(Board *from, Board *to);

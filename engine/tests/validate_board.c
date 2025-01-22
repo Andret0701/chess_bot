@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include "../../board.h"
 #include "../piece_moves.h"
+#include "../../bitboard.h"
 
 void errorf(Board *board, const char *format, ...)
 {
@@ -33,16 +34,16 @@ void validate_kings(Board *board)
 
 void validate_pawns(Board *board)
 {
-    if (board->white_pieces.pawns & rank_mask(0))
+    if (board->white_pieces.pawns & RANK_1_MASK)
         errorf(board, "White pawn on last rank\n");
 
-    if (board->black_pieces.pawns & rank_mask(7))
+    if (board->black_pieces.pawns & RANK_8_MASK)
         errorf(board, "Black pawn on last rank\n");
 
-    if (board->white_pieces.pawns & rank_mask(7))
+    if (board->white_pieces.pawns & RANK_8_MASK)
         errorf(board, "White pawn on first rank\n");
 
-    if (board->black_pieces.pawns & rank_mask(0))
+    if (board->black_pieces.pawns & RANK_1_MASK)
         errorf(board, "Black pawn on first rank\n");
 }
 
@@ -50,37 +51,37 @@ void validate_castling_rights(Board *board)
 {
     if (board->castling_rights & WHITE_KINGSIDE_CASTLE)
     {
-        if (!(board->white_pieces.rooks & position_to_u64(7, 0)))
+        if (!(board->white_pieces.rooks & position_to_bitboard(7, 0)))
             errorf(board, "White has kingside castling rights but no rook on h1\n");
 
-        if (!(board->white_pieces.king & position_to_u64(4, 0)))
+        if (!(board->white_pieces.king & position_to_bitboard(4, 0)))
             errorf(board, "White has kingside castling rights but no king on e1\n");
     }
 
     if (board->castling_rights & WHITE_QUEENSIDE_CASTLE)
     {
-        if (!(board->white_pieces.rooks & position_to_u64(0, 0)))
+        if (!(board->white_pieces.rooks & position_to_bitboard(0, 0)))
             errorf(board, "White has queenside castling rights but no rook on a1\n");
 
-        if (!(board->white_pieces.king & position_to_u64(4, 0)))
+        if (!(board->white_pieces.king & position_to_bitboard(4, 0)))
             errorf(board, "White has queenside castling rights but no king on e1\n");
     }
 
     if (board->castling_rights & BLACK_KINGSIDE_CASTLE)
     {
-        if (!(board->black_pieces.rooks & position_to_u64(7, 7)))
+        if (!(board->black_pieces.rooks & position_to_bitboard(7, 7)))
             errorf(board, "Black has kingside castling rights but no rook on h8\n");
 
-        if (!(board->black_pieces.king & position_to_u64(4, 7)))
+        if (!(board->black_pieces.king & position_to_bitboard(4, 7)))
             errorf(board, "Black has kingside castling rights but no king on e8\n");
     }
 
     if (board->castling_rights & BLACK_QUEENSIDE_CASTLE)
     {
-        if (!(board->black_pieces.rooks & position_to_u64(0, 7)))
+        if (!(board->black_pieces.rooks & position_to_bitboard(0, 7)))
             errorf(board, "Black has queenside castling rights but no rook on a8\n");
 
-        if (!(board->black_pieces.king & position_to_u64(4, 7)))
+        if (!(board->black_pieces.king & position_to_bitboard(4, 7)))
             errorf(board, "Black has queenside castling rights but no king on e8\n");
     }
 }

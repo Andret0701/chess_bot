@@ -8,13 +8,13 @@ void init_board(BoardState *board_state)
     board_state->occupied = board_state->white_pieces | board_state->black_pieces;
 
     // check for castling rights
-    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_u64(7, 0)) == 0)
+    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(7, 0)) == 0)
         board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
-    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_u64(0, 0)) == 0)
+    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(0, 0)) == 0)
         board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
-    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_u64(7, 7)) == 0)
+    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(7, 7)) == 0)
         board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
-    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_u64(0, 7)) == 0)
+    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(0, 7)) == 0)
         board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
 
     generate_attacks(board_state);
@@ -37,7 +37,7 @@ void validate_black_move(BoardStack *stack)
 
 void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
-    uint64_t position = position_to_u64(x, y);
+    uint64_t position = position_to_bitboard(x, y);
     board_state->board.white_pieces.pawns &= ~position;
     board_state->board.white_pieces.knights &= ~position;
     board_state->board.white_pieces.bishops &= ~position;
@@ -46,7 +46,7 @@ void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
 }
 void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
-    uint64_t position = position_to_u64(x, y);
+    uint64_t position = position_to_bitboard(x, y);
     board_state->board.black_pieces.pawns &= ~position;
     board_state->board.black_pieces.knights &= ~position;
     board_state->board.black_pieces.bishops &= ~position;
@@ -62,7 +62,7 @@ void generate_moves(BoardState *board_state, BoardStack *stack)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->white_pieces & position)
                 {
                     if (board_state->board.white_pieces.pawns & position)
@@ -87,7 +87,7 @@ void generate_moves(BoardState *board_state, BoardStack *stack)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->black_pieces & position)
                 {
                     if (board_state->board.black_pieces.pawns & position)
@@ -116,7 +116,7 @@ void generate_captures(BoardState *board_state, BoardStack *stack)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->white_pieces & position)
                 {
                     if (board_state->board.white_pieces.pawns & position)
@@ -141,7 +141,7 @@ void generate_captures(BoardState *board_state, BoardStack *stack)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->black_pieces & position)
                 {
                     if (board_state->board.black_pieces.pawns & position)
@@ -170,7 +170,7 @@ bool is_finished(BoardState *board_state)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->white_pieces & position)
                 {
                     if (board_state->board.white_pieces.pawns & position)
@@ -213,7 +213,7 @@ bool is_finished(BoardState *board_state)
         {
             for (uint8_t x = 0; x < 8; x++)
             {
-                uint64_t position = position_to_u64(x, y);
+                uint64_t position = position_to_bitboard(x, y);
                 if (board_state->black_pieces & position)
                 {
                     if (board_state->board.black_pieces.pawns & position)

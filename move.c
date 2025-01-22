@@ -34,12 +34,12 @@ char *board_to_move(Board *from, Board *to)
     }
 
     // Get all piece positions for each side
-    uint64_t from_white = pieces_to_bitmap(&from->white_pieces);
-    uint64_t from_black = pieces_to_bitmap(&from->black_pieces);
-    uint64_t to_white = pieces_to_bitmap(&to->white_pieces);
-    uint64_t to_black = pieces_to_bitmap(&to->black_pieces);
+    uint64_t from_white = pieces_to_bitboard(&from->white_pieces);
+    uint64_t from_black = pieces_to_bitboard(&from->black_pieces);
+    uint64_t to_white = pieces_to_bitboard(&to->white_pieces);
+    uint64_t to_black = pieces_to_bitboard(&to->black_pieces);
 
-    // Determine which side moved and get their piece bitmaps
+    // Determine which side moved and get their piece bitboards
     bool is_white_move = (from->side_to_move == WHITE);
     uint64_t moving_side_from = is_white_move ? from_white : from_black;
     uint64_t moving_side_to = is_white_move ? to_white : to_black;
