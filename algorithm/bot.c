@@ -158,6 +158,16 @@ BotResult run_bot(char *fen, double seconds)
             }
         }
 
+        BoardScore best_score = move_scores[depth][best_index];
+        if (has_won(best_score.result, board.side_to_move) && best_score.depth <= depth)
+        {
+            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
+
+            BotResult result = {board_to_move(&board, &stack->boards[best_index].board), best_score, depth};
+            destroy_board_stack(stack);
+            return result;
+        }
+
         // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)
         {
