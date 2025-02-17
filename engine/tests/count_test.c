@@ -1,6 +1,6 @@
 #include "count_test.h"
 #include "validate_board.h"
-#include "../../fen.h"
+#include "../../utils/fen.h"
 #include "../piece_moves.h"
 #include "count_tests.h"
 #include <stdio.h>

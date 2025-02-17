@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../board.h"
+#include "../utils/board.h"
 #include "../algorithm/board_score.h"
 
 typedef struct

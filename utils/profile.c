@@ -1,14 +1,14 @@
 #include "profile.h"
 
-#include "engine/board_stack.h"
-#include "algorithm/bot.h"
+#include "../engine/board_stack.h"
+#include "../algorithm/bot.h"
 #include "fen.h"
 #include <time.h>
 #include <stdio.h>
-#include "algorithm/min_max.h"
+#include "../algorithm/min_max.h"
 #include "move.h"
-#include "algorithm/game_history.h"
-#include "algorithm/heuristic/heuristic.h"
+#include "../algorithm/game_history.h"
+#include "../algorithm/heuristic/heuristic.h"
 
 void play_game(double think_time)
 {

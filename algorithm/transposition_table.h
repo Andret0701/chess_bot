@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
-#include "../board.h"
+#include "../utils/board.h"
 #include "board_score.h"
 
 typedef enum

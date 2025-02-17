@@ -1,9 +1,9 @@
 #pragma once
 
 #include <stdint.h>
-#include "../board.h"
+#include "../utils/board.h"
 #include "board_stack.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 #include "attack_generation/attack_generation.h"
 
 void init_board(BoardState *board_state);

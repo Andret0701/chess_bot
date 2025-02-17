@@ -1,11 +1,11 @@
 #include "validate_board.h"
-#include "../../utils.h"
+#include "../../utils/utils.h"
 #include "../board_state.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include "../../board.h"
+#include "../../utils/board.h"
 #include "../piece_moves.h"
-#include "../../bitboard.h"
+#include "../../utils/bitboard.h"
 
 void errorf(Board *board, const char *format, ...)
 {

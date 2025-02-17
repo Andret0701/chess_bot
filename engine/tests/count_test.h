@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "../../board.h"
+#include "../../utils/board.h"
 #include "../board_stack.h"
 
 uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack *stack);

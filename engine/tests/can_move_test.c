@@ -1,7 +1,7 @@
 #include "can_move_test.h"
 #include "count_tests.h"
 #include <stdio.h>
-#include "../../fen.h"
+#include "../../utils/fen.h"
 #include "../board_stack.h"
 #include "../piece_moves.h"
 

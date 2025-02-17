@@ -1,8 +1,8 @@
 #include "move.h"
 #include <string.h>
 #include <stdbool.h>
-#include "engine/board_stack.h"
-#include "engine/piece_moves.h"
+#include "../engine/board_stack.h"
+#include "../engine/piece_moves.h"
 
 char *board_to_move(Board *from, Board *to)
 {

@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <time.h>
-#include "../board.h"
+#include "../utils/board.h"
 #include "../engine/board_stack.h"
 #include "board_score.h"
 

@@ -1,11 +1,11 @@
 #include "bot.h"
 #include <stdio.h>
-#include "../board.h"
+#include "../utils/board.h"
 #include "../engine/board_stack.h"
-#include "../fen.h"
+#include "../utils/fen.h"
 #include "min_max.h"
 #include "../engine/piece_moves.h"
-#include "../move.h"
+#include "../utils/move.h"
 #include "game_history.h"
 
 #define BOARD_STACK_SIZE 65535

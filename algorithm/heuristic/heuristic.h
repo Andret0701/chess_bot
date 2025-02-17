@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../board.h"
+#include "../../utils/board.h"
 #include "../board_score.h"
 #include "../../engine/board_state.h"
 

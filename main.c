@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "board.h"
+#include "utils/board.h"
 #include "engine/board_stack.h"
 #include "engine/piece_moves.h"
-#include "fen.h"
+#include "utils/fen.h"
 
 #include "engine/tests/count_test.h"
 #include "engine/benchmark/count_benchmark.h"
@@ -13,12 +13,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include "algorithm/game_history.h"
-#include "move.h"
-#include "profile.h"
+#include "utils/move.h"
+#include "utils/profile.h"
 #include "algorithm/known_endgames/endgames.h"
 #include "engine/tests/can_move_test.h"
 
-#include "bitboard.h"
+#include "utils/bitboard.h"
 
 Board current_board;
 void new_game()

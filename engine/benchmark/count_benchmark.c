@@ -1,6 +1,6 @@
 #include "count_benchmark.h"
 
-#include "../../fen.h"
+#include "../../utils/fen.h"
 #include <time.h>
 #include <stdio.h>
 #include "../piece_moves.h"

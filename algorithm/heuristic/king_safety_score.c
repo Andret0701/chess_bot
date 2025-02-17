@@ -1,5 +1,5 @@
 #include "king_safety_score.h"
-#include "../../bitboard.h"
+#include "../../utils/bitboard.h"
 
 int get_file(int square)
 {
