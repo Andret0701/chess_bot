@@ -139,80 +139,129 @@ bool can_move(Board *board, char *move)
     return !board_equals(board, &new_board);
 }
 
+#include "move.h"
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h> // For toupper()
+#include "../engine/board_stack.h"
+#include "../engine/piece_moves.h"
+
+// Helper: Returns the type of piece at a given square in the board.
+// Returns 'K', 'Q', 'R', 'B', 'N', or 'P' if found; otherwise '\0'.
+static char get_piece_at(Board board, int square, bool is_white)
+{
+    uint64_t mask = 1ULL << square;
+    if (is_white)
+    {
+        if (board.white_pieces.king & mask)
+            return 'K';
+        if (board.white_pieces.queens & mask)
+            return 'Q';
+        if (board.white_pieces.rooks & mask)
+            return 'R';
+        if (board.white_pieces.bishops & mask)
+            return 'B';
+        if (board.white_pieces.knights & mask)
+            return 'N';
+        if (board.white_pieces.pawns & mask)
+            return 'P';
+    }
+    else
+    {
+        if (board.black_pieces.king & mask)
+            return 'K';
+        if (board.black_pieces.queens & mask)
+            return 'Q';
+        if (board.black_pieces.rooks & mask)
+            return 'R';
+        if (board.black_pieces.bishops & mask)
+            return 'B';
+        if (board.black_pieces.knights & mask)
+            return 'N';
+        if (board.black_pieces.pawns & mask)
+            return 'P';
+    }
+    return '\0';
+}
+
+// Helper: Determines if a candidate move corresponds to moving the correct piece
+// from the 'from' square to the 'to' square, including promotion if specified.
+// - moving_piece: the type (letter) of the piece from the original board.
+// - promotion: if nonzero, indicates that the piece should become this type (in lowercase)
+//   so we compare after converting to uppercase.
+static inline bool candidate_matches_move(BoardState candidate, int from, int to, char promotion, bool is_white_move, char moving_piece)
+{
+    // Ensure that the source square is now empty.
+    if (get_piece_at(candidate.board, from, is_white_move) != '\0')
+        return false;
+
+    // Determine which piece ended up at the destination.
+    char dest_piece = get_piece_at(candidate.board, to, is_white_move);
+
+    // If a promotion is specified, the moved piece must have become that piece.
+    if (promotion != '\0')
+    {
+        char expected = toupper(promotion);
+        if (dest_piece != expected)
+            return false;
+    }
+    else
+    {
+        // Otherwise, the piece type at the destination should match the original moving piece.
+        if (dest_piece != moving_piece)
+            return false;
+    }
+
+    return true;
+}
+
+// Improved apply_move function that checks the correct piece is moved to the expected square.
+// It first verifies the move string, then generates all candidate moves, and finally selects
+// the candidate in which the piece from the source square is removed and appears at the destination.
 Board apply_move(Board *board, char *move)
 {
-    // Calculate the 'from' and 'to' positions from the move string
+    // Validate the move string first.
+    if (!move_valid(move))
+    {
+        // Invalid move string: return original board.
+        return *board;
+    }
+
+    // Parse the move string into source (from), destination (to), and promotion char (if any).
     int from = (move[0] - 'a') + (move[1] - '1') * 8;
     int to = (move[2] - 'a') + (move[3] - '1') * 8;
-
-    // Check if there's a promotion character
     char promotion = (strlen(move) == 5) ? move[4] : '\0';
 
+    // Create bit masks for the source and destination squares.
     uint64_t from_mask = 1ULL << from;
-    uint64_t to_mask = 1ULL << to;
 
-    // Generate all possible moves and store them in a stack
+    // Generate all legal moves from the current board state.
     BoardStack *stack = create_board_stack(1000);
     BoardState board_state = board_to_board_state(board);
     generate_moves(&board_state, stack);
 
-    // Determine if it's white's move or black's move based on the piece at 'from'
-    int is_white_move = (board_state.white_pieces & from_mask) != 0;
+    // Determine which side is moving by checking the piece at the source square.
+    bool is_white_move = (board_state.white_pieces & from_mask) != 0;
 
+    // Determine the type of piece that is moving from the original board.
+    char moving_piece = get_piece_at(board_state.board, from, is_white_move);
+
+    // Iterate through all candidate moves.
     for (uint16_t i = 0; i < stack->count; i++)
     {
         BoardState candidate = stack->boards[i];
 
-        // Check if the move corresponds to the correct piece being moved
-        if (is_white_move)
+        // Check that the candidate move has removed the piece from the source square
+        // and placed the correct piece at the destination (including promotion if specified).
+        if (candidate_matches_move(candidate, from, to, promotion, is_white_move, moving_piece))
         {
-            if ((!(candidate.white_pieces & from_mask)) && (candidate.white_pieces & to_mask))
-            {
-                // Handle promotion
-                if (promotion != '\0')
-                {
-                    if ((promotion == 'q' && (candidate.board.white_pieces.queens & to_mask)) ||
-                        (promotion == 'r' && (candidate.board.white_pieces.rooks & to_mask)) ||
-                        (promotion == 'b' && (candidate.board.white_pieces.bishops & to_mask)) ||
-                        (promotion == 'n' && (candidate.board.white_pieces.knights & to_mask)))
-                    {
-                        destroy_board_stack(stack);
-                        return candidate.board;
-                    }
-                }
-                else
-                {
-                    destroy_board_stack(stack);
-                    return candidate.board;
-                }
-            }
-        }
-        else // Black's move
-        {
-            if ((!(candidate.black_pieces & from_mask)) && (candidate.black_pieces & to_mask))
-            {
-                // Handle promotion
-                if (promotion != '\0')
-                {
-                    if ((promotion == 'q' && (candidate.board.black_pieces.queens & to_mask)) ||
-                        (promotion == 'r' && (candidate.board.black_pieces.rooks & to_mask)) ||
-                        (promotion == 'b' && (candidate.board.black_pieces.bishops & to_mask)) ||
-                        (promotion == 'n' && (candidate.board.black_pieces.knights & to_mask)))
-                    {
-                        destroy_board_stack(stack);
-                        return candidate.board;
-                    }
-                }
-                else
-                {
-                    destroy_board_stack(stack);
-                    return candidate.board;
-                }
-            }
+            Board result = candidate.board;
+            destroy_board_stack(stack);
+            return result;
         }
     }
 
-    // If no matching move was found, return the original board
+    // No candidate move matched; clean up and return the original board.
     destroy_board_stack(stack);
     return board_state.board;
 }
