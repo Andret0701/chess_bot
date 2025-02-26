@@ -10,24 +10,40 @@
 #include "../algorithm/game_history.h"
 #include "../algorithm/heuristic/heuristic.h"
 
-void play_game(double think_time)
+void play_game(double time_seconds, double increment_seconds)
 {
-    Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+    Board board = fen_to_board(STARTFEN);
+    BotFlags flags = {time_seconds * 1000, time_seconds * 1000, increment_seconds * 1000, increment_seconds * 1000, -1};
 
-    print_board(&board);
     reset_game_history();
     push_game_history(board);
     BoardState board_state = board_to_board_state(&board);
     while (true)
     {
         clock_t start = clock();
-        BotResult result = run_bot(board_to_fen(&board_state.board), think_time);
+        BotResult result = run_bot(flags, board);
         clock_t end = clock();
         double time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-        if (time_used > think_time)
+        // take away the time from flags and add increment
+        if (board.side_to_move == WHITE)
         {
-            printf("Used to long to think: %f\n", think_time);
-            printf("That was %f seconds to much.\n", time_used - think_time);
+            flags.wtime -= time_used * 1000;
+            if (flags.wtime < 0)
+            {
+                printf("White ran out of time\n");
+                break;
+            }
+            flags.wtime += flags.winc;
+        }
+        else
+        {
+            flags.btime -= time_used * 1000;
+            if (flags.btime < 0)
+            {
+                printf("Black ran out of time\n");
+                break;
+            }
+            flags.btime += flags.binc;
         }
 
         board = apply_move(&board, result.move);
@@ -38,6 +54,7 @@ void play_game(double think_time)
                result.score.result == WHITE_WON ? "White won" : result.score.result == BLACK_WON ? "Black won"
                                                             : result.score.result == DRAW        ? "Draw"
                                                                                                  : "Unknown");
+        printf("White time: %.1f, Black time: %.1f\n", flags.wtime / 1000.0, flags.btime / 1000.0);
 
         if (threefold_repetition())
         {

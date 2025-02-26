@@ -106,11 +106,45 @@ bool is_move_better(uint16_t i, uint16_t j, uint8_t depth, Color side_to_move)
     return false;
 }
 
-BotResult run_bot(char *fen, double seconds)
+double get_time_allocation(BotFlags flags, Color side_to_move)
+{
+    // If movestogo is 0, assume a default number of moves (e.g., 40 moves remaining in sudden death)
+    if (flags.movestogo <= 0)
+        flags.movestogo = 40;
+
+    // Base minimal time allocation (in seconds) to avoid zero-time moves
+    double base_time = 0.05; // Adjust as needed
+
+    // Choose the appropriate values based on side to move
+    double remaining_time = (side_to_move == WHITE) ? flags.wtime : flags.btime;
+    double increment = (side_to_move == WHITE) ? flags.winc : flags.binc;
+
+    // Convert remaining time and increment from milliseconds to seconds
+    remaining_time /= 1000.0;
+    increment /= 1000.0;
+
+    // Calculate an initial allocation:
+    // Divide remaining time evenly among moves left, then add half of the increment
+    double time_per_move = remaining_time / flags.movestogo;
+    double allocated_time = time_per_move + (increment * 0.5);
+
+    // Avoid spending too much on one move:
+    // For example, cap the allocation to 15% of the total remaining time.
+    double max_allocation = remaining_time * 0.15;
+    if (allocated_time > max_allocation)
+        allocated_time = max_allocation;
+
+    // Ensure a minimum time usage even if remaining time is very low
+    if (allocated_time < base_time)
+        allocated_time = base_time;
+
+    return allocated_time;
+}
+
+BotResult run_bot(BotFlags flags, Board board)
 {
     clock_t start = clock();
-
-    Board board = fen_to_board(fen);
+    double seconds = get_time_allocation(flags, board.side_to_move);
     BoardState board_state = board_to_board_state(&board);
 
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
