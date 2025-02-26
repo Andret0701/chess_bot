@@ -9,7 +9,7 @@
 #include "algorithm/bot.h"
 
 #define UCI_LOG_FILE "uci_log.txt"
-#define INPUT_BUFFER_SIZE 4096
+#define INPUT_BUFFER_SIZE 8192
 
 Board current_board;
 void new_game(char *input)
@@ -30,8 +30,11 @@ void do_move(char *move)
 
 void parse_position(char *input)
 {
-    char *token = strtok(input, " ");
-    token = strtok(NULL, " ");
+    char *token = strtok(input, " "); // Should be "position"
+    token = strtok(NULL, " ");        // Next token: "startpos" or "fen"
+
+    if (!token)
+        return;
 
     if (strcmp(token, "startpos") == 0)
     {
@@ -40,17 +43,27 @@ void parse_position(char *input)
     }
     else if (strcmp(token, "fen") == 0)
     {
-        new_game(token);
-        token = strtok(NULL, " ");
+        // Build the FEN string from tokens until we hit "moves" or run out of tokens.
+        char fen[256] = {0};
+        bool firstField = true;
+        while ((token = strtok(NULL, " ")) != NULL)
+        {
+            if (strcmp(token, "moves") == 0)
+                break;
+            if (!firstField)
+                strcat(fen, " ");
+            strcat(fen, token);
+            firstField = false;
+        }
+        new_game(fen);
     }
 
-    if (strcmp(token, "moves") == 0)
+    // If token equals "moves", process the move list.
+    if (token != NULL && strcmp(token, "moves") == 0)
     {
-        token = strtok(NULL, " ");
-        while (token != NULL)
+        while ((token = strtok(NULL, " ")) != NULL)
         {
             do_move(token);
-            token = strtok(NULL, " ");
         }
     }
 }
