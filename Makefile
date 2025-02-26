@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -O3 -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
 PROFILE_FLAGS = -pg -no-pie -fno-builtin -O3 -fno-inline
-TARGET = main.exe
+TARGET = andobot.exe
 BUILD_DIR = build
 UNITY_SRC = $(BUILD_DIR)/unity.c
 
