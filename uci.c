@@ -133,11 +133,26 @@ void log_board(Board board)
     fclose(file);
 }
 
-void respond(char *response)
+void respond(const char *format, ...)
 {
-    printf("%s\n", response);
+    va_list args;
+    va_start(args, format);
+
+    // Print to stdout
+    vprintf(format, args);
+    printf("\n");
     fflush(stdout);
-    log_uci(response);
+
+    // Log to file
+    FILE *file = fopen(UCI_LOG_FILE, "a");
+    if (file != NULL)
+    {
+        vfprintf(file, format, args);
+        fprintf(file, "\n");
+        fclose(file);
+    }
+
+    va_end(args);
 }
 
 // get message
@@ -207,7 +222,7 @@ void uci_loop()
             // Instead of searching, return a dummy move
             BotFlags flags = parse_go(input);
             BotResult result = run_bot(flags, current_board);
-            respond(result.move);
+            respond("bestmove %s", result.move);
         }
         else if (strcmp(input, "quit") == 0)
         {
