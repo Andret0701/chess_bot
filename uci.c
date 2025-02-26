@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "utils/board.h"
 #include "utils/fen.h"
 #include "algorithm/game_history.h"
@@ -12,6 +13,8 @@
 #define INPUT_BUFFER_SIZE 8192
 
 Board current_board;
+int move_overhead = 50;
+
 void new_game(char *input)
 {
     current_board = fen_to_board(input);
@@ -109,12 +112,18 @@ BotFlags parse_go(char *input)
     return flags;
 }
 
-void log_uci(char *message)
+void log_uci(const char *format, ...)
 {
-    // a file named uci_log.txt will be created in the same directory as the executable
     FILE *file = fopen(UCI_LOG_FILE, "a");
-    fprintf(file, "%s\n", message);
-    fclose(file);
+    if (file != NULL)
+    {
+        va_list args = NULL;
+        va_start(args, format);
+        vfprintf(file, format, args);
+        fprintf(file, "\n");
+        va_end(args);
+        fclose(file);
+    }
 }
 
 void log_board(Board board)
@@ -141,6 +150,15 @@ void listen(char *message)
     log_uci(message);
 }
 
+void set_option(char *name, char *value)
+{
+    if (strcmp(name, "Move Overhead") == 0)
+    {
+        move_overhead = atoi(value);
+        log_uci("Move Overhead set to %d", move_overhead);
+    }
+}
+
 void uci_loop()
 {
     new_game(STARTFEN);
@@ -154,11 +172,23 @@ void uci_loop()
             // Engine identification
             respond("id name AndoBot");
             respond("id author Andreas Tolstrup Christensen");
+            respond("option name Move Overhead type spin default 50 min 0 max 1000");
+            respond("option name Threads type spin default 1 min 1 max 1");
+
             respond("uciok");
         }
         else if (strcmp(input, "isready") == 0)
         {
             respond("readyok");
+        }
+        else if (strncmp(input, "setoption name ", 15) == 0)
+        {
+            char *name = strtok(input + 15, " ");
+            char *value = strtok(NULL, " ");
+            if (name && value)
+            {
+                set_option(name, value);
+            }
         }
         else if (strcmp(input, "ucinewgame") == 0)
         {
