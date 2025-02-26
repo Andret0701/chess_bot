@@ -37,4 +37,6 @@ bool pieces_equals(Pieces *a, Pieces *b);
 bool board_equals(Board *a, Board *b);
 void copy_board(Board *from, Board *to);
 Board flip_board(Board *board);
+
+void print_board_to_file(Board *board, FILE *file);
 void print_board(Board *board);

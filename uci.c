@@ -8,6 +8,9 @@
 #include "utils/move.h"
 #include "algorithm/bot.h"
 
+#define UCI_LOG_FILE "uci_log.txt"
+#define INPUT_BUFFER_SIZE 4096
+
 Board current_board;
 void new_game(char *input)
 {
@@ -93,53 +96,83 @@ BotFlags parse_go(char *input)
     return flags;
 }
 
+void log_uci(char *message)
+{
+    // a file named uci_log.txt will be created in the same directory as the executable
+    FILE *file = fopen(UCI_LOG_FILE, "a");
+    fprintf(file, "%s\n", message);
+    fclose(file);
+}
+
+void log_board(Board board)
+{
+    FILE *file = fopen(UCI_LOG_FILE, "a");
+    print_board_to_file(&board, file);
+    fclose(file);
+}
+
+void respond(char *response)
+{
+    printf("%s\n", response);
+    fflush(stdout);
+    log_uci(response);
+}
+
+// get message
+void listen(char *message)
+{
+    while (fgets(message, INPUT_BUFFER_SIZE, stdin) == NULL)
+        ;
+    // Remove newline
+    message[strcspn(message, "\n")] = 0;
+    log_uci(message);
+}
+
 void uci_loop()
 {
     new_game(STARTFEN);
-    char input[4096];
+    char input[INPUT_BUFFER_SIZE];
 
     while (1)
     {
-        if (!fgets(input, sizeof(input), stdin))
-            continue;
-
-        // Remove newline
-        input[strcspn(input, "\n")] = 0;
-
+        listen(input);
         if (strcmp(input, "uci") == 0)
         {
             // Engine identification
-            printf("id name AndoBot\n");
-            printf("id author Andreas Tolstrup Christensen\n");
-            printf("uciok\n");
-            fflush(stdout);
+            respond("id name AndoBot");
+            respond("id author Andreas Tolstrup Christensen");
+            respond("uciok");
         }
         else if (strcmp(input, "isready") == 0)
         {
-            printf("readyok\n");
-            fflush(stdout);
+            respond("readyok");
         }
         else if (strcmp(input, "ucinewgame") == 0)
         {
             // Start a new game
             new_game(STARTFEN);
+            log_board(current_board);
         }
         else if (strncmp(input, "position", 8) == 0)
         {
             // Handle setting up the board position
             parse_position(input);
+            log_board(current_board);
         }
         else if (strncmp(input, "go", 2) == 0)
         {
             // Instead of searching, return a dummy move
             BotFlags flags = parse_go(input);
             BotResult result = run_bot(flags, current_board);
-            printf("bestmove %s\n", result.move);
-            fflush(stdout);
+            respond(result.move);
         }
         else if (strcmp(input, "quit") == 0)
         {
             break;
         }
+        else
+            log_uci("Unknown command");
+
+        log_uci("");
     }
 }

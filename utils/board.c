@@ -64,7 +64,7 @@ Board flip_board(Board *board)
     return flipped;
 }
 
-void print_board(Board *board)
+void print_board_to_file(Board *board, FILE *file)
 {
     for (int y = 7; y >= 0; y--)
     {
@@ -72,33 +72,38 @@ void print_board(Board *board)
         {
             uint64_t position = position_to_bitboard(x, y);
             if (board->white_pieces.pawns & position)
-                printf("P");
+                fprintf(file, "P");
             if (board->white_pieces.knights & position)
-                printf("N");
+                fprintf(file, "N");
             if (board->white_pieces.bishops & position)
-                printf("B");
+                fprintf(file, "B");
             if (board->white_pieces.rooks & position)
-                printf("R");
+                fprintf(file, "R");
             if (board->white_pieces.queens & position)
-                printf("Q");
+                fprintf(file, "Q");
             if (board->white_pieces.king & position)
-                printf("K");
+                fprintf(file, "K");
             if (board->black_pieces.pawns & position)
-                printf("p");
+                fprintf(file, "p");
             if (board->black_pieces.knights & position)
-                printf("n");
+                fprintf(file, "n");
             if (board->black_pieces.bishops & position)
-                printf("b");
+                fprintf(file, "b");
             if (board->black_pieces.rooks & position)
-                printf("r");
+                fprintf(file, "r");
             if (board->black_pieces.queens & position)
-                printf("q");
+                fprintf(file, "q");
             if (board->black_pieces.king & position)
-                printf("k");
+                fprintf(file, "k");
             if (!((board->white_pieces.pawns | board->white_pieces.knights | board->white_pieces.bishops | board->white_pieces.rooks | board->white_pieces.queens | board->white_pieces.king | board->black_pieces.pawns | board->black_pieces.knights | board->black_pieces.bishops | board->black_pieces.rooks | board->black_pieces.queens | board->black_pieces.king) & position))
-                printf(".");
-            printf(" ");
+                fprintf(file, ".");
+            fprintf(file, " ");
         }
-        printf("\n");
+        fprintf(file, "\n");
     }
+}
+
+void print_board(Board *board)
+{
+    print_board_to_file(board, stdout);
 }
