@@ -17,6 +17,7 @@
 #include "utils/profile.h"
 #include "algorithm/known_endgames/endgames.h"
 #include "engine/tests/can_move_test.h"
+#include "engine/tests/capture_move_test.h"
 
 #include "utils/bitboard.h"
 #include "uci.h"
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
         run_count_tests();
         printf("Running can move tests\n");
         run_can_move_tests();
+        run_capture_move_tests();
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "benchmark") == 0)
