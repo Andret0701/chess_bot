@@ -23,6 +23,12 @@
 
 int main(int argc, char *argv[])
 {
+    // Board board = fen_to_board("r1bqkb1r/ppp2ppp/2n1pn2/3p4/3P4/PQN2N2/1PP1PPPP/R1B1KB1R w KQkq - 0 1");
+    // print_board(&board);
+    // // best move
+    // BotResult result = run_bot((BotFlags){100000, 100000, 0, 0}, board);
+    // print_bot_result(result);
+    // exit(0);
 
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {

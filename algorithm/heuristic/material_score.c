@@ -1,4 +1,5 @@
 #include "material_score.h"
+#include "../../utils/bitboard.h"
 // This is based on the Larry Kaufman's 2021 system
 // https://en.wikipedia.org/wiki/Chess_piece_relative_value
 
@@ -60,20 +61,16 @@ int32_t calculate_combined_piece_score(uint64_t pieces, int32_t first_value, int
 
 int32_t get_middlegame_pawn_score(Board *board)
 {
-    uint64_t center_pawn_mask = 0x1818181818181818ULL;
-    uint64_t bishop_pawn_mask = 0x2424242424242424ULL;
-    uint64_t knight_pawn_mask = 0x0A0A0A0A0A0A0A0AULL;
-    uint64_t rook_pawn_mask = 0x0101010101010101ULL;
 
     int32_t score = 0;
-    score += calculate_piece_score(board->white_pieces.pawns & center_pawn_mask, 100);
-    score -= calculate_piece_score(board->black_pieces.pawns & center_pawn_mask, 100);
-    score += calculate_piece_score(board->white_pieces.pawns & bishop_pawn_mask, 95);
-    score -= calculate_piece_score(board->black_pieces.pawns & bishop_pawn_mask, 95);
-    score += calculate_piece_score(board->white_pieces.pawns & knight_pawn_mask, 85);
-    score -= calculate_piece_score(board->black_pieces.pawns & knight_pawn_mask, 85);
-    score += calculate_piece_score(board->white_pieces.pawns & rook_pawn_mask, 70);
-    score -= calculate_piece_score(board->black_pieces.pawns & rook_pawn_mask, 70);
+    score += calculate_piece_score(board->white_pieces.pawns & CENTER_FILES_MASK, 100);
+    score -= calculate_piece_score(board->black_pieces.pawns & CENTER_FILES_MASK, 100);
+    score += calculate_piece_score(board->white_pieces.pawns & BISHOP_FILES_MASK, 95);
+    score -= calculate_piece_score(board->black_pieces.pawns & BISHOP_FILES_MASK, 95);
+    score += calculate_piece_score(board->white_pieces.pawns & KNIGHT_FILES_MASK, 85);
+    score -= calculate_piece_score(board->black_pieces.pawns & KNIGHT_FILES_MASK, 85);
+    score += calculate_piece_score(board->white_pieces.pawns & ROOK_FILES_MASK, 70);
+    score -= calculate_piece_score(board->black_pieces.pawns & ROOK_FILES_MASK, 70);
 
     return score;
 }
@@ -152,5 +149,7 @@ int32_t get_material_score(Board *board)
     case ENDGAME:
         return get_endgame_material_score(board);
     }
+
+    printf("Unknown game phase\n");
     return 0;
 }
