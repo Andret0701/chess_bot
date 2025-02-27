@@ -1,77 +1,88 @@
 #include "move_sort.h"
 #include <stdio.h>
 
-// Score multiplier to ensure captures are prioritized over positional moves
-#define MVV_LVA_MULTIPLIER 100
-// Bonus for undefended captures
-#define UNDEFENDED_CAPTURE_BONUS 50
-
-uint16_t get_mvv_lva(BoardState *from, BoardState *to)
+uint16_t get_mvvlva(BoardState *from, BoardState *to)
 {
-    // Piece values ordered from pawn to king
-    static const int piece_values[6] = {100, 300, 300, 500, 900, 10000};
+    const int piece_values[6] = {100, 300, 300, 500, 900, 10000}; // Pawn, Knight, Bishop, Rook, Queen, King
 
-    uint64_t moved_piece, captured_piece;
-    bool is_defended;
-    const Pieces *attacker_pieces, *victim_pieces;
-    uint64_t attacker_all_pieces, victim_all_pieces;
-    uint64_t *attack_bitboard;
-
-    // Set up pointers based on side to move
+    uint64_t moved_piece;
+    uint64_t captured_piece;
     if (from->board.side_to_move == WHITE)
     {
-        attacker_pieces = &from->board.white_pieces;
-        victim_pieces = &from->board.black_pieces;
-        attacker_all_pieces = from->white_pieces;
-        victim_all_pieces = from->black_pieces;
-        attack_bitboard = &to->black_attack;
+        if (from->black_pieces == to->black_pieces)
+            return 0;
+        moved_piece = from->white_pieces & ~to->white_pieces;
+        captured_piece = from->black_pieces & ~to->black_pieces;
     }
     else
     {
-        attacker_pieces = &from->board.black_pieces;
-        victim_pieces = &from->board.white_pieces;
-        attacker_all_pieces = from->black_pieces;
-        victim_all_pieces = from->white_pieces;
-        attack_bitboard = &to->white_attack;
+        if (from->white_pieces == to->white_pieces)
+            return 0;
+        moved_piece = from->black_pieces & ~to->black_pieces;
+        captured_piece = from->white_pieces & ~to->white_pieces;
     }
 
-    // If no capture occurred, return baseline score
-    if (victim_all_pieces == (from->board.side_to_move == WHITE ? to->black_pieces : to->white_pieces))
+    uint8_t moved_piece_index = 0;
+    uint8_t captured_piece_index = 0;
+
+    if (from->board.side_to_move == WHITE)
     {
-        return 0;
+        if (moved_piece & from->board.white_pieces.pawns)
+            moved_piece_index = 0;
+        else if (moved_piece & from->board.white_pieces.knights)
+            moved_piece_index = 1;
+        else if (moved_piece & from->board.white_pieces.bishops)
+            moved_piece_index = 2;
+        else if (moved_piece & from->board.white_pieces.rooks)
+            moved_piece_index = 3;
+        else if (moved_piece & from->board.white_pieces.queens)
+            moved_piece_index = 4;
+        else
+            moved_piece_index = 5;
+
+        if (captured_piece & from->board.black_pieces.pawns)
+            captured_piece_index = 0;
+        else if (captured_piece & from->board.black_pieces.knights)
+            captured_piece_index = 1;
+        else if (captured_piece & from->board.black_pieces.bishops)
+            captured_piece_index = 2;
+        else if (captured_piece & from->board.black_pieces.rooks)
+            captured_piece_index = 3;
+        else if (captured_piece & from->board.black_pieces.queens)
+            captured_piece_index = 4;
+        else
+            captured_piece_index = 5;
     }
-
-    moved_piece = attacker_all_pieces & ~(from->board.side_to_move == WHITE ? to->white_pieces : to->black_pieces);
-    captured_piece = victim_all_pieces & ~(from->board.side_to_move == WHITE ? to->black_pieces : to->white_pieces);
-    is_defended = *attack_bitboard & captured_piece;
-
-    // Determine piece types
-    uint8_t moved_piece_type =
-        (moved_piece & attacker_pieces->pawns) ? 0 : (moved_piece & attacker_pieces->knights) ? 1
-                                                 : (moved_piece & attacker_pieces->bishops)   ? 2
-                                                 : (moved_piece & attacker_pieces->rooks)     ? 3
-                                                 : (moved_piece & attacker_pieces->queens)    ? 4
-                                                                                              : 5;
-
-    uint8_t captured_piece_type =
-        (captured_piece & victim_pieces->pawns) ? 0 : (captured_piece & victim_pieces->knights) ? 1
-                                                  : (captured_piece & victim_pieces->bishops)   ? 2
-                                                  : (captured_piece & victim_pieces->rooks)     ? 3
-                                                  : (captured_piece & victim_pieces->queens)    ? 4
-                                                                                                : 5;
-
-    // Calculate MVV-LVA score
-    // Higher value victims and lower value attackers get higher scores
-    int score = piece_values[captured_piece_type] * MVV_LVA_MULTIPLIER -
-                piece_values[moved_piece_type];
-
-    // Bonus for undefended captures
-    if (!is_defended)
+    else
     {
-        score += UNDEFENDED_CAPTURE_BONUS;
+        if (moved_piece & from->board.black_pieces.pawns)
+            moved_piece_index = 0;
+        else if (moved_piece & from->board.black_pieces.knights)
+            moved_piece_index = 1;
+        else if (moved_piece & from->board.black_pieces.bishops)
+            moved_piece_index = 2;
+        else if (moved_piece & from->board.black_pieces.rooks)
+            moved_piece_index = 3;
+        else if (moved_piece & from->board.black_pieces.queens)
+            moved_piece_index = 4;
+        else
+            moved_piece_index = 5;
+
+        if (captured_piece & from->board.white_pieces.pawns)
+            captured_piece_index = 0;
+        else if (captured_piece & from->board.white_pieces.knights)
+            captured_piece_index = 1;
+        else if (captured_piece & from->board.white_pieces.bishops)
+            captured_piece_index = 2;
+        else if (captured_piece & from->board.white_pieces.rooks)
+            captured_piece_index = 3;
+        else if (captured_piece & from->board.white_pieces.queens)
+            captured_piece_index = 4;
+        else
+            captured_piece_index = 5;
     }
 
-    return score > 0 ? score : 0;
+    return piece_values[captured_piece_index] - piece_values[moved_piece_index] + 10000;
 }
 
 int compare_boards(const void *left, const void *right)
@@ -81,10 +92,9 @@ int compare_boards(const void *left, const void *right)
 
 void sort_moves(BoardState *from, BoardStack *stack, uint16_t base)
 {
-    const size_t num_moves = stack->count - base;
     for (uint16_t i = base; i < stack->count; i++)
-    {
-        stack->boards[i].mvvlva_score = get_mvv_lva(from, &stack->boards[i]);
-    }
-    qsort(&stack->boards[base], num_moves, sizeof(BoardState), compare_boards);
+        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
+
+    //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));
+    qsort(&stack->boards[base], stack->count - base, sizeof(BoardState), compare_boards);
 }
