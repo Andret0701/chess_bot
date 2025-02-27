@@ -36,11 +36,8 @@ bool has_bishop_pair(Board *board, Color color)
         return false;
 
     // Check if bishops are on different colors
-    uint64_t dark_squares = 0xAA55AA55AA55AA55ULL;
-    uint64_t light_squares = 0x55AA55AA55AA55AAULL;
-
-    bool has_dark_square_bishop = bishops & dark_squares;
-    bool has_light_square_bishop = bishops & light_squares;
+    bool has_dark_square_bishop = bishops & DARK_SQUARES_MASK;
+    bool has_light_square_bishop = bishops & LIGHT_SQUARES_MASK;
 
     return has_dark_square_bishop && has_light_square_bishop;
 }

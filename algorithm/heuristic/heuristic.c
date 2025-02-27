@@ -3,6 +3,7 @@
 #include "material_score.h"
 #include "king_safety_score.h"
 #include "pawn_structure_score.h"
+#include "../../utils/bitboard.h"
 
 bool has_insufficient_material(Board *board)
 {
@@ -83,15 +84,11 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     score += __builtin_popcountll(board_state->white_attacks.queens) * 10;
     score -= __builtin_popcountll(board_state->black_attacks.queens) * 10;
 
-    // At the top with other constants:
-    static const uint64_t CENTER_SQUARES = 0x0000001818000000ULL;  // e4,d4,e5,d5
-    static const uint64_t EXTENDED_CENTER = 0x00003C3C3C3C0000ULL; // c3-f3 to c6-f6
-
     // In score_board():
-    score += __builtin_popcountll(board_state->white_pieces & CENTER_SQUARES) * 20;
-    score -= __builtin_popcountll(board_state->black_pieces & CENTER_SQUARES) * 20;
-    score += __builtin_popcountll(board_state->white_pieces & EXTENDED_CENTER) * 10;
-    score -= __builtin_popcountll(board_state->black_pieces & EXTENDED_CENTER) * 10;
+    score += __builtin_popcountll(board_state->white_pieces & CENTER_SQUARES_MASK) * 20;
+    score -= __builtin_popcountll(board_state->black_pieces & CENTER_SQUARES_MASK) * 20;
+    score += __builtin_popcountll(board_state->white_pieces & EXTENDED_CENTER_MASK) * 10;
+    score -= __builtin_popcountll(board_state->black_pieces & EXTENDED_CENTER_MASK) * 10;
 
     // Bonus for protected pieces
     score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.queens) * 10;
