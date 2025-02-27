@@ -1,7 +1,7 @@
 #include "pawn_structure_score.h"
 #include "../../utils/bitboard.h"
 
-#define DOUBLE_PAWN_PENALTY 20
+#define DOUBLE_PAWN_PENALTY 5
 #define PAWN_CHAIN_BONUS 10
 
 int32_t get_double_pawn_penalty(BoardState *board_state)
