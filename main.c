@@ -15,7 +15,6 @@
 #include "algorithm/game_history.h"
 #include "utils/move.h"
 #include "utils/profile.h"
-#include "algorithm/known_endgames/endgames.h"
 #include "engine/tests/can_move_test.h"
 #include "engine/tests/capture_move_test.h"
 
