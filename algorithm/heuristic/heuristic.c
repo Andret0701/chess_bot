@@ -2,6 +2,7 @@
 #include "position_score.h"
 #include "material_score.h"
 #include "king_safety_score.h"
+#include "pawn_structure_score.h"
 
 bool has_insufficient_material(Board *board)
 {
@@ -67,6 +68,9 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     // King safety scoring
     score += get_king_safety_score(board_state);
 
+    // Pawn structure scoring
+    score += get_pawn_structure_score(board_state);
+
     // Score for where different pieces can attack to
     score += __builtin_popcountll(board_state->white_attacks.pawns) * 2;
     score -= __builtin_popcountll(board_state->black_attacks.pawns) * 2;
@@ -88,14 +92,6 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     score -= __builtin_popcountll(board_state->black_pieces & CENTER_SQUARES) * 20;
     score += __builtin_popcountll(board_state->white_pieces & EXTENDED_CENTER) * 10;
     score -= __builtin_popcountll(board_state->black_pieces & EXTENDED_CENTER) * 10;
-
-    // Add this near the pawn evaluation:
-    uint64_t white_pawn_attacks = board_state->white_attacks.pawns;
-    uint64_t black_pawn_attacks = board_state->black_attacks.pawns;
-
-    // Bonus for pawns protected by other pawns
-    score += __builtin_popcountll(board_state->board.white_pieces.pawns & white_pawn_attacks) * 15;
-    score -= __builtin_popcountll(board_state->board.black_pieces.pawns & black_pawn_attacks) * 15;
 
     // Bonus for protected pieces
     score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.queens) * 10;
