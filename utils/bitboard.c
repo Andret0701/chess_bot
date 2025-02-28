@@ -38,12 +38,12 @@ uint64_t position_to_bitboard(uint8_t x, uint8_t y)
 
 uint64_t move_bitboard_left(uint64_t bitboard)
 {
-    return (bitboard & ~FILE_H_MASK) << 1;
+    return (bitboard & ~FILE_A_MASK) >> 1;
 }
 
 uint64_t move_bitboard_right(uint64_t bitboard)
 {
-    return (bitboard & ~FILE_A_MASK) >> 1;
+    return (bitboard & ~FILE_H_MASK) << 1;
 }
 
 uint64_t move_bitboard_up(uint64_t bitboard)
