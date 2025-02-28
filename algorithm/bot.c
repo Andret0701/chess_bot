@@ -126,11 +126,11 @@ double get_time_allocation(BotFlags flags, Color side_to_move)
     // Calculate an initial allocation:
     // Divide remaining time evenly among moves left, then add half of the increment
     double time_per_move = remaining_time / flags.movestogo;
-    double allocated_time = time_per_move + (increment * 0.5);
+    double allocated_time = time_per_move + (increment * 0.7);
 
     // Avoid spending too much on one move:
-    // For example, cap the allocation to 15% of the total remaining time.
-    double max_allocation = remaining_time * 0.15;
+    // For example, cap the allocation to 20% of the total remaining time.
+    double max_allocation = remaining_time * 0.2;
     if (allocated_time > max_allocation)
         allocated_time = max_allocation;
 
