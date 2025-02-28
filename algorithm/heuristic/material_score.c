@@ -136,17 +136,36 @@ int32_t get_endgame_material_score(Board *board)
 
 int32_t get_material_score(Board *board)
 {
-    GamePhase phase = get_game_phase(board);
-    switch (phase)
-    {
-    case MIDDLEGAME:
-        return get_middlegame_material_score(board);
-    case THRESHOLD:
-        return get_threshold_material_score(board);
-    case ENDGAME:
-        return get_endgame_material_score(board);
-    }
+    // GamePhase phase = get_game_phase(board);
+    // switch (phase)
+    // {
+    // case MIDDLEGAME:
+    //     return get_middlegame_material_score(board);
+    // case THRESHOLD:
+    //     return get_threshold_material_score(board);
+    // case ENDGAME:
+    //     return get_endgame_material_score(board);
+    // }
 
-    printf("Unknown game phase\n");
-    return 0;
+    // printf("Unknown game phase\n");
+    // return 0;
+
+    int32_t score = 0;
+    score += calculate_piece_score(board->white_pieces.pawns, 100);
+    score -= calculate_piece_score(board->black_pieces.pawns, 100);
+    score += calculate_piece_score(board->white_pieces.knights, 320);
+    score -= calculate_piece_score(board->black_pieces.knights, 320);
+    score += calculate_piece_score(board->white_pieces.bishops, 330);
+    score -= calculate_piece_score(board->black_pieces.bishops, 330);
+    score += calculate_piece_score(board->white_pieces.rooks, 500);
+    score -= calculate_piece_score(board->black_pieces.rooks, 500);
+    score += calculate_piece_score(board->white_pieces.queens, 900);
+    score -= calculate_piece_score(board->black_pieces.queens, 900);
+
+    if (has_bishop_pair(board, WHITE))
+        score += 20;
+    if (has_bishop_pair(board, BLACK))
+        score -= 20;
+
+    return score;
 }
