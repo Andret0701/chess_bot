@@ -1,7 +1,11 @@
 #include "pawn_structure_score.h"
 #include "../../utils/bitboard.h"
 
-#define DOUBLE_PAWN_PENALTY 5
+#define DOUBLE_PAWN_PENALTY 20
+#define ISOLATED_PAWN_PENALTY 20
+#define BACKWARD_PAWN_PENALTY 10
+#define PASSED_PAWN_BONUS 10
+#define PAWN_ISLAND_PENALTY 10
 #define PAWN_CHAIN_BONUS 10
 
 int32_t get_double_pawn_penalty(BoardState *board_state)
@@ -52,7 +56,48 @@ int32_t get_double_pawn_penalty(BoardState *board_state)
 
 int32_t get_isolated_pawn_penalty(BoardState *board_state)
 {
-    return 0;
+    int32_t score = 0;
+
+    uint64_t white_pawns = board_state->board.white_pieces.pawns;
+    uint64_t black_pawns = board_state->board.black_pieces.pawns;
+
+    bool file_a_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_A_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_B_MASK) == 0;
+    bool file_b_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_B_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_C_MASK) == 0;
+    bool file_c_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_C_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_D_MASK) == 0;
+    bool file_d_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_D_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_E_MASK) == 0;
+    bool file_e_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_E_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_F_MASK) == 0;
+    bool file_f_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_F_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_G_MASK) == 0;
+    bool file_g_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_G_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_H_MASK) == 0;
+    bool file_h_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_H_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_G_MASK) == 0;
+
+    bool file_a_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_A_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_B_MASK) == 0;
+    bool file_b_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_B_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_C_MASK) == 0;
+    bool file_c_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_C_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_D_MASK) == 0;
+    bool file_d_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_D_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_E_MASK) == 0;
+    bool file_e_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_E_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0;
+    bool file_f_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_F_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0;
+    bool file_g_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_G_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_H_MASK) == 0;
+    bool file_h_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_H_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0;
+
+    score -= file_a_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_b_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_c_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_d_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_e_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_f_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_g_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score -= file_h_has_isolated_white_pawn ? ISOLATED_PAWN_PENALTY : 0;
+
+    score += file_a_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_b_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_c_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_d_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_e_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_f_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_g_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+    score += file_h_has_isolated_black_pawn ? ISOLATED_PAWN_PENALTY : 0;
+
+    return score;
 }
 
 int32_t get_backward_pawn_penalty(BoardState *board_state)
@@ -62,7 +107,12 @@ int32_t get_backward_pawn_penalty(BoardState *board_state)
 
 int32_t get_passed_pawn_bonus(BoardState *board_state)
 {
-    return 0;
+    int32_t score = 0;
+
+    uint64_t white_pawns = board_state->board.white_pieces.pawns;
+    uint64_t black_pawns = board_state->board.black_pieces.pawns;
+
+    return score;
 }
 
 int32_t get_pawn_island_penalty(BoardState *board_state)
