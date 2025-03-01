@@ -103,3 +103,6 @@ uint64_t move_bitboard_right(uint64_t bitboard);
 uint64_t move_bitboard_up(uint64_t bitboard);
 uint64_t move_bitboard_down(uint64_t bitboard);
 uint64_t expand_bitboard(uint64_t bitboard);
+
+uint64_t get_passed_pawn_mask_white(uint64_t pawn);
+uint64_t get_passed_pawn_mask_black(uint64_t pawn);

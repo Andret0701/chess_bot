@@ -4,9 +4,10 @@
 #define DOUBLE_PAWN_PENALTY 20
 #define ISOLATED_PAWN_PENALTY 20
 #define BACKWARD_PAWN_PENALTY 10
-#define PASSED_PAWN_BONUS 10
 #define PAWN_ISLAND_PENALTY 10
 #define PAWN_CHAIN_BONUS 10
+
+static const int PASSED_PAWN_BONUS[] = {0, 120, 80, 50, 30, 15, 15}; // Number of squares from promotion
 
 int32_t get_double_pawn_penalty(BoardState *board_state)
 {
@@ -111,6 +112,30 @@ int32_t get_passed_pawn_bonus(BoardState *board_state)
 
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
+
+    while (white_pawns)
+    {
+        int index = __builtin_ctzll(white_pawns);
+        white_pawns &= white_pawns - 1;
+
+        uint64_t position = 1ULL << index;
+        uint64_t passed_pawn_mask = get_passed_pawn_mask_white(position);
+        uint8_t number_of_squares_from_promotion = 7 - (index / 8);
+        if (passed_pawn_mask & board_state->black_pieces)
+            score += PASSED_PAWN_BONUS[number_of_squares_from_promotion];
+    }
+
+    while (black_pawns)
+    {
+        int index = __builtin_ctzll(black_pawns);
+        black_pawns &= black_pawns - 1;
+
+        uint64_t position = 1ULL << index;
+        uint64_t passed_pawn_mask = get_passed_pawn_mask_black(position);
+        uint8_t number_of_squares_from_promotion = index / 8;
+        if (passed_pawn_mask & board_state->white_pieces)
+            score -= PASSED_PAWN_BONUS[number_of_squares_from_promotion];
+    }
 
     return score;
 }

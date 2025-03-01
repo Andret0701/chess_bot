@@ -69,3 +69,35 @@ uint64_t expand_bitboard(uint64_t bitboard)
 
     return up | down | left | right | up_left | up_right | down_left | down_right;
 }
+
+uint64_t get_passed_pawn_mask_white(uint64_t pawn)
+{
+    uint64_t mask = 0;
+    mask |= move_bitboard_up(pawn);
+    mask |= move_bitboard_up(mask);
+    mask |= move_bitboard_up(mask);
+    mask |= move_bitboard_up(mask);
+    mask |= move_bitboard_up(mask);
+    mask |= move_bitboard_up(mask);
+
+    mask |= move_bitboard_left(mask);
+    mask |= move_bitboard_right(mask);
+
+    return mask;
+}
+
+uint64_t get_passed_pawn_mask_black(uint64_t pawn)
+{
+    uint64_t mask = 0;
+    mask |= move_bitboard_down(pawn);
+    mask |= move_bitboard_down(mask);
+    mask |= move_bitboard_down(mask);
+    mask |= move_bitboard_down(mask);
+    mask |= move_bitboard_down(mask);
+    mask |= move_bitboard_down(mask);
+
+    mask |= move_bitboard_left(mask);
+    mask |= move_bitboard_right(mask);
+
+    return mask;
+}
