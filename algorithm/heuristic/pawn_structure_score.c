@@ -121,7 +121,7 @@ int32_t get_passed_pawn_bonus(BoardState *board_state)
         uint64_t position = 1ULL << index;
         uint64_t passed_pawn_mask = get_passed_pawn_mask_white(position);
         uint8_t number_of_squares_from_promotion = 7 - (index / 8);
-        if (passed_pawn_mask & board_state->black_pieces)
+        if (!(passed_pawn_mask & board_state->board.black_pieces.pawns))
             score += PASSED_PAWN_BONUS[number_of_squares_from_promotion];
     }
 
@@ -133,7 +133,7 @@ int32_t get_passed_pawn_bonus(BoardState *board_state)
         uint64_t position = 1ULL << index;
         uint64_t passed_pawn_mask = get_passed_pawn_mask_black(position);
         uint8_t number_of_squares_from_promotion = index / 8;
-        if (passed_pawn_mask & board_state->white_pieces)
+        if (!(passed_pawn_mask & board_state->board.white_pieces.pawns))
             score -= PASSED_PAWN_BONUS[number_of_squares_from_promotion];
     }
 
