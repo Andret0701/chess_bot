@@ -189,7 +189,7 @@ static char get_piece_at(Board board, int square, bool is_white)
 // - moving_piece: the type (letter) of the piece from the original board.
 // - promotion: if nonzero, indicates that the piece should become this type (in lowercase)
 //   so we compare after converting to uppercase.
-static inline bool candidate_matches_move(BoardState candidate, int from, int to, char promotion, bool is_white_move, char moving_piece)
+static inline bool candidate_matches_move(Board *board, BoardState candidate, int from, int to, char promotion, bool is_white_move, char moving_piece)
 {
     // Ensure that the source square is now empty.
     if (get_piece_at(candidate.board, from, is_white_move) != '\0')
@@ -210,6 +210,16 @@ static inline bool candidate_matches_move(BoardState candidate, int from, int to
         // Otherwise, the piece type at the destination should match the original moving piece.
         if (dest_piece != moving_piece)
             return false;
+    }
+
+    // To avoid castling when the rook moves
+    bool moved_king = (moving_piece == 'K' || moving_piece == 'k');
+    if (!moved_king)
+    {
+        if (is_white_move)
+            return candidate.board.white_pieces.king == board->white_pieces.king;
+        else
+            return candidate.board.black_pieces.king == board->black_pieces.king;
     }
 
     return true;
@@ -253,7 +263,7 @@ Board apply_move(Board *board, char *move)
 
         // Check that the candidate move has removed the piece from the source square
         // and placed the correct piece at the destination (including promotion if specified).
-        if (candidate_matches_move(candidate, from, to, promotion, is_white_move, moving_piece))
+        if (candidate_matches_move(board, candidate, from, to, promotion, is_white_move, moving_piece))
         {
             Board result = candidate.board;
             destroy_board_stack(stack);
