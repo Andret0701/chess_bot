@@ -85,9 +85,6 @@ void generate_attacks(BoardState *board_state)
     board_state->white_attacks.king = generate_king_attacks(board_state->board.white_pieces.king);
     board_state->black_attacks.king = generate_king_attacks(board_state->board.black_pieces.king);
 
-    uint64_t white_sliding_pieces = board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens;
-    uint64_t black_sliding_pieces = board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens;
-
     // Process white bishops
     uint64_t white_bishops = board_state->board.white_pieces.bishops;
     while (white_bishops)
