@@ -23,8 +23,7 @@
 
 int main(int argc, char *argv[])
 {
-    // Board board = fen_to_board("r1bqkb1r/ppp2ppp/2n1pn2/3p4/3P4/PQN2N2/1PP1PPPP/R1B1KB1R w KQkq - 0 1");
-    // print_board(&board);
+    // Board board = fen_to_board("rnbqkb1r/ppp1pppp/5n2/3p4/8/2N2N2/PPPPPPPP/R1BQKB1R w KQkq - 0 1");
     // // best move
     // BotResult result = run_bot((BotFlags){100000, 100000, 0, 0}, board);
     // print_bot_result(result);
