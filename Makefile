@@ -1,6 +1,6 @@
 # Compiler and Flags
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -O3 -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
+CFLAGS = -Wall -Wextra -std=c11 -Ofast -march=native -flto -finline-functions -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine
 PROFILE_FLAGS = -pg -no-pie -fno-builtin -O3 -fno-inline
 TARGET = andobot.exe
 BUILD_DIR = build
