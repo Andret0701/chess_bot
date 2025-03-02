@@ -85,13 +85,15 @@ void generate_attacks(BoardState *board_state)
     board_state->white_attacks.king = generate_king_attacks(board_state->board.white_pieces.king);
     board_state->black_attacks.king = generate_king_attacks(board_state->board.black_pieces.king);
 
+    uint64_t occupied = board_state->occupied;
+
     // Process white bishops
     uint64_t white_bishops = board_state->board.white_pieces.bishops;
     while (white_bishops)
     {
         int index = __builtin_ctzll(white_bishops);
         white_bishops &= white_bishops - 1;
-        board_state->white_attacks.bishops |= generate_bishop_attacks(board_state->occupied, index);
+        board_state->white_attacks.bishops |= generate_bishop_attacks(occupied, index);
     }
 
     // Process white rooks
@@ -100,7 +102,7 @@ void generate_attacks(BoardState *board_state)
     {
         int index = __builtin_ctzll(white_rooks);
         white_rooks &= white_rooks - 1;
-        board_state->white_attacks.rooks |= generate_rook_attacks(board_state->occupied, index);
+        board_state->white_attacks.rooks |= generate_rook_attacks(occupied, index);
     }
 
     // Process white queens
@@ -109,7 +111,7 @@ void generate_attacks(BoardState *board_state)
     {
         int index = __builtin_ctzll(white_queens);
         white_queens &= white_queens - 1;
-        board_state->white_attacks.queens |= generate_queen_attacks(board_state->occupied, index);
+        board_state->white_attacks.queens |= generate_queen_attacks(occupied, index);
     }
 
     // Process black bishops
@@ -118,7 +120,7 @@ void generate_attacks(BoardState *board_state)
     {
         int index = __builtin_ctzll(black_bishops);
         black_bishops &= black_bishops - 1;
-        board_state->black_attacks.bishops |= generate_bishop_attacks(board_state->occupied, index);
+        board_state->black_attacks.bishops |= generate_bishop_attacks(occupied, index);
     }
 
     // Process black rooks
@@ -127,7 +129,7 @@ void generate_attacks(BoardState *board_state)
     {
         int index = __builtin_ctzll(black_rooks);
         black_rooks &= black_rooks - 1;
-        board_state->black_attacks.rooks |= generate_rook_attacks(board_state->occupied, index);
+        board_state->black_attacks.rooks |= generate_rook_attacks(occupied, index);
     }
 
     // Process black queens
