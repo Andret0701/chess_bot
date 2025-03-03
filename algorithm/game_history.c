@@ -63,14 +63,19 @@ void print_game_history()
 
 bool threefold_repetition()
 {
-    if (move_count < 6) // Fewer than 4 positions mean no threefold repetition
+    if (move_count < 6) // Not enough moves for threefold repetition.
+        return false;
+
+    int earliest_move = move_count - 1 - moves_since_permanent_change[move_count - 1];
+
+    // Not enough history to even allow 3 repetitions
+    if (move_count - earliest_move < 6)
         return false;
 
     Board *current = &board_history[move_count - 1];
     int repetitions = 1;
 
-    // Iterate through all earlier positions
-    for (int i = move_count - 3; i >= 0; i -= 2)
+    for (int i = move_count - 3; i >= earliest_move; i -= 2)
     {
         if (board_equals(current, &board_history[i]))
         {
