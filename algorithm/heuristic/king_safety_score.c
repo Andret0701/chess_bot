@@ -1,12 +1,12 @@
 #include "king_safety_score.h"
 #include "../../utils/bitboard.h"
 
-#define CAN_CASTLE_KINGSIDE_BONUS 15
-#define CAN_CASTLE_QUEENSIDE_BONUS 10
-#define CAN_CASTLE_BOTH_SIDES_BONUS 20
+#define CAN_CASTLE_KINGSIDE_BONUS 20
+#define CAN_CASTLE_QUEENSIDE_BONUS 15
+#define CAN_CASTLE_BOTH_SIDES_BONUS 25
 
-#define HAS_CASTLED_KINGSIDE_BONUS 26
-#define HAS_CASTLED_QUEENSIDE_BONUS 21
+#define HAS_CASTLED_KINGSIDE_BONUS 30
+#define HAS_CASTLED_QUEENSIDE_BONUS 25
 
 int get_file(int square)
 {
