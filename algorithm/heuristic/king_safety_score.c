@@ -1,6 +1,13 @@
 #include "king_safety_score.h"
 #include "../../utils/bitboard.h"
 
+#define CAN_CASTLE_KINGSIDE_BONUS 15
+#define CAN_CASTLE_QUEENSIDE_BONUS 10
+#define CAN_CASTLE_BOTH_SIDES_BONUS 20
+
+#define HAS_CASTLED_KINGSIDE_BONUS 26
+#define HAS_CASTLED_QUEENSIDE_BONUS 21
+
 int get_file(int square)
 {
     return square % 8;
@@ -16,17 +23,35 @@ int get_king_square(uint64_t king)
     return __builtin_ctzll(king);
 }
 
-int32_t get_castling_rights_score(Board *board) // This should be changed. Having castled is better than having the right to castle
+int32_t get_castling_score(BoardState *board_state)
 {
     int32_t score = 0;
-    if (board->castling_rights & WHITE_KINGSIDE_CASTLE)
-        score += 10;
-    if (board->castling_rights & WHITE_QUEENSIDE_CASTLE)
-        score += 10;
-    if (board->castling_rights & BLACK_KINGSIDE_CASTLE)
-        score -= 10;
-    if (board->castling_rights & BLACK_QUEENSIDE_CASTLE)
-        score -= 10;
+    Board *board = &board_state->board;
+    if (((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0))
+        score += CAN_CASTLE_BOTH_SIDES_BONUS;
+    else if ((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0)
+        score += CAN_CASTLE_KINGSIDE_BONUS;
+    else if ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0)
+        score += CAN_CASTLE_QUEENSIDE_BONUS;
+
+    if (((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0))
+        score -= CAN_CASTLE_BOTH_SIDES_BONUS;
+    else if ((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0)
+        score -= CAN_CASTLE_KINGSIDE_BONUS;
+    else if ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0)
+        score -= CAN_CASTLE_QUEENSIDE_BONUS;
+
+    if (board_state->has_castled & WHITE_KINGSIDE_CASTLE)
+        score += HAS_CASTLED_KINGSIDE_BONUS;
+
+    if (board_state->has_castled & WHITE_QUEENSIDE_CASTLE)
+        score += HAS_CASTLED_QUEENSIDE_BONUS;
+
+    if (board_state->has_castled & BLACK_KINGSIDE_CASTLE)
+        score -= HAS_CASTLED_KINGSIDE_BONUS;
+
+    if (board_state->has_castled & BLACK_QUEENSIDE_CASTLE)
+        score -= HAS_CASTLED_QUEENSIDE_BONUS;
 
     return score;
 }
@@ -141,7 +166,7 @@ int32_t get_weak_back_rank_penalty(Board *board) // Having a weak back rank is b
 int32_t get_king_safety_score(BoardState *board_state)
 {
     int32_t score = 0;
-    score += get_castling_rights_score(&board_state->board);
+    score += get_castling_score(board_state);
     score += get_pawn_shelter_score(&board_state->board);
     score += get_open_file_penalty(&board_state->board);
     score += get_pawn_storm_score(&board_state->board);

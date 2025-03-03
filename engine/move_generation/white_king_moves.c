@@ -28,6 +28,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
                 new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                 init_board(new_board_state);
+                new_board_state->has_castled = board_state->has_castled;
 
                 validate_white_move(stack);
             }
@@ -58,7 +59,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
                     new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                     init_board(new_board_state);
-
+                    new_board_state->has_castled = board_state->has_castled | WHITE_KINGSIDE_CASTLE;
                     validate_white_move(stack);
                 }
             }
@@ -84,6 +85,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
                     new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                     init_board(new_board_state);
+                    new_board_state->has_castled = board_state->has_castled | WHITE_QUEENSIDE_CASTLE;
                     validate_white_move(stack);
                 }
             }

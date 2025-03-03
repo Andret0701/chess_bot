@@ -28,7 +28,7 @@ void generate_white_king_captures(BoardState *board_state, uint8_t x, uint8_t y,
                 new_board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
                 new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                 init_board(new_board_state);
-
+                new_board_state->has_castled = board_state->has_castled;
                 validate_white_move(stack);
             }
         }

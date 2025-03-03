@@ -28,6 +28,7 @@ void generate_black_king_captures(BoardState *board_state, uint8_t x, uint8_t y,
                 new_board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
 
                 init_board(new_board_state);
+                new_board_state->has_castled = board_state->has_castled;
                 validate_black_move(stack);
             }
         }

@@ -16,6 +16,7 @@ void c_black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardSta
             new_board_state->board.side_to_move = WHITE;
 
             init_board(new_board_state);
+            new_board_state->has_castled = board_state->has_castled;
             validate_black_move(stack);
         }
     }
@@ -34,6 +35,7 @@ void c_black_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardSta
             new_board_state->board.side_to_move = WHITE;
 
             init_board(new_board_state);
+            new_board_state->has_castled = board_state->has_castled;
             validate_black_move(stack);
         }
     }
@@ -52,6 +54,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to bishop
@@ -63,6 +66,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to rook
@@ -74,6 +78,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to queen
@@ -85,6 +90,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
     }
 
@@ -100,6 +106,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to bishop
@@ -112,6 +119,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to rook
@@ -124,6 +132,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
 
         // Promote to queen
@@ -136,6 +145,7 @@ void c_black_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y
         new_board_state->board.side_to_move = WHITE;
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
         validate_black_move(stack);
     }
 }
@@ -156,6 +166,7 @@ void c_black_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, Boar
                 new_board_state->board.en_passant = 0;
                 new_board_state->board.side_to_move = WHITE;
                 init_board(new_board_state);
+                new_board_state->has_castled = board_state->has_castled;
                 validate_black_move(stack);
             }
         }
@@ -172,6 +183,7 @@ void c_black_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, Boar
                 new_board_state->board.en_passant = 0;
                 new_board_state->board.side_to_move = WHITE;
                 init_board(new_board_state);
+                new_board_state->has_castled = board_state->has_castled;
                 validate_black_move(stack);
             }
         }

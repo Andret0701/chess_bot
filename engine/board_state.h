@@ -20,6 +20,8 @@ typedef struct
     bool white_check;
     bool black_check;
 
+    uint8_t has_castled;
+
     uint16_t mvvlva_score; // for sorting moves
 } BoardState;
 
