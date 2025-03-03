@@ -149,3 +149,49 @@ void validate_board(Board *board)
     validate_en_passant(board);
     validate_check(board);
 }
+
+void validate_castling(BoardState *from, BoardState *to)
+{
+    if (from->has_castled != 0 && to->has_castled == 0)
+        errorf(&to->board, "Has castled values were lost\n");
+
+    uint8_t from_white_rights = from->board.castling_rights & (WHITE_KINGSIDE_CASTLE | WHITE_QUEENSIDE_CASTLE);
+    uint8_t to_white_rights = to->board.castling_rights & (WHITE_KINGSIDE_CASTLE | WHITE_QUEENSIDE_CASTLE);
+    uint8_t from_black_rights = from->board.castling_rights & (BLACK_KINGSIDE_CASTLE | BLACK_QUEENSIDE_CASTLE);
+    uint8_t to_black_rights = to->board.castling_rights & (BLACK_KINGSIDE_CASTLE | BLACK_QUEENSIDE_CASTLE);
+
+    uint8_t from_white_castled = from->has_castled & (WHITE_KINGSIDE_CASTLE | WHITE_QUEENSIDE_CASTLE);
+    uint8_t to_white_castled = to->has_castled & (WHITE_KINGSIDE_CASTLE | WHITE_QUEENSIDE_CASTLE);
+    uint8_t from_black_castled = from->has_castled & (BLACK_KINGSIDE_CASTLE | BLACK_QUEENSIDE_CASTLE);
+    uint8_t to_black_castled = to->has_castled & (BLACK_KINGSIDE_CASTLE | BLACK_QUEENSIDE_CASTLE);
+
+    if (from_white_castled == 0 && to_white_castled != 0)
+    {
+        if (to_white_rights != 0)
+            errorf(&to->board, "White has castled but still has castling rights\n");
+
+        if (from_white_rights == 0)
+            errorf(&to->board, "White has castled but had no castling rights\n");
+    }
+
+    if (from_black_castled == 0 && to_black_castled != 0)
+    {
+        if (to_black_rights != 0)
+            errorf(&to->board, "Black has castled but still has castling rights\n");
+
+        if (from_black_rights == 0)
+            errorf(&to->board, "Black has castled but had no castling rights\n");
+    }
+
+    if (from_white_rights == to_white_rights)
+    {
+        if (from_white_castled != to_white_castled)
+            errorf(&to->board, "Rights and castled values for white do not match\n");
+    }
+
+    if (from_black_rights == to_black_rights)
+    {
+        if (from_black_castled != to_black_castled)
+            errorf(&to->board, "Rights and castled values for black do not match\n");
+    }
+}

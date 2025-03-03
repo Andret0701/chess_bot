@@ -20,6 +20,7 @@ uint64_t count_recursive_test(BoardState *board_state, uint8_t depth, BoardStack
     uint64_t total = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
+        validate_castling(board_state, &stack->boards[i]);
         total += count_recursive_test(&stack->boards[i], depth - 1, stack);
     }
 
