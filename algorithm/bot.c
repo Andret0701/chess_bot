@@ -223,8 +223,29 @@ BotResult run_bot(BotFlags flags, Board board)
             }
         }
 
+        // if only one move is not lost
+        uint16_t num_not_lost = 0;
+        uint16_t last_not_lost = 0;
+        for (uint16_t i = 0; i < stack->count; i++)
+        {
+            if (!has_lost(move_scores[depth][i].result, board.side_to_move))
+            {
+                num_not_lost++;
+                last_not_lost = i;
+            }
+        }
+        if (num_not_lost == 1)
+        {
+            print_out_search_info(stack, &board, last_not_lost, depth, stack->count + 1);
+
+            BotResult result = {board_to_move(&board, &stack->boards[last_not_lost].board), move_scores[depth][last_not_lost], depth};
+            destroy_board_stack(stack);
+            return result;
+        }
+
         // if no move is unknown
         bool all_moves_known = true;
+
         for (uint16_t i = 0; i < stack->count; i++)
         {
             if (move_scores[depth][i].result == UNKNOWN)
