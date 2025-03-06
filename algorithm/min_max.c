@@ -5,6 +5,7 @@
 #include "../engine/piece_moves.h"
 #include <stdio.h>
 #include "move_sort.h"
+#include "transposition_table.h"
 
 SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
@@ -22,6 +23,37 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     // if in check - extend search
     if (board_state->white_check || board_state->black_check)
         max_depth++;
+
+    // --- TT Lookup ---
+    uint64_t hash = hash_board(&board_state->board);
+    TT_Entry tt_entry;
+    if (TT_lookup(hash, &tt_entry, max_depth - depth))
+    {
+        BoardScore score = (BoardScore){tt_entry.score, tt_entry.result, depth + tt_entry.depth};
+        if (tt_entry.type == EXACT)
+        {
+            pop_game_history();
+            return (SearchResult){score, true};
+        }
+        else if (tt_entry.type == UPPERBOUND)
+        {
+            beta = max_score(beta, score, BLACK);
+            if (is_better_equal(alpha, beta, WHITE))
+            {
+                pop_game_history();
+                return (SearchResult){score, true};
+            }
+        }
+        else if (tt_entry.type == LOWERBOUND)
+        {
+            alpha = max_score(alpha, score, WHITE);
+            if (is_better_equal(beta, alpha, BLACK))
+            {
+                pop_game_history();
+                return (SearchResult){score, true};
+            }
+        }
+    }
 
     if (depth == max_depth)
     {
@@ -44,6 +76,8 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         else
             score = score_board(board_state, depth, finished);
 
+        // --- TT Store for terminal nodes ---
+        TT_store(hash, max_depth - depth, score.score, score.result, EXACT);
         pop_game_history();
         return (SearchResult){score, true};
     }
@@ -58,6 +92,9 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     {
         BoardScore score = score_board(board_state, depth, finished);
         stack->count = base;
+
+        // --- TT Store for no legal moves ---
+        TT_store(hash, max_depth - depth, score.score, score.result, EXACT);
         pop_game_history();
         return (SearchResult){score, true};
     }
@@ -79,19 +116,33 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         BoardScore score = search_result.board_score;
         best_score = max_score(best_score, score, board_state->board.side_to_move);
         if (board_state->board.side_to_move == WHITE)
-            alpha = max_score(alpha, score, WHITE);
-        else
-            beta = max_score(beta, score, BLACK);
-
-        if (is_better_equal(alpha, beta, WHITE)) // alpha >= beta
         {
-            stack->count = base;
-            pop_game_history();
-            return (SearchResult){best_score, true};
+            alpha = max_score(alpha, score, WHITE);
+            if (is_better_equal(beta, alpha, BLACK))
+            {
+                stack->count = base;
+                TT_store(hash, max_depth - depth, best_score.score, best_score.result, LOWERBOUND);
+                pop_game_history();
+                return (SearchResult){best_score, true};
+            }
+        }
+        else
+        {
+            beta = max_score(beta, score, BLACK);
+            if (is_better_equal(alpha, beta, WHITE))
+            {
+                stack->count = base;
+                TT_store(hash, max_depth - depth, best_score.score, best_score.result, UPPERBOUND);
+                pop_game_history();
+                return (SearchResult){best_score, true};
+            }
         }
     }
 
     stack->count = base;
+
+    // --- TT Store for final value ---
+    TT_store(hash, max_depth - depth, best_score.score, best_score.result, EXACT);
     pop_game_history();
     return (SearchResult){best_score, true};
 }

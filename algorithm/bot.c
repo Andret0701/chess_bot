@@ -7,6 +7,7 @@
 #include "../engine/piece_moves.h"
 #include "../utils/move.h"
 #include "game_history.h"
+#include "transposition_table.h"
 
 #define BOARD_STACK_SIZE 65535
 #define MAX_DEPTH 100
@@ -143,6 +144,7 @@ double get_time_allocation(BotFlags flags, Color side_to_move)
 
 BotResult run_bot(BotFlags flags, Board board)
 {
+    TT_clear_generation();
     clock_t start = clock();
     double seconds = get_time_allocation(flags, board.side_to_move);
     BoardState board_state = board_to_board_state(&board);
@@ -181,14 +183,13 @@ BotResult run_bot(BotFlags flags, Board board)
 
             BoardScore score = search_result.board_score;
             move_scores[depth][i] = score;
-
             if (i == 0 || is_move_better(i, best_index, depth, board.side_to_move))
             {
                 best_index = i;
                 if (board.side_to_move == WHITE)
-                    alpha = max_score(alpha, score, board.side_to_move);
+                    alpha = max_score(alpha, score, WHITE);
                 else
-                    beta = max_score(beta, score, board.side_to_move);
+                    beta = max_score(beta, score, BLACK);
             }
         }
 

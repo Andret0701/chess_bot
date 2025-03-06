@@ -7,17 +7,22 @@
 typedef enum
 {
     EXACT,
-    NOT_EXACT,
+    LOWERBOUND,
+    UPPERBOUND
 } TT_Entry_Type;
 
 typedef struct
 {
-    bool valid;
-    Board board;
-    BoardScore score;
-    TT_Entry_Type type;
+    uint64_t hash;      // Zobrist hash of the position.
+    uint8_t depth;      // Remaining depth at which this evaluation was computed.
+    int32_t score;      // The evaluation score.
+    Result result;      // The result of the evaluation.
+    TT_Entry_Type type; // The type of the evaluation.
+    uint8_t generation; // The generation of the entry.
 } TT_Entry;
 
-void init_zobrist_keys();
-void update_tt_entry(Board *board, BoardScore score, uint8_t depth, TT_Entry_Type type);
-TT_Entry check_tt_entry(Board *board, uint8_t depth);
+void TT_clear_generation();
+void init_transposition_table();
+static bool TT_lookup(uint64_t hash, TT_Entry *entry, uint8_t depth);
+static void TT_store(uint64_t hash, uint8_t depth, int32_t score, Result result, TT_Entry_Type type);
+void TT_log_stats();
