@@ -7,7 +7,7 @@
 #include "move_sort.h"
 #include "transposition_table.h"
 
-SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
+SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
     if (has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
@@ -105,7 +105,7 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
-        SearchResult search_result = min_max(next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds);
+        SearchResult search_result = min_max(bot_color, next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds);
 
         // --- Check if timed out ---
         if (!search_result.valid)
@@ -116,7 +116,16 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         }
 
         // --- Check if has mate in 1 ---
-        if (search_result.board_score.depth == depth + 1 && has_won(search_result.board_score.result, board_state->board.side_to_move))
+        bool is_mate = has_won(search_result.board_score.result, board_state->board.side_to_move);
+        bool is_mate_in_1 = search_result.board_score.depth == depth + 1 && is_mate;
+        if (bot_color == board_state->board.side_to_move && is_mate_in_1)
+        {
+            stack->count = base;
+            // Maybe add TT_store if it performs better
+            pop_game_history();
+            return search_result;
+        }
+        else if (bot_color != board_state->board.side_to_move && is_mate)
         {
             stack->count = base;
             // Maybe add TT_store if it performs better

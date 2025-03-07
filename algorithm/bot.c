@@ -167,7 +167,7 @@ BotResult run_bot(BotFlags flags, Board board)
             }
 
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = min_max(current_board_state, stack, depth, 0, alpha, beta, start, seconds);
+            SearchResult search_result = min_max(board.side_to_move, current_board_state, stack, depth, 0, alpha, beta, start, seconds);
             if (!search_result.valid)
             {
 
