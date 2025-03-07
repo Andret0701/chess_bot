@@ -106,11 +106,22 @@ SearchResult min_max(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     {
         BoardState *next_board_state = &stack->boards[i];
         SearchResult search_result = min_max(next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds);
+
+        // --- Check if timed out ---
         if (!search_result.valid)
         {
             stack->count = base;
             pop_game_history();
             return (SearchResult){best_score, false};
+        }
+
+        // --- Check if has mate in 1 ---
+        if (search_result.board_score.depth == depth + 1 && has_won(search_result.board_score.result, board_state->board.side_to_move))
+        {
+            stack->count = base;
+            // Maybe add TT_store if it performs better
+            pop_game_history();
+            return search_result;
         }
 
         BoardScore score = search_result.board_score;
