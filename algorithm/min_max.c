@@ -10,14 +10,14 @@
 SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
     if (has_timed_out(start, seconds))
-        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false};
+        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, false, 1};
     push_game_history(board_state->board);
     if (threefold_repetition() || has_50_move_rule_occurred())
     {
         BoardScore score = score_board(board_state, depth, false);
         pop_game_history();
         score.result = DRAW;
-        return (SearchResult){score, true};
+        return (SearchResult){score, true, 1};
     }
 
     // if in check - extend search
@@ -33,7 +33,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
         if (tt_entry.type == EXACT)
         {
             pop_game_history();
-            return (SearchResult){score, true};
+            return (SearchResult){score, true, 1};
         }
         else if (tt_entry.type == UPPERBOUND)
         {
@@ -41,7 +41,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
             if (is_better_equal(alpha, beta, WHITE))
             {
                 pop_game_history();
-                return (SearchResult){score, true};
+                return (SearchResult){score, true, 1};
             }
         }
         else if (tt_entry.type == LOWERBOUND)
@@ -50,7 +50,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
             if (is_better_equal(beta, alpha, BLACK))
             {
                 pop_game_history();
-                return (SearchResult){score, true};
+                return (SearchResult){score, true, 1};
             }
         }
     }
@@ -62,9 +62,11 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
         finished |= result != UNKNOWN;
 
         BoardScore score;
+        uint64_t quiesce_nodes_searched = 0;
         if (!finished)
         {
             SearchResult q_result = quiesce(board_state, stack, alpha, beta, depth, start, seconds);
+            quiesce_nodes_searched += q_result.nodes_searched;
             if (!q_result.valid)
             {
                 pop_game_history();
@@ -79,7 +81,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
         // --- TT Store for terminal nodes ---
         TT_store(hash, max_depth - depth, score.score, score.result, EXACT);
         pop_game_history();
-        return (SearchResult){score, true};
+        return (SearchResult){score, true, 1 + quiesce_nodes_searched};
     }
 
     uint16_t base = stack->count;
@@ -102,17 +104,20 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
     sort_moves(board_state, stack, base);
 
     BoardScore best_score = get_worst_score(board_state->board.side_to_move);
+    uint64_t nodes_searched = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
         SearchResult search_result = min_max(bot_color, next_board_state, stack, max_depth, depth + 1, alpha, beta, start, seconds);
+        nodes_searched += search_result.nodes_searched + 1; // +1 for the current node
+        search_result.nodes_searched = nodes_searched;
 
         // --- Check if timed out ---
         if (!search_result.valid)
         {
             stack->count = base;
             pop_game_history();
-            return (SearchResult){best_score, false};
+            return (SearchResult){best_score, false, nodes_searched};
         }
 
         // --- Check if has mate in 1 ---
@@ -143,7 +148,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
                 stack->count = base;
                 TT_store(hash, max_depth - depth, best_score.score, best_score.result, LOWERBOUND);
                 pop_game_history();
-                return (SearchResult){best_score, true};
+                return (SearchResult){best_score, true, nodes_searched};
             }
         }
         else
@@ -154,7 +159,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
                 stack->count = base;
                 TT_store(hash, max_depth - depth, best_score.score, best_score.result, UPPERBOUND);
                 pop_game_history();
-                return (SearchResult){best_score, true};
+                return (SearchResult){best_score, true, nodes_searched};
             }
         }
     }
@@ -164,7 +169,7 @@ SearchResult min_max(Color bot_color, BoardState *board_state, BoardStack *stack
     // --- TT Store for final value ---
     TT_store(hash, max_depth - depth, best_score.score, best_score.result, EXACT);
     pop_game_history();
-    return (SearchResult){best_score, true};
+    return (SearchResult){best_score, true, nodes_searched};
 }
 
 void print_search_result(SearchResult search_result)

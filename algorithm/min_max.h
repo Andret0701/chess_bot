@@ -10,6 +10,7 @@ typedef struct
 {
     BoardScore board_score;
     bool valid;
+    uint64_t nodes_searched;
 } SearchResult;
 
 SearchResult quiesce(BoardState *board_state, BoardStack *stack, BoardScore alpha, BoardScore beta,

@@ -26,7 +26,7 @@ void print_bot_result(BotResult result)
 }
 
 BoardScore move_scores[MAX_DEPTH][MAX_MOVES];
-void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index, uint8_t depth, uint16_t cancelled_index)
+void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index, uint8_t depth, uint16_t cancelled_index, uint64_t nodes_searched, double seconds)
 {
     FILE *file = fopen("search_info.txt", "a");
     if (file == NULL)
@@ -48,6 +48,8 @@ void print_out_search_info(BoardStack *stack, Board *board, uint16_t best_index,
     if (stack->boards[best_index].black_check)
         fprintf(file, "Black is in check\n");
     fprintf(file, "It is %s's turn\n", board->side_to_move == WHITE ? "White" : "Black");
+    fprintf(file, "Time: %.2f seconds\n", seconds);
+    fprintf(file, "Nodes searched: %llu, Nodes per second: %.2f\n", nodes_searched, (double)nodes_searched / seconds);
     fprintf(file, "The best move is %s with a score of %d, depth of %d, and result %s\n",
             board_to_move(board, &stack->boards[best_index].board),
             move_scores[depth][best_index].score,
@@ -153,6 +155,7 @@ BotResult run_bot(BotFlags flags, Board board)
     generate_moves(&board_state, stack);
 
     uint8_t depth = 0;
+    uint64_t nodes_searched = 0;
     while (true)
     {
         BoardScore alpha = get_worst_score(WHITE);
@@ -168,11 +171,12 @@ BotResult run_bot(BotFlags flags, Board board)
 
             BoardState *current_board_state = &stack->boards[i];
             SearchResult search_result = min_max(board.side_to_move, current_board_state, stack, depth, 0, alpha, beta, start, seconds);
+            nodes_searched += search_result.nodes_searched + 1; // +1 for the current node
+            search_result.nodes_searched = nodes_searched;
             if (!search_result.valid)
             {
 
-                print_out_search_info(stack, &board, best_index, depth, i);
-
+                print_out_search_info(stack, &board, best_index, depth, i, nodes_searched, seconds);
                 if (i == 0)
                     depth--;
 
@@ -196,7 +200,7 @@ BotResult run_bot(BotFlags flags, Board board)
         BoardScore best_score = move_scores[depth][best_index];
         if (has_won(best_score.result, board.side_to_move) && best_score.depth <= depth)
         {
-            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
+            print_out_search_info(stack, &board, best_index, depth, stack->count + 1, nodes_searched, seconds);
 
             BotResult result = {board_to_move(&board, &stack->boards[best_index].board), best_score, depth};
             destroy_board_stack(stack);
@@ -237,7 +241,7 @@ BotResult run_bot(BotFlags flags, Board board)
         }
         if (num_not_lost == 1)
         {
-            print_out_search_info(stack, &board, last_not_lost, depth, stack->count + 1);
+            print_out_search_info(stack, &board, last_not_lost, depth, stack->count + 1, nodes_searched, seconds);
 
             BotResult result = {board_to_move(&board, &stack->boards[last_not_lost].board), move_scores[depth][last_not_lost], depth};
             destroy_board_stack(stack);
@@ -258,7 +262,7 @@ BotResult run_bot(BotFlags flags, Board board)
 
         if (all_moves_known)
         {
-            print_out_search_info(stack, &board, best_index, depth, stack->count + 1);
+            print_out_search_info(stack, &board, best_index, depth, stack->count + 1, nodes_searched, seconds);
 
             BotResult result = {board_to_move(&board, &stack->boards[best_index].board), move_scores[depth][best_index], depth};
             destroy_board_stack(stack);
