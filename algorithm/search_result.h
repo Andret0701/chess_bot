@@ -14,4 +14,11 @@ typedef struct
     Validity valid;
 } SearchResult;
 
+typedef struct
+{
+    int32_t score;
+    Validity valid;
+} QuiescenceResult;
+
 void print_search_result(SearchResult search_result);
+void print_quiescence_result(QuiescenceResult quiescence_result);

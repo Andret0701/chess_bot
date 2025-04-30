@@ -5,7 +5,6 @@
 #include "fen.h"
 #include <time.h>
 #include <stdio.h>
-#include "../algorithm/min_max.h"
 #include "move.h"
 #include "../algorithm/game_history.h"
 #include "../algorithm/heuristic/heuristic.h"

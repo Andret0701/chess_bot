@@ -35,13 +35,13 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         BoardScore score;
         if (!finished)
         {
-            SearchResult q_result = quiescence(board_state, stack, alpha, beta, depth, start, seconds);
-            if (q_result.valid == INVALID)
+            QuiescenceResult quiescence_result = quiescence(board_state, stack, alpha.score, beta.score, depth, start, seconds);
+            if (quiescence_result.valid == INVALID)
             {
                 pop_game_history();
                 return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
             }
-            score = (BoardScore){q_result.board_score.score, result, depth};
+            score = (BoardScore){quiescence_result.score, result, depth};
         }
         else
             score = score_board(board_state, depth, finished);

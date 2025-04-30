@@ -6,7 +6,6 @@
 
 #include "engine/tests/count_test.h"
 #include "engine/benchmark/count_benchmark.h"
-#include "algorithm/min_max.h"
 #include "algorithm/board_score.h"
 
 #include "algorithm/bot.h"

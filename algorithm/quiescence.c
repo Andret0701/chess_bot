@@ -1,28 +1,29 @@
 #include "quiescence.h"
 #include "heuristic/heuristic.h"
 
-SearchResult quiescence(BoardState *board_state,
-                        BoardStack *stack,
-                        BoardScore alpha,
-                        BoardScore beta,
-                        uint8_t depth,
-                        clock_t start,
-                        double seconds)
+QuiescenceResult quiescence(BoardState *board_state,
+                            BoardStack *stack,
+                            int32_t alpha,
+                            int32_t beta,
+                            uint8_t depth,
+                            clock_t start,
+                            double seconds)
 {
     if (has_timed_out(start, seconds))
-        return (SearchResult){{0, UNKNOWN, 0}, INVALID};
+        return (QuiescenceResult){0, INVALID};
 
     Color side = board_state->board.side_to_move;
 
     // 1) Stand-pat
-    BoardScore stand_pat = score_board(board_state, depth, false);
-    BoardScore best_score = stand_pat;
+    int32_t stand_pat = score_board(board_state, depth, false).score;
+    int32_t best_score = stand_pat;
 
     // 2) β-cutoff on stand-pat
-    if (is_greater_equal_score(stand_pat, beta))
-        return (SearchResult){stand_pat, VALID};
+    if (stand_pat >= beta)
+        return (QuiescenceResult){stand_pat, VALID};
 
-    alpha = max_score(alpha, stand_pat);
+    if (stand_pat > alpha)
+        alpha = stand_pat;
 
     // 4) Recurse on captures
     uint16_t base = stack->count;
@@ -31,28 +32,29 @@ SearchResult quiescence(BoardState *board_state,
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *child = &stack->boards[i];
-        SearchResult sr = quiescence(child, stack, invert_score(beta), invert_score(alpha), depth + 1, start, seconds);
-        sr.board_score = invert_score(sr.board_score);
-
-        if (sr.valid == INVALID)
+        QuiescenceResult quiescence_result = quiescence(child, stack, -beta, -alpha, depth + 1, start, seconds);
+        quiescence_result.score = -quiescence_result.score;
+        if (quiescence_result.valid == INVALID)
         {
             stack->count = base;
-            return (SearchResult){{0, UNKNOWN, 0}, INVALID};
+            return (QuiescenceResult){0, INVALID};
         }
 
-        BoardScore score = sr.board_score;
+        int32_t score = quiescence_result.score;
 
-        // 4a) Captured‐move cutoff
-        if (is_greater_equal_score(score, beta))
+        if (score >= beta)
         {
             stack->count = base;
-            return (SearchResult){score, VALID};
+            return (QuiescenceResult){score, VALID};
         }
 
-        best_score = max_score(best_score, score);
-        alpha = max_score(alpha, score);
+        if (score > best_score)
+            best_score = score;
+
+        if (score > alpha)
+            alpha = score;
     }
 
     stack->count = base;
-    return (SearchResult){best_score, VALID};
+    return (QuiescenceResult){best_score, VALID};
 }
