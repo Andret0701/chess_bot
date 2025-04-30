@@ -45,10 +45,8 @@ Result get_result(BoardState *board_state, bool is_finished)
         result = DRAW;
     else if (is_finished)
     {
-        if (board_state->white_check)
-            result = BLACK_WON;
-        else if (board_state->black_check)
-            result = WHITE_WON;
+        if (board_state->white_check || board_state->black_check)
+            result = LOST;
         else
             result = DRAW;
     }
@@ -142,5 +140,7 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     // // Pawn storm
     // // Attacking squares around the king
 
+    if (board_state->board.side_to_move == BLACK)
+        score = -score;
     return (BoardScore){score, result, depth};
 }

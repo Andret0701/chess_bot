@@ -14,18 +14,15 @@ Result get_game_result(BoardState *board_state)
 {
     BoardStack *stack = create_board_stack(65535);
     generate_moves(board_state, stack);
-
-    if (stack->count == 0)
-    {
-        destroy_board_stack(stack);
-        if (board_state->white_check)
-            return BLACK_WON;
-        else if (board_state->black_check)
-            return WHITE_WON;
-        else
-            return DRAW;
-    }
-
+    bool is_finished = stack->count == 0;
     destroy_board_stack(stack);
+
+    if (is_finished)
+    {
+        if (board_state->board.side_to_move == WHITE)
+            return board_state->white_check ? LOST : DRAW;
+        else
+            return board_state->black_check ? LOST : DRAW;
+    }
     return UNKNOWN;
 }

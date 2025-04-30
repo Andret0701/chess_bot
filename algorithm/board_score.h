@@ -5,8 +5,8 @@
 
 typedef enum
 {
-    WHITE_WON,
-    BLACK_WON,
+    WON,
+    LOST,
     DRAW,
     UNKNOWN
 } Result;
@@ -18,13 +18,14 @@ typedef struct
     uint8_t depth;
 } BoardScore;
 
-bool has_won(Result result, Color color);
-bool has_lost(Result result, Color color);
-BoardScore get_worst_score(Color color);
-
-bool is_better_score(BoardScore a, BoardScore b, Color color);
-bool is_equal_score(BoardScore a, BoardScore b);
-bool is_better_equal(BoardScore a, BoardScore b, Color color);
-BoardScore max_score(BoardScore a, BoardScore b, Color color);
-
+static const BoardScore BEST_SCORE = {INT32_MAX, WON, 0};
+static const BoardScore WORST_SCORE = {INT32_MIN, LOST, 0};
+BoardScore invert_score(BoardScore score);
 void print_score(BoardScore score);
+
+bool is_greater_score(BoardScore a, BoardScore b);
+bool is_equal_score(BoardScore a, BoardScore b);
+bool is_greater_equal_score(BoardScore a, BoardScore b);
+
+BoardScore max_score(BoardScore a, BoardScore b);
+BoardScore min_score(BoardScore a, BoardScore b);

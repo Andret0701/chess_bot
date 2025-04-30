@@ -50,10 +50,7 @@ void play_game(double time_seconds, double increment_seconds)
         push_game_history(board);
         board_state = board_to_board_state(&board);
         print_board(&board);
-        printf("Move: %s, Score: %d, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth,
-               result.score.result == WHITE_WON ? "White won" : result.score.result == BLACK_WON ? "Black won"
-                                                            : result.score.result == DRAW        ? "Draw"
-                                                                                                 : "Unknown");
+        printf("Move: %s, Score: %d, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result.score.result == WON ? "WON" : (result.score.result == LOST ? "LOST" : (result.score.result == DRAW ? "DRAW" : "UNKNOWN")));
         printf("White time: %.1f, Black time: %.1f\n", flags.wtime / 1000.0, flags.btime / 1000.0);
 
         if (threefold_repetition())
@@ -75,12 +72,12 @@ void play_game(double time_seconds, double increment_seconds)
         }
 
         Result game_result = get_game_result(&board_state);
-        if (game_result == WHITE_WON)
+        if (board_state.board.side_to_move == BLACK && game_result == LOST)
         {
             printf("White checkmated black\n");
             break;
         }
-        else if (game_result == BLACK_WON)
+        else if (board_state.board.side_to_move == WHITE && game_result == LOST)
         {
             printf("Black checkmated white\n");
             break;
