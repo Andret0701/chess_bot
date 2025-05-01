@@ -96,5 +96,5 @@ void sort_moves(BoardState *from, BoardStack *stack, uint16_t base)
         stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
 
     //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));
-    qsort(&stack->boards[base], stack->count - base, sizeof(BoardState), compare_boards);
+    qsort(stack->boards + base, stack->count - base, sizeof(BoardState), compare_boards);
 }

@@ -10,7 +10,7 @@
 #include "transposition_table.h"
 
 #define BOARD_STACK_SIZE 65535
-#define MAX_DEPTH 100
+#define MAX_DEPTH 150
 #define MAX_MOVES 300
 
 void print_bot_result(BotResult result)
@@ -127,6 +127,15 @@ double get_time_allocation(BotFlags flags, Color side_to_move)
     return allocated_time;
 }
 
+void updated_best_board(BoardState **best_board, BoardScore *best_score, BoardState *current_board_state, BoardScore score)
+{
+    if (is_greater_score(score, *best_score))
+    {
+        *best_board = current_board_state;
+        *best_score = score;
+    }
+}
+
 BotResult run_bot(BotFlags flags, Board board)
 {
     // TT_clear_generation();
@@ -140,8 +149,6 @@ BotResult run_bot(BotFlags flags, Board board)
     uint8_t depth = 0;
     while (true)
     {
-        BoardScore alpha = WORST_SCORE;
-        BoardScore beta = BEST_SCORE;
         BoardScore best_score = WORST_SCORE;
         BoardState *best_board = NULL;
         for (uint16_t i = 0; i < stack->count; i++)
@@ -149,11 +156,12 @@ BotResult run_bot(BotFlags flags, Board board)
             if (depth != 0 && move_scores[depth - 1][i].result == LOST)
             {
                 move_scores[depth][i] = move_scores[depth - 1][i];
+                updated_best_board(&best_board, &best_score, &stack->boards[i], move_scores[depth][i]);
                 continue;
             }
 
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = negamax(current_board_state, stack, depth, 0, invert_score(beta), invert_score(alpha), start, seconds);
+            SearchResult search_result = negamax(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
             {
@@ -175,12 +183,7 @@ BotResult run_bot(BotFlags flags, Board board)
 
             BoardScore score = search_result.board_score;
             move_scores[depth][i] = score;
-            if (is_greater_score(score, best_score))
-            {
-                best_board = current_board_state;
-                best_score = score;
-            }
-            alpha = max_score(alpha, score);
+            updated_best_board(&best_board, &best_score, current_board_state, score);
         }
 
         // if (best_score.result == WON && best_score.depth <= depth)
@@ -216,10 +219,6 @@ BotResult run_bot(BotFlags flags, Board board)
                 }
             }
         }
-
-        best_board = &stack->boards[0];
-        best_score = move_scores[depth][0];
-
         // // if only one move is not lost
         // uint16_t num_not_lost = 0;
         // uint16_t last_not_lost = 0;
@@ -261,5 +260,12 @@ BotResult run_bot(BotFlags flags, Board board)
         }
 
         depth++;
+        if (depth == MAX_DEPTH)
+        {
+            print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
+            BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+            destroy_board_stack(stack);
+            return result;
+        }
     }
 }

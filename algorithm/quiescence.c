@@ -12,8 +12,6 @@ QuiescenceResult quiescence(BoardState *board_state,
     if (has_timed_out(start, seconds))
         return (QuiescenceResult){0, INVALID};
 
-    Color side = board_state->board.side_to_move;
-
     // 1) Stand-pat
     int32_t stand_pat = score_board(board_state, depth, false).score;
     int32_t best_score = stand_pat;

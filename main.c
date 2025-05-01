@@ -26,13 +26,15 @@ int main(int argc, char *argv[])
 {
     init_zobrist_keys();
 
-    // Board board = fen_to_board("r1b2rk1/p1q1bppp/2p2n2/1BPp4/8/2N5/PPP2PPP/R1BQ1RK1 w - - 1 12");
+    // Board board = fen_to_board("8/5p1p/4r2k/5P2/1R3p2/3q3P/6PK/q7 w - -");
     // print_board(&board);
-    // BotResult result = run_bot((BotFlags){3000000, 3000000, 0, 0}, board);
+    // BotResult result = run_bot((BotFlags){30000, 30000, 0, 0}, board);
     // print_bot_result(result);
     // board = apply_move(&board, result.move);
-    // result = run_bot((BotFlags){100000, 100000, 0, 0}, board);
-    // print_board(&board);
+    // // result = run_bot((BotFlags){10000, 10000, 0, 0}, board);
+    // // print_bot_result(result);
+    // // print_board(&board);
+
     // // for (int i = 0; i < 20; i++)
     // // {
     // //     board = apply_move(&board, result.move);
