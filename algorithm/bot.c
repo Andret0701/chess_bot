@@ -48,7 +48,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
     fprintf(file, "It is %s's turn\n", board->side_to_move == WHITE ? "White" : "Black");
     fprintf(file, "Time: %.2f seconds\n", seconds);
     fprintf(file, "The best move is %s with a score of %d, depth of %d, and result %s\n",
-            board_to_move(board, best_board),
+            board_to_move(board, &best_board->board),
             best_score.score,
             best_score.depth,
             best_score.result == WON ? "WON" : best_score.result == LOST ? "LOST"
@@ -184,16 +184,16 @@ BotResult run_bot(BotFlags flags, Board board)
             BoardScore score = search_result.board_score;
             move_scores[depth][i] = score;
             updated_best_board(&best_board, &best_score, current_board_state, score);
+
+            // If the move is winning. Do not search deeper.
+            if (best_score.result == WON && best_score.depth <= depth)
+            {
+                print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
+                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+                destroy_board_stack(stack);
+                return result;
+            }
         }
-
-        // if (best_score.result == WON && best_score.depth <= depth)
-        // {
-        //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
-
-        //     BotResult result = {board_to_move(&board, &best_board), best_score, depth};
-        //     destroy_board_stack(stack);
-        //     return result;
-        // }
 
         // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)

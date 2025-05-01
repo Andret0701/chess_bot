@@ -45,7 +45,15 @@ void play_game(double time_seconds, double increment_seconds)
             flags.btime += flags.binc;
         }
 
+        Color side_to_move = board.side_to_move;
         board = apply_move(&board, result.move);
+        if (board.side_to_move == side_to_move)
+        {
+            printf("Invalid move: %s\n", result.move);
+            print_board(&board);
+            exit(1);
+        }
+
         push_game_history(board);
         board_state = board_to_board_state(&board);
         print_board(&board);

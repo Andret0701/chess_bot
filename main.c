@@ -26,21 +26,22 @@ int main(int argc, char *argv[])
 {
     init_zobrist_keys();
 
-    // Board board = fen_to_board("8/5p1p/4r2k/5P2/1R3p2/3q3P/6PK/q7 w - -");
+    // Board board = fen_to_board("3k1b1r/ppp1ppp1/6p1/6P1/8/P4n1q/1PP2P1B/7K b - -");
     // print_board(&board);
     // BotResult result = run_bot((BotFlags){30000, 30000, 0, 0}, board);
     // print_bot_result(result);
-    // board = apply_move(&board, result.move);
-    // // result = run_bot((BotFlags){10000, 10000, 0, 0}, board);
-    // // print_bot_result(result);
-    // // print_board(&board);
+    // board = apply_move(&board, "f7f3");
+    // print_board(&board);
+    // result = run_bot((BotFlags){10000, 10000, 0, 0}, board);
+    // print_bot_result(result);
+    // print_board(&board);
 
-    // // for (int i = 0; i < 20; i++)
-    // // {
-    // //     board = apply_move(&board, result.move);
-    // //     print_bot_result(result);
-    // //     print_board(&board);
-    // // }
+    // for (int i = 0; i < 20; i++)
+    // {
+    //     board = apply_move(&board, result.move);
+    //     print_bot_result(result);
+    //     print_board(&board);
+    // }
     // exit(0);
 
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
