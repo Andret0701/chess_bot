@@ -14,9 +14,7 @@ bool is_move_promotion(BoardState *from, BoardState *to)
     return __builtin_popcountll(from->board.black_pieces.pawns) != __builtin_popcountll(to->board.black_pieces.pawns);
 }
 
-bool is_move_check(BoardState *from, BoardState *to)
+bool is_move_check(BoardState *to)
 {
-    if (from->board.side_to_move == WHITE)
-        return to->black_check;
-    return to->white_check;
+    return to->black_check || to->white_check;
 }
