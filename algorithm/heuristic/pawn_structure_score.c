@@ -7,6 +7,9 @@
 #define PAWN_ISLAND_PENALTY 10
 #define PAWN_CHAIN_BONUS 10
 
+#define BISHOP_PAWN_FRIENDLY_PENALTY 3
+#define BISHOP_PAWN_ENEMY_PENALTY 2
+
 static const int PASSED_PAWN_BONUS[] = {0, 120, 80, 50, 30, 15, 15}; // Number of squares from promotion
 
 int32_t get_double_pawn_penalty(BoardState *board_state)
@@ -204,6 +207,47 @@ int32_t get_pawn_chain_bonus(BoardState *board_state)
     return score;
 }
 
+int32_t get_bishop_block_score(BoardState *board_state)
+{
+    int32_t score = 0;
+
+    bool white_has_light_square_bishop = (board_state->board.white_pieces.bishops & LIGHT_SQUARES_MASK) != 0;
+    bool white_has_dark_square_bishop = (board_state->board.white_pieces.bishops & DARK_SQUARES_MASK) != 0;
+    bool black_has_light_square_bishop = (board_state->board.black_pieces.bishops & LIGHT_SQUARES_MASK) != 0;
+    bool black_has_dark_square_bishop = (board_state->board.black_pieces.bishops & DARK_SQUARES_MASK) != 0;
+
+    uint8_t white_pawn_light_square_count = __builtin_popcountll(board_state->board.white_pieces.pawns & LIGHT_SQUARES_MASK);
+    uint8_t white_pawn_dark_square_count = __builtin_popcountll(board_state->board.white_pieces.pawns & DARK_SQUARES_MASK);
+    uint8_t black_pawn_light_square_count = __builtin_popcountll(board_state->board.black_pieces.pawns & LIGHT_SQUARES_MASK);
+    uint8_t black_pawn_dark_square_count = __builtin_popcountll(board_state->board.black_pieces.pawns & DARK_SQUARES_MASK);
+
+    if (white_has_light_square_bishop)
+    {
+        score -= white_pawn_light_square_count * BISHOP_PAWN_FRIENDLY_PENALTY;
+        score -= black_pawn_light_square_count * BISHOP_PAWN_ENEMY_PENALTY;
+    }
+
+    if (white_has_dark_square_bishop)
+    {
+        score -= white_pawn_dark_square_count * BISHOP_PAWN_FRIENDLY_PENALTY;
+        score -= black_pawn_dark_square_count * BISHOP_PAWN_ENEMY_PENALTY;
+    }
+
+    if (black_has_light_square_bishop)
+    {
+        score += white_pawn_light_square_count * BISHOP_PAWN_ENEMY_PENALTY;
+        score += black_pawn_light_square_count * BISHOP_PAWN_FRIENDLY_PENALTY;
+    }
+
+    if (black_has_dark_square_bishop)
+    {
+        score += white_pawn_dark_square_count * BISHOP_PAWN_ENEMY_PENALTY;
+        score += black_pawn_dark_square_count * BISHOP_PAWN_FRIENDLY_PENALTY;
+    }
+
+    return score;
+}
+
 int32_t get_pawn_structure_score(BoardState *board_state)
 {
     int32_t score = 0;
@@ -213,5 +257,6 @@ int32_t get_pawn_structure_score(BoardState *board_state)
     score += get_passed_pawn_bonus(board_state);
     score += get_pawn_island_penalty(board_state);
     score += get_pawn_chain_bonus(board_state);
+    score += get_bishop_block_score(board_state);
     return score;
 }
