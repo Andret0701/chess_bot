@@ -73,6 +73,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         bool is_promo = is_move_promotion(board_state, next_board_state);
         bool is_check = is_move_check(next_board_state);
         bool is_quiet = !is_capture && !is_promo && !is_check;
+        bool is_threatening_promo = is_move_threatening_promotion(board_state, next_board_state);
 
         int reduction = 0;
         bool do_reduction = is_quiet && (i >= base + 2) && (depth >= 3);
@@ -80,7 +81,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
             reduction = 1; // Reduce depth by 1
 
         int extension = 0;
-        if (is_check)      // ||is_promo)
+        if (is_check || is_threatening_promo)
             extension = 1; // Extend depth by 1
 
         SearchResult search_result = negamax(next_board_state, stack, (max_depth + extension) - reduction, depth + 1, invert_score(beta), invert_score(alpha), start, seconds);
