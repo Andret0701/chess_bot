@@ -3,7 +3,7 @@
 
 #define DOUBLE_PAWN_PENALTY 20
 #define ISOLATED_PAWN_PENALTY 20
-#define BACKWARD_PAWN_PENALTY 10
+#define BACKWARD_PAWN_PENALTY 15
 #define PAWN_ISLAND_PENALTY 10
 #define PAWN_CHAIN_BONUS 10
 
@@ -103,7 +103,54 @@ int32_t get_isolated_pawn_penalty(BoardState *board_state)
 
 int32_t get_backward_pawn_penalty(BoardState *board_state)
 {
-    return 0;
+    int32_t score = 0;
+
+    uint64_t white_pawns = board_state->board.white_pieces.pawns;
+    uint64_t black_pawns = board_state->board.black_pieces.pawns;
+
+    uint8_t number_of_white_backward_pawns = 0;
+    while (white_pawns)
+    {
+        int index = __builtin_ctzll(white_pawns);
+        white_pawns &= white_pawns - 1;
+
+        uint64_t position = 1ULL << index;
+        uint64_t backward_pawn_mask = get_backward_pawn_mask_white(position);
+
+        bool is_pawn_undefendable = (backward_pawn_mask & board_state->board.white_pieces.pawns) == 0;
+
+        uint64_t front_square = increment_rank(position);
+        bool is_front_under_attack = (front_square & board_state->black_attacks.pawns) != 0;
+
+        bool has_black_pawn_in_front = (get_white_front_file_mask(position) & board_state->board.black_pieces.pawns) != 0;
+
+        if (is_pawn_undefendable && is_front_under_attack && !has_black_pawn_in_front)
+            number_of_white_backward_pawns++;
+    }
+
+    uint8_t number_of_black_backward_pawns = 0;
+    while (black_pawns)
+    {
+        int index = __builtin_ctzll(black_pawns);
+        black_pawns &= black_pawns - 1;
+
+        uint64_t position = 1ULL << index;
+        uint64_t backward_pawn_mask = get_backward_pawn_mask_black(position);
+        bool is_pawn_undefendable = (backward_pawn_mask & board_state->board.black_pieces.pawns) == 0;
+
+        uint64_t front_square = decrement_rank(position);
+        bool is_front_under_attack = (front_square & board_state->white_attacks.pawns) != 0;
+
+        bool has_white_pawn_in_front = (get_black_front_file_mask(position) & board_state->board.white_pieces.pawns) != 0;
+
+        if (is_pawn_undefendable && is_front_under_attack && !has_white_pawn_in_front)
+            number_of_black_backward_pawns++;
+    }
+
+    score -= number_of_white_backward_pawns * BACKWARD_PAWN_PENALTY;
+    score += number_of_black_backward_pawns * BACKWARD_PAWN_PENALTY;
+
+    return score;
 }
 
 int32_t get_passed_pawn_bonus(BoardState *board_state)

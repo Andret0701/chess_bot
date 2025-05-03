@@ -61,16 +61,16 @@ int32_t get_pawn_shelter_score(Board *board)
     int32_t score = 0;
 
     // White king shelter
-    uint64_t front_of_white_king_mask = move_bitboard_up(board->white_pieces.king);
-    uint64_t ahead_of_white_king_mask = move_bitboard_up(front_of_white_king_mask);
-    uint64_t left_of_white_king_mask = move_bitboard_left(front_of_white_king_mask);
-    uint64_t right_of_white_king_mask = move_bitboard_right(front_of_white_king_mask);
+    uint64_t front_of_white_king_mask = increment_rank(board->white_pieces.king);
+    uint64_t ahead_of_white_king_mask = increment_rank(front_of_white_king_mask);
+    uint64_t left_of_white_king_mask = decrement_file(front_of_white_king_mask);
+    uint64_t right_of_white_king_mask = increment_file(front_of_white_king_mask);
 
     // Black king shelter
-    uint64_t front_of_black_king_mask = move_bitboard_down(board->black_pieces.king);
-    uint64_t ahead_of_black_king_mask = move_bitboard_down(front_of_black_king_mask);
-    uint64_t left_of_black_king_mask = move_bitboard_left(front_of_black_king_mask);
-    uint64_t right_of_black_king_mask = move_bitboard_right(front_of_black_king_mask);
+    uint64_t front_of_black_king_mask = decrement_rank(board->black_pieces.king);
+    uint64_t ahead_of_black_king_mask = decrement_rank(front_of_black_king_mask);
+    uint64_t left_of_black_king_mask = decrement_file(front_of_black_king_mask);
+    uint64_t right_of_black_king_mask = increment_file(front_of_black_king_mask);
 
     // Check white pawn shelter
     bool has_white_front_pawn = (board->white_pieces.pawns & front_of_white_king_mask) != 0;

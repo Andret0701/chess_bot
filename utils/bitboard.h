@@ -98,11 +98,17 @@
 uint64_t flip_bitboard(uint64_t bitboard);
 void print_bitboard(uint64_t bitboard);
 uint64_t position_to_bitboard(uint8_t x, uint8_t y);
-uint64_t move_bitboard_left(uint64_t bitboard);
-uint64_t move_bitboard_right(uint64_t bitboard);
-uint64_t move_bitboard_up(uint64_t bitboard);
-uint64_t move_bitboard_down(uint64_t bitboard);
+uint64_t decrement_file(uint64_t bitboard);
+uint64_t increment_file(uint64_t bitboard);
+uint64_t decrement_rank(uint64_t bitboard);
+uint64_t increment_rank(uint64_t bitboard);
 uint64_t expand_bitboard(uint64_t bitboard);
 
 uint64_t get_passed_pawn_mask_white(uint64_t pawn);
 uint64_t get_passed_pawn_mask_black(uint64_t pawn);
+
+uint64_t get_backward_pawn_mask_white(uint64_t pawn);
+uint64_t get_backward_pawn_mask_black(uint64_t pawn);
+
+uint64_t get_white_front_file_mask(uint64_t piece);
+uint64_t get_black_front_file_mask(uint64_t piece);
