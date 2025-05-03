@@ -30,33 +30,14 @@ bool is_greater_score(BoardScore a, BoardScore b)
     else if (a.result != LOST && b.result == LOST)
         return true;
 
-    bool has_better_score = a.score > b.score;
     if (a.result == WON && b.result == WON)
         return a.depth < b.depth;
     else if (a.result == LOST && b.result == LOST)
         return a.depth > b.depth;
-    else if (a.result == UNKNOWN && b.result == UNKNOWN)
-        return has_better_score;
-    else if (a.result == DRAW && b.result == DRAW)
-        return has_better_score;
-    else if (a.result == UNKNOWN && b.result == DRAW)
-    {
-        bool a_is_winning = a.score >= 0;
-        if (a_is_winning)
-            return true;
-        return false;
-    }
-    else if (a.result == DRAW && b.result == UNKNOWN)
-    {
-        bool b_is_winning = b.score >= 0;
-        if (b_is_winning)
-            return false;
-        return true;
-    }
 
-    printf("Error: Invalid comparison between scores\n");
-    exit(1);
-    return false; // This line will never be reached, but added to avoid compiler warnings
+    int32_t a_score = a.result == DRAW ? 0 : a.score;
+    int32_t b_score = b.result == DRAW ? 0 : b.score;
+    return a_score > b_score;
 }
 
 bool is_equal_score(BoardScore a, BoardScore b)
