@@ -1,5 +1,6 @@
 #include "move_sort.h"
 #include <stdio.h>
+#include "../engine/encoded_move.h"
 
 uint16_t get_mvvlva(BoardState *from, BoardState *to)
 {
@@ -90,10 +91,16 @@ int compare_boards(const void *left, const void *right)
     return ((BoardState *)right)->mvvlva_score - ((BoardState *)left)->mvvlva_score;
 }
 
-void sort_moves(BoardState *from, BoardStack *stack, uint16_t base)
+void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
 {
+    bool found_tt_move = false;
     for (uint16_t i = base; i < stack->count; i++)
-        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
+    {
+        if (encoded_move_equals(stack->boards[i].move, tt_move))
+            stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
+        else
+            stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
+    }
 
     //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));
     qsort(stack->boards + base, stack->count - base, sizeof(BoardState), compare_boards);

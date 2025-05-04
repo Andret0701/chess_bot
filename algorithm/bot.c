@@ -138,7 +138,7 @@ void updated_best_board(BoardState **best_board, BoardScore *best_score, BoardSt
 
 BotResult run_bot(BotFlags flags, Board board)
 {
-    // TT_clear_generation();
+    TT_clear_generation();
     clock_t start = clock();
     double seconds = get_time_allocation(flags, board.side_to_move);
     BoardState board_state = board_to_board_state(&board);
@@ -194,6 +194,7 @@ BotResult run_bot(BotFlags flags, Board board)
                 return result;
             }
         }
+        TT_store(hash_board(&board_state.board), depth, best_score.score, best_score.result, EXACT, best_board->move);
 
         // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)

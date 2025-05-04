@@ -8,6 +8,8 @@
 #include "move_sort.h"
 #include "quiescence.h"
 #include "move_categorization.h"
+#include "transposition_table.h"
+#include "zobrist_hash.h"
 
 SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
 {
@@ -22,6 +24,30 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         score.result = DRAW;
         return (SearchResult){score, VALID};
     }
+
+    uint8_t remaining_depth = max_depth - depth;
+    uint64_t hash = hash_board(&board_state->board);
+    bool found_tt = false;
+    TT_Entry tt_entry;
+    found_tt = TT_lookup(hash, &tt_entry);
+    // if (found_tt && tt_entry.depth >= remaining_depth)
+    // {
+    //     BoardScore tt_score = {tt_entry.score, tt_entry.result, tt_entry.depth + depth};
+    //     if (tt_entry.type == EXACT)
+    //     {
+    //         pop_game_history();
+    //         return (SearchResult){tt_score, VALID};
+    //     }
+    //     // else if (tt_entry.type == LOWERBOUND)
+    //     // {
+    //     //     alpha = max_score(alpha, tt_score);
+    //     //     if (is_greater_equal_score(alpha, beta))
+    //     //     {
+    //     //         pop_game_history();
+    //     //         return (SearchResult){tt_score, VALID};
+    //     //     }
+    //     // }
+    // }
 
     if (depth >= max_depth)
     {
@@ -44,6 +70,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
             score = score_board(board_state, depth, finished);
 
         pop_game_history();
+        TT_store(hash, 0, score.score, result, EXACT, 0);
         return (SearchResult){score, VALID};
     }
 
@@ -61,9 +88,10 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         return (SearchResult){score, VALID};
     }
 
-    sort_moves(board_state, stack, base);
+    sort_moves(board_state, stack, base, found_tt ? tt_entry.move : 0);
 
     BoardScore best_score = WORST_SCORE;
+    uint16_t best_move = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
@@ -109,17 +137,24 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         }
 
         BoardScore score = search_result.board_score;
-        best_score = max_score(best_score, score);
+
+        if (is_greater_score(score, best_score))
+        {
+            best_score = score;
+            best_move = next_board_state->move;
+        }
         alpha = max_score(alpha, score);
         if (is_greater_equal_score(alpha, beta))
         {
             stack->count = base;
             pop_game_history();
+            TT_store(hash, remaining_depth, best_score.score, result, LOWERBOUND, best_move);
             return (SearchResult){best_score, VALID};
         }
     }
 
     stack->count = base;
     pop_game_history();
+    TT_store(hash, remaining_depth, best_score.score, result, EXACT, best_move);
     return (SearchResult){best_score, VALID};
 }
