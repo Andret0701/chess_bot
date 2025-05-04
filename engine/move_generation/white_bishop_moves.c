@@ -20,6 +20,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x + i, y + i), true);
                 validate_white_move(stack);
             }
 
@@ -35,6 +36,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
+        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x + i, y + i), false);
         validate_white_move(stack);
     }
 
@@ -56,6 +58,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x + i, y - i), true);
                 validate_white_move(stack);
             }
 
@@ -71,6 +74,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
+        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x + i, y - i), false);
         validate_white_move(stack);
     }
 
@@ -92,6 +96,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x - i, y + i), true);
                 validate_white_move(stack);
             }
 
@@ -107,6 +112,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
+        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x - i, y + i), false);
         validate_white_move(stack);
     }
 
@@ -128,6 +134,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.en_passant = 0;
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x - i, y - i), true);
                 validate_white_move(stack);
             }
 
@@ -143,6 +150,7 @@ void generate_white_bishop_moves(BoardState *board_state, uint8_t x, uint8_t y, 
         new_board_state->board.en_passant = 0;
         init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
+        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x - i, y - i), false);
         validate_white_move(stack);
     }
 }

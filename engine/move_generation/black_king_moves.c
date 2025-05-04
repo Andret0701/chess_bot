@@ -29,6 +29,7 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
 
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_white_piece(board_state, new_x, new_y));
                 validate_black_move(stack);
             }
         }
@@ -59,6 +60,7 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
 
                     init_board(new_board_state);
                     new_board_state->has_castled = board_state->has_castled | BLACK_KINGSIDE_CASTLE;
+                    new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(6, 7));
                     validate_black_move(stack);
                 }
             }
@@ -85,6 +87,7 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
 
                     init_board(new_board_state);
                     new_board_state->has_castled = board_state->has_castled | BLACK_QUEENSIDE_CASTLE;
+                    new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(2, 7));
                     validate_black_move(stack);
                 }
             }

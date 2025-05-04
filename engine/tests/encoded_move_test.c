@@ -6,78 +6,79 @@
 #include "../encoded_move.h"
 #include <stdio.h>
 
-bool check_encoded_move_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
+typedef struct
 {
-    if (depth == 0)
-        return 1;
+    uint64_t passed;
+    uint64_t count;
+} TestResults;
 
+TestResults check_encoded_move_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
+{
     uint32_t base = stack->count;
     generate_moves(board_state, stack);
 
     if (stack->count == base)
-        return 0;
+        return (TestResults){0, 0};
 
+    TestResults results = {0, 0};
     for (uint16_t i = base; i < stack->count; i++)
     {
         uint16_t move = board_to_encoded_move(&board_state->board, &stack->boards[i].board);
-        if (!encoded_move_equals(move, stack->boards[i].move))
+        if (encoded_move_equals(move, stack->boards[i].move))
+            results.passed++;
+        else
         {
             printf(":( Test %u failed: \n", i);
             printf("  Should have been: ");
             print_move(move);
-            printf("  Found have been: ");
+            printf("  Found:            ");
             print_move(stack->boards[i].move);
-
-            return false;
         }
 
-        bool passed = check_encoded_move_recursive(&stack->boards[i], depth - 1, stack);
-        if (!passed)
-            return false;
+        results.count++;
+
+        if (depth == 1)
+            continue;
+
+        TestResults sub_results = check_encoded_move_recursive(&stack->boards[i], depth - 1, stack);
+        results.passed += sub_results.passed;
+        results.count += sub_results.count;
     }
 
     stack->count = base;
-    return true;
+    return results;
 }
 
 void run_encoded_move_tests()
 {
     BoardStack *stack = create_board_stack(65535);
     uint16_t number_of_tests = sizeof(tests) / sizeof(Test);
-    uint16_t num_passed = 0;
+
+    TestResults results = {0, 0};
     for (uint16_t i = 0; i < number_of_tests; i++)
     {
         stack->count = 0;
         Board board = fen_to_board(tests[i].fen);
         BoardState board_state = board_to_board_state(&board);
 
-        bool passed = check_encoded_move_recursive(&board_state, tests[i].depth, stack);
-        if (!passed)
-        {
-            printf(":( Test %u failed. ", i);
-            printf("FEN: %s\n\n", tests[i].fen);
-        }
-        else
-        {
-            // printf(":) Test %u passed. Expected %u, got %u\n", i, board_to_encoded_move(&board_state, &board), tests[i].move);
-            num_passed++;
-        }
+        uint8_t depth = tests[i].depth;
+        if (depth < 3)
+            depth = 3;
+
+        TestResults sub_results = check_encoded_move_recursive(&board_state, depth, stack);
+        results.passed += sub_results.passed;
+        results.count += sub_results.count;
 
         board = flip_board(&board);
         board_state = board_to_board_state(&board);
-        passed = check_encoded_move_recursive(&board_state, tests[i].depth, stack);
-        if (!passed)
-        {
-            printf(":( Flipped %u failed. ", i);
-            printf("FEN: %s\n\n", tests[i].fen);
-        }
-        else
-        {
-            // printf(":) Flipped %u passed. Expected %u, got %u\n", i, board_to_encoded_move(&board_state, &board), tests[i].move);
-            num_passed++;
-        }
+        sub_results = check_encoded_move_recursive(&board_state, depth, stack);
+        results.passed += sub_results.passed;
+        results.count += sub_results.count;
     }
 
-    printf("Passed %u out of %u tests\n", num_passed, number_of_tests * 2);
+    if (results.count != results.passed)
+        printf(":( Passed %llu out of %llu tests\n", results.passed, results.count);
+    else
+        printf(":) Passed all %llu out of %llu tests\n", results.passed, results.count);
     destroy_board_stack(stack);
 }

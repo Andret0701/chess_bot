@@ -9,3 +9,8 @@ bool has_timed_out(clock_t start, double seconds)
         return true;
     return false;
 }
+
+uint8_t position_to_index(uint8_t x, uint8_t y)
+{
+    return (x + y * 8);
+}

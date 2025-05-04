@@ -92,14 +92,14 @@ int main(int argc, char *argv[])
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
     {
-        printf("Running encoded move tests\n");
-        run_encoded_move_tests();
         printf("Running count tests\n");
         run_count_tests();
         printf("Running can move tests\n");
         run_can_move_tests();
         printf("Running capture move tests\n");
         run_capture_move_tests();
+        printf("Running encoded move tests\n");
+        run_encoded_move_tests();
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "benchmark") == 0)

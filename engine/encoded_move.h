@@ -27,6 +27,11 @@ uint16_t set_promotion_piece(uint16_t move, uint8_t promotion);
 uint16_t set_capture_move(uint16_t move, bool capture);
 uint16_t set_special_move(uint16_t move, bool special);
 
+uint16_t new_simple_encoded_move(uint8_t from, uint8_t to, bool is_capture);
+uint16_t new_en_passant_encoded_move(uint8_t from, uint8_t to);
+uint16_t new_castling_encoded_move(uint8_t from, uint8_t to);
+uint16_t new_promotion_encoded_move(uint8_t from, uint8_t to, uint8_t promotion, bool is_capture);
+
 bool encoded_move_equals(uint16_t move1, uint16_t move2);
 
 uint16_t board_to_encoded_move(const Board *from, const Board *to);

@@ -64,6 +64,46 @@ uint16_t set_special_move(uint16_t move, bool special)
     return move;
 }
 
+uint16_t new_simple_encoded_move(uint8_t from, uint8_t to, bool is_capture)
+{
+    uint16_t move = 0;
+    move = set_from_square(move, from);
+    move = set_to_square(move, to);
+    move = set_capture_move(move, is_capture);
+    return move;
+}
+
+uint16_t new_en_passant_encoded_move(uint8_t from, uint8_t to)
+{
+    uint16_t move = 0;
+    move = set_from_square(move, from);
+    move = set_to_square(move, to);
+    move = set_capture_move(move, true); // Set capture move for en passant
+    move = set_special_move(move, true); // Set special move for en passant
+    return move;
+}
+
+uint16_t new_castling_encoded_move(uint8_t from, uint8_t to)
+{
+    uint16_t move = 0;
+    move = set_from_square(move, from);
+    move = set_to_square(move, to);
+    move = set_capture_move(move, false); // No capture for castling
+    move = set_special_move(move, true);  // Set special move for castling
+    return move;
+}
+
+uint16_t new_promotion_encoded_move(uint8_t from, uint8_t to, uint8_t promotion, bool is_capture)
+{
+    uint16_t move = 0;
+    move = set_from_square(move, from);
+    move = set_to_square(move, to);
+    move = set_capture_move(move, is_capture);
+    move = set_promotion_piece(move, promotion); // Set the promotion piece
+    move = set_special_move(move, true);         // Set special move for promotion
+    return move;
+}
+
 bool encoded_move_equals(uint16_t move1, uint16_t move2)
 {
     // If move is not a special move, clear the promotion bits
@@ -157,29 +197,23 @@ uint16_t board_to_encoded_move(const Board *from, const Board *to)
     }
 
     bool is_en_passant = false;
-    if (is_white_move && (from->white_pieces.pawns & source_squares) && (to->black_pieces.pawns & dest_squares))
-    {
-        // Check if the move is an en passant capture
-        if ((source_idx % 8) != (dest_idx % 8) && (source_idx / 8) == 4 && (dest_idx / 8) == 5)
-            is_en_passant = true;
-    }
-    else if (!is_white_move && (from->black_pieces.pawns & source_squares) && (to->white_pieces.pawns & dest_squares))
-    {
-        // Check if the move is an en passant capture
-        if ((source_idx % 8) != (dest_idx % 8) && (source_idx / 8) == 3 && (dest_idx / 8) == 2)
-            is_en_passant = true;
-    }
+    if (is_white_move && (from->black_pieces.pawns != to->black_pieces.pawns) && ((from->black_pieces.pawns & pieces_to_bitboard(&to->white_pieces)) == 0))
+        is_en_passant = true;
+    else if (!is_white_move && (from->white_pieces.pawns != to->white_pieces.pawns) && ((from->white_pieces.pawns & pieces_to_bitboard(&to->black_pieces)) == 0))
+        is_en_passant = true;
 
     bool is_capture = false;
     if (is_white_move && !pieces_equals(&from->black_pieces, &to->black_pieces))
         is_capture = true;
     else if (!is_white_move && !pieces_equals(&from->white_pieces, &to->white_pieces))
         is_capture = true;
+    if (is_en_passant)
+        is_capture = true; // En passant is a capture
 
     move = set_from_square(move, source_idx);
     move = set_to_square(move, dest_idx);
     move = set_promotion_piece(move, promotion);
-    move = set_special_move(move, is_en_passant | is_promotion);
+    move = set_special_move(move, is_en_passant || is_promotion);
     move = set_capture_move(move, is_capture);
 
     return move;

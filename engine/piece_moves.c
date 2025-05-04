@@ -54,6 +54,18 @@ void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
     board_state->board.black_pieces.queens &= ~position;
 }
 
+bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
+{
+    uint64_t position = position_to_bitboard(x, y);
+    return (board_state->white_pieces & position) != 0;
+}
+
+bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
+{
+    uint64_t position = position_to_bitboard(x, y);
+    return (board_state->black_pieces & position) != 0;
+}
+
 void generate_moves(BoardState *board_state, BoardStack *stack)
 {
     if (board_state->board.side_to_move == WHITE)

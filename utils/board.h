@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define WHITE_KINGSIDE_CASTLE (1 << 0)
 #define WHITE_QUEENSIDE_CASTLE (1 << 1)
