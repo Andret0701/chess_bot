@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include "bitboard.h"
 
-uint64_t pieces_to_bitboard(Pieces *pieces)
+uint64_t pieces_to_bitboard(const Pieces *pieces)
 {
     return pieces->pawns | pieces->knights | pieces->bishops | pieces->rooks | pieces->queens | pieces->king;
 }
 
-bool pieces_equals(Pieces *a, Pieces *b)
+bool pieces_equals(const Pieces *a, const Pieces *b)
 {
     return a->bishops == b->bishops &&
            a->knights == b->knights &&
