@@ -93,7 +93,6 @@ int compare_boards(const void *left, const void *right)
 
 void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
 {
-    bool found_tt_move = false;
     for (uint16_t i = base; i < stack->count; i++)
     {
         if (encoded_move_equals(stack->boards[i].move, tt_move))

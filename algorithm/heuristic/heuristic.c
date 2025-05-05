@@ -3,6 +3,7 @@
 #include "material_score.h"
 #include "king_safety_score.h"
 #include "pawn_structure_score.h"
+#include "square_control.h"
 #include "../../utils/bitboard.h"
 
 bool has_insufficient_material(Board *board)
@@ -70,17 +71,8 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
     // Pawn structure scoring
     score += get_pawn_structure_score(board_state);
 
-    // // Score for where different pieces can attack to
-    // score += __builtin_popcountll(board_state->white_attacks.pawns) * 2;
-    // score -= __builtin_popcountll(board_state->black_attacks.pawns) * 2;
-    // score += __builtin_popcountll(board_state->white_attacks.knights) * 4;
-    // score -= __builtin_popcountll(board_state->black_attacks.knights) * 4;
-    // score += __builtin_popcountll(board_state->white_attacks.bishops) * 4;
-    // score -= __builtin_popcountll(board_state->black_attacks.bishops) * 4;
-    // score += __builtin_popcountll(board_state->white_attacks.rooks) * 6;
-    // score -= __builtin_popcountll(board_state->black_attacks.rooks) * 6;
-    // score += __builtin_popcountll(board_state->white_attacks.queens) * 10;
-    // score -= __builtin_popcountll(board_state->black_attacks.queens) * 10;
+    // Square control scoring
+    score += get_square_control(board_state);
 
     // // In score_board():
     // score += __builtin_popcountll(board_state->white_pieces & CENTER_SQUARES_MASK) * 20;
