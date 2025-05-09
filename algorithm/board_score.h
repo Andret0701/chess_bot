@@ -2,6 +2,8 @@
 
 #include "../utils/board.h"
 #include <stdint.h>
+#include <stdbool.h>
+#include <float.h>
 
 typedef enum
 {
@@ -13,13 +15,13 @@ typedef enum
 
 typedef struct
 {
-    int32_t score;
+    double score;
     Result result;
     uint8_t depth;
 } BoardScore;
 
-static const BoardScore BEST_SCORE = {INT32_MAX, WON, 0};
-static const BoardScore WORST_SCORE = {INT32_MIN, LOST, 0};
+static const BoardScore BEST_SCORE = {DBL_MAX, WON, 0};
+static const BoardScore WORST_SCORE = {DBL_MIN, LOST, 0};
 BoardScore invert_score(BoardScore score);
 void print_score(BoardScore score);
 

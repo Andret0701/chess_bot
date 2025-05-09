@@ -1,28 +1,6 @@
 #include "material_score.h"
 #include "../../utils/bitboard.h"
-// This is based on the Larry Kaufman's 2021 system
-// https://en.wikipedia.org/wiki/Chess_piece_relative_value
-
-typedef enum
-{
-    MIDDLEGAME,
-    THRESHOLD,
-    ENDGAME
-} GamePhase;
-
-GamePhase get_game_phase(Board *board)
-{
-    uint8_t white_queen_count = popcountll(board->white_pieces.queens);
-    uint8_t black_queen_count = popcountll(board->black_pieces.queens);
-
-    if (white_queen_count == 0 && black_queen_count == 0)
-        return ENDGAME;
-
-    if (white_queen_count == black_queen_count)
-        return MIDDLEGAME;
-
-    return THRESHOLD;
-}
+#include "heuristic_values.h"
 
 bool has_bishop_pair(Board *board, Color color)
 {
@@ -42,111 +20,32 @@ bool has_bishop_pair(Board *board, Color color)
     return has_dark_square_bishop && has_light_square_bishop;
 }
 
-int32_t calculate_piece_score(uint64_t pieces, int32_t value)
+double get_material_score(Board *board, double game_phase)
 {
-    return __builtin_popcountll(pieces) * value;
-}
+    double score = 0;
 
-int32_t calculate_combined_piece_score(uint64_t pieces, int32_t first_value, int32_t additional_value)
-{
-    int count = __builtin_popcountll(pieces);
-    if (count == 0)
-        return 0;
-
-    return first_value + (count - 1) * additional_value;
-}
-
-int32_t get_middlegame_pawn_score(Board *board)
-{
-
-    int32_t score = 0;
-    score += calculate_piece_score(board->white_pieces.pawns & CENTER_FILES_MASK, 100);
-    score -= calculate_piece_score(board->black_pieces.pawns & CENTER_FILES_MASK, 100);
-    score += calculate_piece_score(board->white_pieces.pawns & BISHOP_FILES_MASK, 95);
-    score -= calculate_piece_score(board->black_pieces.pawns & BISHOP_FILES_MASK, 95);
-    score += calculate_piece_score(board->white_pieces.pawns & KNIGHT_FILES_MASK, 85);
-    score -= calculate_piece_score(board->black_pieces.pawns & KNIGHT_FILES_MASK, 85);
-    score += calculate_piece_score(board->white_pieces.pawns & ROOK_FILES_MASK, 70);
-    score -= calculate_piece_score(board->black_pieces.pawns & ROOK_FILES_MASK, 70);
+    score += __builtin_popcountll(board->white_pieces.pawns & CENTER_FILES_MASK) * ((1 - game_phase) * CENTER_PAWN_MIDDLEGAME + game_phase * CENTER_PAWN_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.pawns & CENTER_FILES_MASK) * ((1 - game_phase) * CENTER_PAWN_MIDDLEGAME + game_phase * CENTER_PAWN_ENDGAME);
+    score += __builtin_popcountll(board->white_pieces.pawns & BISHOP_FILES_MASK) * ((1 - game_phase) * BISHOP_PAWN_MIDDLEGAME + game_phase * BISHOP_PAWN_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.pawns & BISHOP_FILES_MASK) * ((1 - game_phase) * BISHOP_PAWN_MIDDLEGAME + game_phase * BISHOP_PAWN_ENDGAME);
+    score += __builtin_popcountll(board->white_pieces.pawns & KNIGHT_FILES_MASK) * ((1 - game_phase) * KNIGHT_PAWN_MIDDLEGAME + game_phase * KNIGHT_PAWN_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.pawns & KNIGHT_FILES_MASK) * ((1 - game_phase) * KNIGHT_PAWN_MIDDLEGAME + game_phase * KNIGHT_PAWN_ENDGAME);
+    score += __builtin_popcountll(board->white_pieces.pawns & ROOK_FILES_MASK) * ((1 - game_phase) * ROOK_PAWN_MIDDLEGAME + game_phase * ROOK_PAWN_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.pawns & ROOK_FILES_MASK) * ((1 - game_phase) * ROOK_PAWN_MIDDLEGAME + game_phase * ROOK_PAWN_ENDGAME);
+    score += __builtin_popcountll(board->white_pieces.knights) * ((1 - game_phase) * KNIGHT_MIDDLEGAME + game_phase * KNIGHT_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.knights) * ((1 - game_phase) * KNIGHT_MIDDLEGAME + game_phase * KNIGHT_ENDGAME);
+    score += __builtin_popcountll(board->white_pieces.bishops) * ((1 - game_phase) * BISHOP_MIDDLEGAME + game_phase * BISHOP_ENDGAME);
+    score -= __builtin_popcountll(board->black_pieces.bishops) * ((1 - game_phase) * BISHOP_MIDDLEGAME + game_phase * BISHOP_ENDGAME);
+    score += (__builtin_popcountll(board->white_pieces.rooks) > 0) ? FIRST_ROOK_MIDDLEGAME * (1 - game_phase) + FIRST_ROOK_ENDGAME * game_phase : 0;
+    score -= (__builtin_popcountll(board->black_pieces.rooks) > 0) ? FIRST_ROOK_MIDDLEGAME * (1 - game_phase) + FIRST_ROOK_ENDGAME * game_phase : 0;
+    score += (__builtin_popcountll(board->white_pieces.rooks) > 1) ? (__builtin_popcountll(board->white_pieces.rooks) - 1) * ((1 - game_phase) * ADDITIONAL_ROOK_MIDDLEGAME + game_phase * ADDITIONAL_ROOK_ENDGAME) : 0;
+    score -= (__builtin_popcountll(board->black_pieces.rooks) > 1) ? (__builtin_popcountll(board->black_pieces.rooks) - 1) * ((1 - game_phase) * ADDITIONAL_ROOK_MIDDLEGAME + game_phase * ADDITIONAL_ROOK_ENDGAME) : 0;
+    score += (__builtin_popcountll(board->white_pieces.queens) > 0) ? FIRST_QUEEN_MIDDLEGAME * (1 - game_phase) + FIRST_QUEEN_ENDGAME * game_phase : 0;
+    score -= (__builtin_popcountll(board->black_pieces.queens) > 0) ? FIRST_QUEEN_MIDDLEGAME * (1 - game_phase) + FIRST_QUEEN_ENDGAME * game_phase : 0;
+    score += (__builtin_popcountll(board->white_pieces.queens) > 1) ? (__builtin_popcountll(board->white_pieces.queens) - 1) * ((1 - game_phase) * ADDITIONAL_QUEEN_MIDDLEGAME + game_phase * ADDITIONAL_QUEEN_ENDGAME) : 0;
+    score -= (__builtin_popcountll(board->black_pieces.queens) > 1) ? (__builtin_popcountll(board->black_pieces.queens) - 1) * ((1 - game_phase) * ADDITIONAL_QUEEN_MIDDLEGAME + game_phase * ADDITIONAL_QUEEN_ENDGAME) : 0;
+    score += has_bishop_pair(board, WHITE) ? BISHOP_PAIR_MIDDLEGAME * (1 - game_phase) + BISHOP_PAIR_ENDGAME * game_phase : 0;
+    score -= has_bishop_pair(board, BLACK) ? BISHOP_PAIR_MIDDLEGAME * (1 - game_phase) + BISHOP_PAIR_ENDGAME * game_phase : 0;
 
     return score;
-}
-
-int32_t get_middlegame_material_score(Board *board)
-{
-    int32_t score = 0;
-    score += get_middlegame_pawn_score(board);
-
-    score += calculate_piece_score(board->white_pieces.knights, 320);
-    score -= calculate_piece_score(board->black_pieces.knights, 320);
-    score += calculate_piece_score(board->white_pieces.bishops, 330);
-    score -= calculate_piece_score(board->black_pieces.bishops, 330);
-    score += calculate_combined_piece_score(board->white_pieces.rooks, 470, 450);
-    score -= calculate_combined_piece_score(board->black_pieces.rooks, 470, 450);
-
-    if (has_bishop_pair(board, WHITE))
-        score += 30;
-    if (has_bishop_pair(board, BLACK))
-        score -= 30;
-
-    return score;
-}
-
-int32_t get_threshold_material_score(Board *board)
-{
-    int32_t score = 0;
-    score += calculate_piece_score(board->white_pieces.pawns, 90);
-    score -= calculate_piece_score(board->black_pieces.pawns, 90);
-    score += calculate_piece_score(board->white_pieces.knights, 320);
-    score -= calculate_piece_score(board->black_pieces.knights, 320);
-    score += calculate_piece_score(board->white_pieces.bishops, 330);
-    score -= calculate_piece_score(board->black_pieces.bishops, 330);
-    score += calculate_combined_piece_score(board->white_pieces.rooks, 480, 490);
-    score -= calculate_combined_piece_score(board->black_pieces.rooks, 480, 490);
-    score += calculate_combined_piece_score(board->white_pieces.queens, 940, 870);
-    score -= calculate_combined_piece_score(board->black_pieces.queens, 940, 870);
-
-    if (has_bishop_pair(board, WHITE))
-        score += 40;
-    if (has_bishop_pair(board, BLACK))
-        score -= 40;
-
-    return score;
-}
-
-int32_t get_endgame_material_score(Board *board)
-{
-    int32_t score = 0;
-    score += calculate_piece_score(board->white_pieces.pawns, 100);
-    score -= calculate_piece_score(board->black_pieces.pawns, 100);
-    score += calculate_piece_score(board->white_pieces.knights, 320);
-    score -= calculate_piece_score(board->black_pieces.knights, 320);
-    score += calculate_piece_score(board->white_pieces.bishops, 330);
-    score -= calculate_piece_score(board->black_pieces.bishops, 330);
-    score += calculate_combined_piece_score(board->white_pieces.rooks, 530, 500);
-    score -= calculate_combined_piece_score(board->black_pieces.rooks, 530, 500);
-
-    if (has_bishop_pair(board, WHITE))
-        score += 50;
-    if (has_bishop_pair(board, BLACK))
-        score -= 50;
-
-    return score;
-}
-
-int32_t get_material_score(Board *board)
-{
-    GamePhase phase = get_game_phase(board);
-    switch (phase)
-    {
-    case MIDDLEGAME:
-        return get_middlegame_material_score(board);
-    case THRESHOLD:
-        return get_threshold_material_score(board);
-    case ENDGAME:
-        return get_endgame_material_score(board);
-    }
-
-    printf("Unknown game phase\n");
-    return 0;
 }

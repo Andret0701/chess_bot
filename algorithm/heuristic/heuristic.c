@@ -54,83 +54,53 @@ Result get_result(BoardState *board_state, bool is_finished)
     return result;
 }
 
+double get_game_phase(Board *board)
+{
+    const int PHASE_KNIGHT = 1;
+    const int PHASE_BISHOP = 1;
+    const int PHASE_ROOK = 2;
+    const int PHASE_QUEEN = 4;
+
+    const int MAX_PHASE = 24;
+
+    int phase = 0;
+
+    // Count remaining white pieces
+    phase += PHASE_KNIGHT * __builtin_popcountll(board->white_pieces.knights);
+    phase += PHASE_BISHOP * __builtin_popcountll(board->white_pieces.bishops);
+    phase += PHASE_ROOK * __builtin_popcountll(board->white_pieces.rooks);
+    phase += PHASE_QUEEN * __builtin_popcountll(board->white_pieces.queens);
+
+    // Count remaining black pieces
+    phase += PHASE_KNIGHT * __builtin_popcountll(board->black_pieces.knights);
+    phase += PHASE_BISHOP * __builtin_popcountll(board->black_pieces.bishops);
+    phase += PHASE_ROOK * __builtin_popcountll(board->black_pieces.rooks);
+    phase += PHASE_QUEEN * __builtin_popcountll(board->black_pieces.queens);
+
+    // Flip to endgame = 1.0, opening = 0.0
+    return 1.0 - ((double)phase / MAX_PHASE);
+}
+
 BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
 {
-    int score = 0;
+    double score = 0;
     Result result = get_result(board_state, is_finished);
+    double game_phase = get_game_phase(&board_state->board);
 
     // Material counting
-    score += get_material_score(&board_state->board);
+    score += get_material_score(&board_state->board, game_phase);
 
     // Positional scoring
-    score += get_position_score(&board_state->board);
+    score += get_position_score(&board_state->board, game_phase);
 
     // King safety scoring
-    score += get_king_safety_score(board_state);
+    score += get_king_safety_score(board_state, game_phase);
 
     // Pawn structure scoring
-    score += get_pawn_structure_score(board_state);
+    score += get_pawn_structure_score(board_state, game_phase);
 
     // Square control scoring
-    score += get_square_control(board_state);
-
-    // // In score_board():
-    // score += __builtin_popcountll(board_state->white_pieces & CENTER_SQUARES_MASK) * 20;
-    // score -= __builtin_popcountll(board_state->black_pieces & CENTER_SQUARES_MASK) * 20;
-    // score += __builtin_popcountll(board_state->white_pieces & EXTENDED_CENTER_MASK) * 10;
-    // score -= __builtin_popcountll(board_state->black_pieces & EXTENDED_CENTER_MASK) * 10;
-
-    // // Bonus for protected pieces
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.queens) * 10;
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.rooks) * 5;
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.bishops) * 5;
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.knights) * 5;
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.white_pieces.pawns) * 2;
-
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.queens) * 10;
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.rooks) * 5;
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.bishops) * 5;
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.knights) * 5;
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.black_pieces.pawns) * 2;
-
-    // // Bonus for attacking the king
-    // score += __builtin_popcountll(board_state->white_attack & board_state->board.black_pieces.king) * 20;
-    // score -= __builtin_popcountll(board_state->black_attack & board_state->board.white_pieces.king) * 20;
-    // // Bonus for having the move
-    // if (board_state->board.side_to_move == WHITE)
-    //     score += 5;
-    // else
-    //     score -= 5;
-
-    // // Bonus for rooks on open files
-    // uint64_t white_rooks = board_state->board.white_pieces.rooks;
-    // uint64_t black_rooks = board_state->board.black_pieces.rooks;
-    // uint64_t white_open_files = 0;
-    // uint64_t black_open_files = 0;
-    // for (int i = 0; i < 8; i++)
-    // {
-    //     uint64_t file = 0x0101010101010101ULL << i;
-    //     if ((white_rooks & file) == 0)
-    //         white_open_files |= file;
-    //     if ((black_rooks & file) == 0)
-    //         black_open_files |= file;
-    // }
-    // score += __builtin_popcountll(white_open_files & board_state->white_attack & board_state->board.white_pieces.rooks) * 10;
-    // score -= __builtin_popcountll(black_open_files & board_state->black_attack & board_state->board.black_pieces.rooks) * 10;
-
-    // // Bonus for connected rooks
-    // if ((board_state->board.white_pieces.rooks & board_state->white_attacks.rooks) != 0)
-    //     score += 10;
-    // if ((board_state->board.black_pieces.rooks & board_state->black_attacks.rooks) != 0)
-    //     score -= 10;
-
-    // // King safety
-    // // - Bonus for pawn shelter in front of the king
-    // // - Penalty for open files or half-open file next to king
-    // // Bonus for number of moves for sliding pieces
-    // // Taxicab (Distance from queen to king)
-    // // Pawn storm
-    // // Attacking squares around the king
+    score += get_square_control(board_state, game_phase);
 
     if (board_state->board.side_to_move == BLACK)
         score = -score;

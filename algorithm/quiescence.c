@@ -3,8 +3,8 @@
 
 QuiescenceResult quiescence(BoardState *board_state,
                             BoardStack *stack,
-                            int32_t alpha,
-                            int32_t beta,
+                            double alpha,
+                            double beta,
                             uint8_t depth,
                             clock_t start,
                             double seconds)
@@ -13,8 +13,8 @@ QuiescenceResult quiescence(BoardState *board_state,
         return (QuiescenceResult){0, INVALID};
 
     // 1) Stand-pat
-    int32_t stand_pat = score_board(board_state, depth, false).score;
-    int32_t best_score = stand_pat;
+    double stand_pat = score_board(board_state, depth, false).score;
+    double best_score = stand_pat;
 
     // 2) β-cutoff on stand-pat
     if (stand_pat >= beta)
@@ -38,7 +38,7 @@ QuiescenceResult quiescence(BoardState *board_state,
             return (QuiescenceResult){0, INVALID};
         }
 
-        int32_t score = quiescence_result.score;
+        double score = quiescence_result.score;
 
         if (score >= beta)
         {

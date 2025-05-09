@@ -3,4 +3,4 @@
 #include "../../utils/board.h"
 #include <stdint.h>
 
-int32_t get_material_score(Board *board);
+double get_material_score(Board *board, double game_phase);

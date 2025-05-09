@@ -1,64 +1,43 @@
 #include "king_safety_score.h"
 #include "../../utils/bitboard.h"
+#include "heuristic_values.h"
 
-#define CAN_CASTLE_KINGSIDE_BONUS 20
-#define CAN_CASTLE_QUEENSIDE_BONUS 15
-#define CAN_CASTLE_BOTH_SIDES_BONUS 25
-
-#define HAS_CASTLED_KINGSIDE_BONUS 30
-#define HAS_CASTLED_QUEENSIDE_BONUS 25
-
-int get_file(int square)
+double get_castling_score(BoardState *board_state, double game_phase)
 {
-    return square % 8;
-}
-
-int get_rank(int square)
-{
-    return square / 8;
-}
-
-int get_king_square(uint64_t king)
-{
-    return __builtin_ctzll(king);
-}
-
-int32_t get_castling_score(BoardState *board_state)
-{
-    int32_t score = 0;
+    double score = 0;
     Board *board = &board_state->board;
     if (((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0))
-        score += CAN_CASTLE_BOTH_SIDES_BONUS;
+        score += CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_BOTH_SIDES_ENDGAME * game_phase;
     else if ((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0)
-        score += CAN_CASTLE_KINGSIDE_BONUS;
+        score += CAN_CASTLE_KINGSIDE_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_KINGSIDE_ENDGAME * game_phase;
     else if ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0)
-        score += CAN_CASTLE_QUEENSIDE_BONUS;
+        score += CAN_CASTLE_QUEENSIDE_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_QUEENSIDE_ENDGAME * game_phase;
 
     if (((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0))
-        score -= CAN_CASTLE_BOTH_SIDES_BONUS;
+        score -= CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_BOTH_SIDES_ENDGAME * game_phase;
     else if ((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0)
-        score -= CAN_CASTLE_KINGSIDE_BONUS;
+        score -= CAN_CASTLE_KINGSIDE_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_KINGSIDE_ENDGAME * game_phase;
     else if ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0)
-        score -= CAN_CASTLE_QUEENSIDE_BONUS;
+        score -= CAN_CASTLE_QUEENSIDE_MIDDLEGAME * (1 - game_phase) + CAN_CASTLE_QUEENSIDE_ENDGAME * game_phase;
 
     if (board_state->has_castled & WHITE_KINGSIDE_CASTLE)
-        score += HAS_CASTLED_KINGSIDE_BONUS;
+        score += HAS_CASTLED_KINGSIDE_MIDDLEGAME * (1 - game_phase) + HAS_CASTLED_KINGSIDE_ENDGAME * game_phase;
 
     if (board_state->has_castled & WHITE_QUEENSIDE_CASTLE)
-        score += HAS_CASTLED_QUEENSIDE_BONUS;
+        score += HAS_CASTLED_QUEENSIDE_MIDDLEGAME * (1 - game_phase) + HAS_CASTLED_QUEENSIDE_ENDGAME * game_phase;
 
     if (board_state->has_castled & BLACK_KINGSIDE_CASTLE)
-        score -= HAS_CASTLED_KINGSIDE_BONUS;
+        score -= HAS_CASTLED_KINGSIDE_MIDDLEGAME * (1 - game_phase) + HAS_CASTLED_KINGSIDE_ENDGAME * game_phase;
 
     if (board_state->has_castled & BLACK_QUEENSIDE_CASTLE)
-        score -= HAS_CASTLED_QUEENSIDE_BONUS;
+        score -= HAS_CASTLED_QUEENSIDE_MIDDLEGAME * (1 - game_phase) + HAS_CASTLED_QUEENSIDE_ENDGAME * game_phase;
 
     return score;
 }
 
-int32_t get_pawn_shelter_score(Board *board)
+double get_pawn_shelter_score(Board *board, double game_phase)
 {
-    int32_t score = 0;
+    double score = 0;
 
     // White king shelter
     uint64_t front_of_white_king_mask = increment_rank(board->white_pieces.king);
@@ -86,50 +65,32 @@ int32_t get_pawn_shelter_score(Board *board)
 
     // Score white pawn shelter
     if (has_white_front_pawn)
-        score += 10;
-    else
-        score -= 15; // Penalty for missing front pawn
+        score += FRONT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + FRONT_PAWN_BONUS_ENDGAME * game_phase;
 
     if (has_white_ahead_pawn)
-        score += 5;
+        score += AHEAD_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + AHEAD_PAWN_BONUS_ENDGAME * game_phase;
     if (has_white_left_pawn)
-        score += 8;
+        score += LEFT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + LEFT_PAWN_BONUS_ENDGAME * game_phase;
     if (has_white_right_pawn)
-        score += 8;
+        score += RIGHT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + RIGHT_PAWN_BONUS_ENDGAME * game_phase;
 
     // Score black pawn shelter (mirror of white scoring)
     if (has_black_front_pawn)
-        score -= 10;
-    else
-        score += 15;
+        score -= FRONT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + FRONT_PAWN_BONUS_ENDGAME * game_phase;
 
     if (has_black_ahead_pawn)
-        score -= 5;
+        score -= AHEAD_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + AHEAD_PAWN_BONUS_ENDGAME * game_phase;
     if (has_black_left_pawn)
-        score -= 8;
+        score -= LEFT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + LEFT_PAWN_BONUS_ENDGAME * game_phase;
     if (has_black_right_pawn)
-        score -= 8;
+        score -= RIGHT_PAWN_BONUS_MIDDLEGAME * (1 - game_phase) + RIGHT_PAWN_BONUS_ENDGAME * game_phase;
 
     return score;
 }
 
-int32_t get_open_file_penalty(Board *board)
+double get_attacking_king_squares_score(BoardState *board_state, double game_phase)
 {
-    int32_t score = 0;
-
-    return score;
-}
-
-int32_t get_pawn_storm_score(Board *board) // Having pawns storming the enemy king is good
-{
-    int32_t score = 0;
-
-    return score;
-}
-
-int32_t get_attacking_king_squares_score(BoardState *board_state)
-{
-    int32_t score = 0;
+    double score = 0;
 
     // Calculate squares adjacent to the kings, excluding the squares they currently occupy
     uint64_t white_king_squares = expand_bitboard(board_state->board.white_pieces.king) & ~board_state->board.white_pieces.king;
@@ -139,38 +100,17 @@ int32_t get_attacking_king_squares_score(BoardState *board_state)
     uint8_t attacked_white_king_squares = __builtin_popcountll(white_king_squares & board_state->black_attack);
     uint8_t attacked_black_king_squares = __builtin_popcountll(black_king_squares & board_state->white_attack);
 
-    // Cap the number of attacked squares to 4
-    if (attacked_white_king_squares > 4)
-        attacked_white_king_squares = 4;
-
-    if (attacked_black_king_squares > 4)
-        attacked_black_king_squares = 4;
-
-    // Apply exponential scoring for attacking squares around the enemy king
-    if (attacked_black_king_squares > 0)
-        score += 1 << (attacked_black_king_squares - 1);
-
-    if (attacked_white_king_squares > 0)
-        score -= 1 << (attacked_white_king_squares - 1);
+    score += ATTACKING_KING_SQUARES_MIDDLEGAME[attacked_white_king_squares] * (1 - game_phase) + ATTACKING_KING_SQUARES_ENDGAME[attacked_white_king_squares] * game_phase;
+    score -= ATTACKING_KING_SQUARES_MIDDLEGAME[attacked_black_king_squares] * (1 - game_phase) + ATTACKING_KING_SQUARES_ENDGAME[attacked_black_king_squares] * game_phase;
 
     return score;
 }
 
-int32_t get_weak_back_rank_penalty(Board *board) // Having a weak back rank is bad
+double get_king_safety_score(BoardState *board_state, double game_phase)
 {
-    int32_t score = 0;
-
-    return score;
-}
-
-int32_t get_king_safety_score(BoardState *board_state)
-{
-    int32_t score = 0;
-    score += get_castling_score(board_state);
-    score += get_pawn_shelter_score(&board_state->board);
-    score += get_open_file_penalty(&board_state->board);
-    score += get_pawn_storm_score(&board_state->board);
-    score += get_attacking_king_squares_score(board_state);
-    score += get_weak_back_rank_penalty(&board_state->board);
+    double score = 0;
+    score += get_castling_score(board_state, game_phase);
+    score += get_pawn_shelter_score(&board_state->board, game_phase);
+    score += get_attacking_king_squares_score(board_state, game_phase);
     return score;
 }

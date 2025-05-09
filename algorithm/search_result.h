@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct
 {
-    int32_t score;
+    double score;
     Validity valid;
 } QuiescenceResult;
 

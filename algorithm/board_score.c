@@ -14,7 +14,7 @@ BoardScore invert_score(BoardScore score)
 void print_score(BoardScore score)
 {
     const char *results[] = {"Won", "Lost", "Draw", "Unknown"};
-    printf("Score: %d, Result: %s, Depth: %d\n", score.score, results[score.result], score.depth);
+    printf("Score: %.2f, Result: %s, Depth: %d\n", score.score, results[score.result], score.depth);
 }
 
 bool is_greater_score(BoardScore a, BoardScore b)
@@ -35,8 +35,8 @@ bool is_greater_score(BoardScore a, BoardScore b)
     else if (a.result == LOST && b.result == LOST)
         return a.depth > b.depth;
 
-    int32_t a_score = a.result == DRAW ? 0 : a.score;
-    int32_t b_score = b.result == DRAW ? 0 : b.score;
+    double a_score = a.result == DRAW ? 0 : a.score;
+    double b_score = b.result == DRAW ? 0 : b.score;
     return a_score > b_score;
 }
 

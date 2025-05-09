@@ -15,7 +15,7 @@
 
 void print_bot_result(BotResult result)
 {
-    printf("Move: %s, Depth: %d (Score: %d, Depth: %d, Result: %s)\n",
+    printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d, Result: %s)\n",
            result.move,
            result.depth,
            result.score.score,
@@ -47,7 +47,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
         fprintf(file, "Black is in check\n");
     fprintf(file, "It is %s's turn\n", board->side_to_move == WHITE ? "White" : "Black");
     fprintf(file, "Time: %.2f seconds\n", seconds);
-    fprintf(file, "The best move is %s with a score of %d, depth of %d, and result %s\n",
+    fprintf(file, "The best move is %s with a score of %f, depth of %d, and result %s\n",
             board_to_move(board, &best_board->board),
             best_score.score,
             best_score.depth,
@@ -58,7 +58,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
     fprintf(file, "Move: | ");
     for (int16_t d = depth; d >= 0; d--)
     {
-        fprintf(file, "Depth: %-19d", d);
+        fprintf(file, "Depth: %-27d", d);
         if (d != 0)
             fprintf(file, " | ");
     }
@@ -70,13 +70,13 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
         for (int16_t d = depth; d >= 0; d--)
         {
             if (i == cancelled_index && d == depth)
-                fprintf(file, "---                       ");
+                fprintf(file, "---                               ");
             else if (i >= cancelled_index && d == depth)
-                fprintf(file, "                          ");
+                fprintf(file, "                                  ");
             else
             {
-                fprintf(file, "%-5d %-9s Depth: %-3d",
-                        move_scores[d][i].score,
+                fprintf(file, "%-10.2f %-10s Depth: %-5d",
+                        (double)move_scores[d][i].score,
                         move_scores[d][i].result == WON ? "WON" : move_scores[d][i].result == LOST ? "LOST"
                                                               : move_scores[d][i].result == DRAW   ? "DRAW"
                                                                                                    : "UNKNOWN",
