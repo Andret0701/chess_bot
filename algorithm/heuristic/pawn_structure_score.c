@@ -27,7 +27,7 @@ double get_double_pawn_penalty(BoardState *board_state, double game_phase)
     uint8_t black_pawn_g_file = __builtin_popcountll(black_pawns & FILE_G_MASK);
     uint8_t black_pawn_h_file = __builtin_popcountll(black_pawns & FILE_H_MASK);
 
-    double double_pawn_penalty = (1 - game_phase) * DOUBLE_PAWN_MIDDLEGAME + game_phase * DOUBLE_PAWN_ENDEGAME;
+    double double_pawn_penalty = (1 - game_phase) * DOUBLE_PAWN_MIDDLEGAME + game_phase * DOUBLE_PAWN_ENDGAME;
     score += (white_pawn_a_file > 1) ? (white_pawn_a_file - 1) * double_pawn_penalty : 0;
     score += (white_pawn_b_file > 1) ? (white_pawn_b_file - 1) * double_pawn_penalty : 0;
     score += (white_pawn_c_file > 1) ? (white_pawn_c_file - 1) * double_pawn_penalty : 0;
@@ -74,7 +74,7 @@ double get_isolated_pawn_penalty(BoardState *board_state, double game_phase)
     bool file_g_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_G_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_H_MASK) == 0;
     bool file_h_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_H_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0;
 
-    double isolated_pawn_penalty = (1 - game_phase) * ISOLATED_PAWN_MIDDLEGAME + game_phase * ISOLATED_PAWN_ENDEGAME;
+    double isolated_pawn_penalty = (1 - game_phase) * ISOLATED_PAWN_MIDDLEGAME + game_phase * ISOLATED_PAWN_ENDGAME;
     score += file_a_has_isolated_white_pawn ? isolated_pawn_penalty : 0;
     score += file_b_has_isolated_white_pawn ? isolated_pawn_penalty : 0;
     score += file_c_has_isolated_white_pawn ? isolated_pawn_penalty : 0;
@@ -142,7 +142,7 @@ double get_backward_pawn_penalty(BoardState *board_state, double game_phase)
             number_of_black_backward_pawns++;
     }
 
-    double backward_pawn_penalty = (1 - game_phase) * BACKWARD_PAWN_MIDDLEGAME + game_phase * BACKWARD_PAWN_ENDEGAME;
+    double backward_pawn_penalty = (1 - game_phase) * BACKWARD_PAWN_MIDDLEGAME + game_phase * BACKWARD_PAWN_ENDGAME;
     score += number_of_white_backward_pawns * backward_pawn_penalty;
     score -= number_of_black_backward_pawns * backward_pawn_penalty;
 
@@ -226,8 +226,8 @@ double get_bishop_block_score(BoardState *board_state, double game_phase)
     uint8_t black_pawn_light_square_count = __builtin_popcountll(board_state->board.black_pieces.pawns & LIGHT_SQUARES_MASK);
     uint8_t black_pawn_dark_square_count = __builtin_popcountll(board_state->board.black_pieces.pawns & DARK_SQUARES_MASK);
 
-    double bishop_pawn_friendly_penalty = (1 - game_phase) * BISHOP_PAWN_FRIENDLY_MIDDELGAME + game_phase * BISHOP_PAWN_FRIENDLY_ENDGAME;
-    double bishop_pawn_enemy_penalty = (1 - game_phase) * BISHOP_PAWN_ENEMY_MIDDELGAME + game_phase * BISHOP_PAWN_ENEMY_ENDGAME;
+    double bishop_pawn_friendly_penalty = (1 - game_phase) * BISHOP_PAWN_FRIENDLY_MIDDLEGAME + game_phase * BISHOP_PAWN_FRIENDLY_ENDGAME;
+    double bishop_pawn_enemy_penalty = (1 - game_phase) * BISHOP_PAWN_ENEMY_MIDDLEGAME + game_phase * BISHOP_PAWN_ENEMY_ENDGAME;
     if (white_has_light_square_bishop)
     {
         score -= white_pawn_light_square_count * bishop_pawn_friendly_penalty;
