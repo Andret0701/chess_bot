@@ -81,10 +81,9 @@ double get_game_phase(Board *board)
     return 1.0 - ((double)phase / MAX_PHASE);
 }
 
-BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
+double score_board(BoardState *board_state)
 {
     double score = 0;
-    Result result = get_result(board_state, is_finished);
     double game_phase = get_game_phase(&board_state->board);
 
     // Material counting
@@ -104,5 +103,6 @@ BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished)
 
     if (board_state->board.side_to_move == BLACK)
         score = -score;
-    return (BoardScore){score, result, depth};
+
+    return score;
 }

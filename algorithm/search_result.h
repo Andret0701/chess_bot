@@ -14,11 +14,4 @@ typedef struct
     Validity valid;
 } SearchResult;
 
-typedef struct
-{
-    double score;
-    Validity valid;
-} QuiescenceResult;
-
 void print_search_result(SearchResult search_result);
-void print_quiescence_result(QuiescenceResult quiescence_result);

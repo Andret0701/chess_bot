@@ -7,11 +7,3 @@ void print_search_result(SearchResult search_result)
     else
         printf("Invalid\n");
 }
-
-void print_quiescence_result(QuiescenceResult quiescence_result)
-{
-    if (quiescence_result.valid == VALID)
-        printf("Quiescence score: %.2f\n", quiescence_result.score);
-    else
-        printf("Invalid\n");
-}

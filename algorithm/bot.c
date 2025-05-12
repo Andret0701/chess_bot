@@ -9,6 +9,8 @@
 #include "game_history.h"
 #include "transposition_table.h"
 
+#define DEBUG_INFO false
+
 #define BOARD_STACK_SIZE 65535
 #define MAX_DEPTH 150
 #define MAX_MOVES 300
@@ -172,7 +174,8 @@ BotResult run_bot(BotFlags flags, Board board)
                         best_score = move_scores[depth - 1][0];
                 }
 
-                print_out_search_info(stack, &board, best_board, best_score, depth, i, seconds);
+                if (DEBUG_INFO)
+                    print_out_search_info(stack, &board, best_board, best_score, depth, i, seconds);
                 if (i == 0)
                     depth--;
 
@@ -188,7 +191,8 @@ BotResult run_bot(BotFlags flags, Board board)
             // If the move is winning. Do not search deeper.
             if (best_score.result == WON && best_score.depth <= depth)
             {
-                print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
+                if (DEBUG_INFO)
+                    print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
                 BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
                 destroy_board_stack(stack);
                 return result;
@@ -253,7 +257,8 @@ BotResult run_bot(BotFlags flags, Board board)
 
         if (all_moves_known)
         {
-            print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
+            if (DEBUG_INFO)
+                print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
 
             BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
             destroy_board_stack(stack);
@@ -263,7 +268,8 @@ BotResult run_bot(BotFlags flags, Board board)
         depth++;
         if (depth == MAX_DEPTH)
         {
-            print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
+            if (DEBUG_INFO)
+                print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
             BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
             destroy_board_stack(stack);
             return result;

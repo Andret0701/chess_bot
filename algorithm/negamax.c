@@ -19,9 +19,8 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     push_game_history(board_state->board);
     if (threefold_repetition() || has_50_move_rule_occurred())
     {
-        BoardScore score = score_board(board_state, depth, false);
+        BoardScore score = (BoardScore){score_board(board_state), DRAW, depth};
         pop_game_history();
-        score.result = DRAW;
         return (SearchResult){score, VALID};
     }
 
@@ -58,16 +57,11 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
         BoardScore score;
         if (!finished)
         {
-            QuiescenceResult quiescence_result = quiescence(board_state, stack, alpha.score, beta.score, depth, start, seconds);
-            if (quiescence_result.valid == INVALID)
-            {
-                pop_game_history();
-                return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
-            }
-            score = (BoardScore){quiescence_result.score, result, depth};
+            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score);
+            score = (BoardScore){quiescence_score, result, depth};
         }
         else
-            score = score_board(board_state, depth, finished);
+            score = (BoardScore){score_board(board_state), result, depth};
 
         pop_game_history();
         TT_store(hash, 0, score.score, result, EXACT, 0);
@@ -82,7 +76,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     finished |= result != UNKNOWN;
     if (finished)
     {
-        BoardScore score = score_board(board_state, depth, finished);
+        BoardScore score = (BoardScore){score_board(board_state), result, depth};
         stack->count = base;
         pop_game_history();
         return (SearchResult){score, VALID};

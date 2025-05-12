@@ -8,4 +8,4 @@
 
 bool has_insufficient_material(Board *board);
 Result get_result(BoardState *board_state, bool is_finished);
-BoardScore score_board(BoardState *board_state, uint8_t depth, bool is_finished);
+double score_board(BoardState *board_state);
