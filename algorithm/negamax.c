@@ -1,5 +1,5 @@
-
 #include "negamax.h"
+
 #include "heuristic/heuristic.h"
 #include "game_history.h"
 #include "../utils/utils.h"
@@ -19,7 +19,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     push_game_history(board_state->board);
     if (threefold_repetition() || has_50_move_rule_occurred())
     {
-        BoardScore score = (BoardScore){score_board(board_state), DRAW, depth};
+        BoardScore score = (BoardScore){0, DRAW, depth};
         pop_game_history();
         return (SearchResult){score, VALID};
     }
@@ -61,7 +61,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
             score = (BoardScore){quiescence_score, result, depth};
         }
         else
-            score = (BoardScore){score_board(board_state), result, depth};
+            score = (BoardScore){0, result, depth}; // I think the score can be 0 here, as it's not used when comparing known results
 
         pop_game_history();
         TT_store(hash, 0, score.score, result, EXACT, 0);
@@ -76,7 +76,7 @@ SearchResult negamax(BoardState *board_state, BoardStack *stack, uint8_t max_dep
     finished |= result != UNKNOWN;
     if (finished)
     {
-        BoardScore score = (BoardScore){score_board(board_state), result, depth};
+        BoardScore score = (BoardScore){0, result, depth}; // I think the score can be 0 here, as it's not used when comparing known results
         stack->count = base;
         pop_game_history();
         return (SearchResult){score, VALID};

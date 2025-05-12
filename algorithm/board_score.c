@@ -35,9 +35,8 @@ bool is_greater_score(BoardScore a, BoardScore b)
     else if (a.result == LOST && b.result == LOST)
         return a.depth > b.depth;
 
-    double a_score = a.result == DRAW ? 0 : a.score;
-    double b_score = b.result == DRAW ? 0 : b.score;
-    return a_score > b_score;
+    // Assumes DRAWs score is 0
+    return a.score > b.score;
 }
 
 bool is_equal_score(BoardScore a, BoardScore b)
