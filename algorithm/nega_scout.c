@@ -57,7 +57,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         if (!finished)
         {
             double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score);
-            score = (BoardScore){quiescence_score, result, depth};
+            score = (BoardScore){quiescence_score, UNKNOWN, depth};
         }
         else
             score = (BoardScore){0, result, depth}; // I think the score can be 0 here, as it's not used when comparing known results
