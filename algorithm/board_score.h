@@ -28,6 +28,7 @@ void print_score(BoardScore score);
 bool is_greater_score(BoardScore a, BoardScore b);
 bool is_equal_score(BoardScore a, BoardScore b);
 bool is_greater_equal_score(BoardScore a, BoardScore b);
+bool is_less_score(BoardScore a, BoardScore b);
 
 BoardScore max_score(BoardScore a, BoardScore b);
 BoardScore min_score(BoardScore a, BoardScore b);

@@ -3,13 +3,13 @@
 #include "../utils/board.h"
 #include "../engine/board_stack.h"
 #include "../utils/fen.h"
-#include "negamax.h"
+#include "nega_scout.h"
 #include "../engine/piece_moves.h"
 #include "../utils/move.h"
 #include "game_history.h"
 #include "transposition_table.h"
 
-#define DEBUG_INFO false
+#define DEBUG_INFO true
 
 #define BOARD_STACK_SIZE 65535
 #define MAX_DEPTH 150
@@ -163,7 +163,7 @@ BotResult run_bot(BotFlags flags, Board board)
             }
 
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = negamax(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), start, seconds);
+            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
             {
