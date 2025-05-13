@@ -60,7 +60,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
     fprintf(file, "Move: | ");
     for (int16_t d = depth; d >= 0; d--)
     {
-        fprintf(file, "Depth: %-16d", d);
+        fprintf(file, "Depth: %-13d", d);
         if (d != 0)
             fprintf(file, " | ");
     }
@@ -72,17 +72,17 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
         for (int16_t d = depth; d >= 0; d--)
         {
             if (i == cancelled_index && d == depth)
-                fprintf(file, "---                    ");
+                fprintf(file, "---                 ");
             else if (i >= cancelled_index && d == depth)
-                fprintf(file, "                       ");
+                fprintf(file, "                    ");
             else
             {
                 if (move_scores[d][i].result == UNKNOWN)
-                    fprintf(file, "%-10.2f Depth: %-5d",
+                    fprintf(file, "%-10.2f Depth: %-2d",
                             move_scores[d][i].score,
                             move_scores[d][i].depth);
                 else
-                    fprintf(file, "%-10s Depth: %-5d",
+                    fprintf(file, "%-10s Depth: %-2d",
                             move_scores[d][i].result == WON ? "WON" : move_scores[d][i].result == LOST ? "LOST"
                                                                                                        : "DRAW",
                             move_scores[d][i].depth);
