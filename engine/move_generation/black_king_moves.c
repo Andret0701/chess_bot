@@ -2,37 +2,30 @@
 
 void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
 {
-    for (int dy = -1; dy <= 1; dy++)
+    uint64_t king_moves = board_state->black_attacks.king;
+    king_moves &= ~board_state->black_pieces;
+    king_moves &= ~board_state->white_attack;
+    while (king_moves)
     {
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            if (dx == 0 && dy == 0)
-                continue;
-            int new_x = x + dx;
-            int new_y = y + dy;
+        uint8_t sq = __builtin_ctzll(king_moves);
+        king_moves &= king_moves - 1;
+        uint8_t new_x = sq % 8;
+        uint8_t new_y = sq / 8;
 
-            if (new_x >= 0 && new_x < 8 && new_y >= 0 && new_y < 8)
-            {
-                if (board_state->black_pieces & position_to_bitboard(new_x, new_y))
-                    continue;
+        BoardState *new_board_state = &stack->boards[stack->count];
+        copy_board(&board_state->board, &new_board_state->board);
+        remove_white_piece(new_board_state, new_x, new_y);
 
-                BoardState *new_board_state = &stack->boards[stack->count];
-                copy_board(&board_state->board, &new_board_state->board);
-                remove_white_piece(new_board_state, new_x, new_y);
-
-                new_board_state->board.black_pieces.king &= ~position_to_bitboard(x, y);
-                new_board_state->board.black_pieces.king |= position_to_bitboard(new_x, new_y);
-                new_board_state->board.side_to_move = WHITE;
-                new_board_state->board.en_passant = 0;
-                new_board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
-                new_board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
-
-                init_board(new_board_state);
-                new_board_state->has_castled = board_state->has_castled;
-                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_white_piece(board_state, new_x, new_y));
-                validate_black_move(stack);
-            }
-        }
+        new_board_state->board.black_pieces.king &= ~position_to_bitboard(x, y);
+        new_board_state->board.black_pieces.king |= position_to_bitboard(new_x, new_y);
+        new_board_state->board.side_to_move = WHITE;
+        new_board_state->board.en_passant = 0;
+        new_board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
+        new_board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
+        init_board(new_board_state);
+        new_board_state->has_castled = board_state->has_castled;
+        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_white_piece(board_state, new_x, new_y));
+        validate_black_move(stack);
     }
 
     // Castling
@@ -57,7 +50,6 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.en_passant = 0;
                     new_board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
                     new_board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
-
                     init_board(new_board_state);
                     new_board_state->has_castled = board_state->has_castled | BLACK_KINGSIDE_CASTLE;
                     new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(6, 7));
@@ -84,7 +76,6 @@ void generate_black_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.en_passant = 0;
                     new_board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
                     new_board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
-
                     init_board(new_board_state);
                     new_board_state->has_castled = board_state->has_castled | BLACK_QUEENSIDE_CASTLE;
                     new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(2, 7));

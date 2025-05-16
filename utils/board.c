@@ -1,6 +1,7 @@
 #include "board.h"
 #include <stdio.h>
 #include "bitboard.h"
+#include <string.h>
 
 uint64_t pieces_to_bitboard(const Pieces *pieces)
 {
@@ -9,12 +10,7 @@ uint64_t pieces_to_bitboard(const Pieces *pieces)
 
 bool pieces_equals(const Pieces *a, const Pieces *b)
 {
-    return a->bishops == b->bishops &&
-           a->knights == b->knights &&
-           a->pawns == b->pawns &&
-           a->queens == b->queens &&
-           a->rooks == b->rooks &&
-           a->king == b->king;
+    return memcmp(a, b, sizeof(Pieces)) == 0;
 }
 
 bool board_equals(Board *a, Board *b)
@@ -24,11 +20,7 @@ bool board_equals(Board *a, Board *b)
 
 void copy_board(Board *from, Board *to)
 {
-    to->white_pieces = from->white_pieces;
-    to->black_pieces = from->black_pieces;
-    to->en_passant = from->en_passant;
-    to->castling_rights = from->castling_rights;
-    to->side_to_move = from->side_to_move;
+    memcpy(to, from, sizeof(Board));
 }
 
 Board flip_board(Board *board)

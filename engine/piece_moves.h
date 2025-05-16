@@ -8,15 +8,15 @@
 #include "attack_generation/attack_generation.h"
 #include "encoded_move.h"
 
-void init_board(BoardState *board_state);
-void validate_white_move(BoardStack *stack);
-void validate_black_move(BoardStack *stack);
+static inline void init_board(BoardState *board_state);
+static inline void validate_white_move(BoardStack *stack);
+static inline void validate_black_move(BoardStack *stack);
 
-void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
-void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
+static inline void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
+static inline void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
 
-bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
-bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
+static inline bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
+static inline bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
 
 void generate_moves(BoardState *board_state, BoardStack *stack);
 void generate_captures(BoardState *board_state, BoardStack *stack);
