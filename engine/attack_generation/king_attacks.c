@@ -1,5 +1,5 @@
 #include "attack_generation.h"
-uint64_t generate_king_attacks(uint64_t kings)
+static inline uint64_t generate_king_attacks(uint64_t kings)
 {
     uint64_t attacks = 0;
     // Vertical moves

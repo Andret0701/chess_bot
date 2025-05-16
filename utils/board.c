@@ -13,12 +13,12 @@ bool pieces_equals(const Pieces *a, const Pieces *b)
     return memcmp(a, b, sizeof(Pieces)) == 0;
 }
 
-bool board_equals(Board *a, Board *b)
+bool board_equals(const Board *a, const Board *b)
 {
     return pieces_equals(&a->white_pieces, &b->white_pieces) && pieces_equals(&a->black_pieces, &b->black_pieces) && a->en_passant == b->en_passant && a->castling_rights == b->castling_rights && a->side_to_move == b->side_to_move;
 }
 
-void copy_board(Board *from, Board *to)
+void copy_board(const Board *from, Board *to)
 {
     memcpy(to, from, sizeof(Board));
 }

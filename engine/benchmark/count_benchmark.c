@@ -68,13 +68,20 @@ void run_count_benchmark()
     Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
     BoardState board_state = board_to_board_state(&board);
 
+    Board flipped_board = flip_board(&board);
+    BoardState flipped_board_state = board_to_board_state(&flipped_board);
+
     printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
     for (uint8_t i = 1; i <= 6; i++)
     {
         clock_t start = clock();
         uint64_t result = count_recursive(&board_state, i, stack);
+        result += count_recursive(&flipped_board_state, i, stack);
+        result += count_recursive(&board_state, i, stack);
+        result += count_recursive(&flipped_board_state, i, stack);
         clock_t end = clock();
-        double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+        result /= 4;
+        double time_spent = (double)(end - start) / (CLOCKS_PER_SEC * 4);
         double million_boards_per_second = result / (time_spent * 1e6);
         double microseconds_per_board = (time_spent * 1e6) / result;
         printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n", i, result, time_spent, million_boards_per_second, microseconds_per_board);

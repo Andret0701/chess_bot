@@ -1,6 +1,6 @@
 #include "attack_generation.h"
 
-uint64_t generate_knight_attacks(uint64_t knights)
+static inline uint64_t generate_knight_attacks(uint64_t knights)
 {
     uint64_t l1 = (knights >> 1) & 0x7f7f7f7f7f7f7f7fULL;
     uint64_t l2 = (knights >> 2) & 0x3f3f3f3f3f3f3f3fULL;

@@ -35,8 +35,8 @@ typedef struct
 
 uint64_t pieces_to_bitboard(const Pieces *pieces);
 bool pieces_equals(const Pieces *a, const Pieces *b);
-bool board_equals(Board *a, Board *b);
-void copy_board(Board *from, Board *to);
+bool board_equals(const Board *a, const Board *b);
+void copy_board(const Board *from, Board *to);
 Board flip_board(Board *board);
 
 void print_board_to_file(Board *board, FILE *file);

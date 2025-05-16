@@ -286,13 +286,6 @@ void black_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, BoardS
                 init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_en_passant_encoded_move(position_to_index(x, y), position_to_index(x + 1, y - 1));
-                if (!encoded_move_equals(new_board_state->move, board_to_encoded_move(&board_state->board, &new_board_state->board)))
-                {
-                    printf("Error: En passant move does not match the expected move.\n");
-                    print_move(new_board_state->move);
-                    print_move(board_to_encoded_move(&board_state->board, &new_board_state->board));
-                    exit(0);
-                }
 
                 validate_black_move(stack);
             }
