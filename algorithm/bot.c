@@ -97,18 +97,14 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
     fclose(file);
 }
 
-double get_time_allocation(BotFlags flags, Color side_to_move)
+double get_time_allocation(int wtime, int btime, int winc, int binc, Color side_to_move)
 {
-    // If movestogo is 0, assume a default number of moves (e.g., 40 moves remaining in sudden death)
-    if (flags.movestogo <= 0)
-        flags.movestogo = 40;
-
     // Base minimal time allocation (in seconds) to avoid zero-time moves
     double base_time = 0.05; // Adjust as needed
 
     // Choose the appropriate values based on side to move
-    double remaining_time = (side_to_move == WHITE) ? flags.wtime : flags.btime;
-    double increment = (side_to_move == WHITE) ? flags.winc : flags.binc;
+    double remaining_time = (side_to_move == WHITE) ? wtime : btime;
+    double increment = (side_to_move == WHITE) ? winc : binc;
 
     // Convert remaining time and increment from milliseconds to seconds
     remaining_time /= 1000.0;
@@ -116,7 +112,7 @@ double get_time_allocation(BotFlags flags, Color side_to_move)
 
     // Calculate an initial allocation:
     // Divide remaining time evenly among moves left, then add half of the increment
-    double time_per_move = remaining_time / flags.movestogo;
+    double time_per_move = remaining_time / 40.0; // Assuming 40 moves left
     double allocated_time = time_per_move + (increment * 0.7);
 
     // Avoid spending too much on one move:
@@ -141,13 +137,11 @@ void updated_best_board(BoardState **best_board, BoardScore *best_score, BoardSt
     }
 }
 
-BotResult run_bot(BotFlags flags, Board board)
+BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_depth, uint8_t max_depth)
 {
-    TT_clear_generation();
     clock_t start = clock();
-    double seconds = get_time_allocation(flags, board.side_to_move);
+    TT_clear_generation();
     BoardState board_state = board_to_board_state(&board);
-
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(&board_state, stack);
 
@@ -166,7 +160,7 @@ BotResult run_bot(BotFlags flags, Board board)
             }
 
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), start, seconds);
+            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
             {
@@ -227,25 +221,6 @@ BotResult run_bot(BotFlags flags, Board board)
                 }
             }
         }
-        // // if only one move is not lost
-        // uint16_t num_not_lost = 0;
-        // uint16_t last_not_lost = 0;
-        // for (uint16_t i = 0; i < stack->count; i++)
-        // {
-        //     if (!has_lost(move_scores[depth][i].result, board.side_to_move))
-        //     {
-        //         num_not_lost++;
-        //         last_not_lost = i;
-        //     }
-        // }
-        // if (num_not_lost == 1)
-        // {
-        //     print_out_search_info(stack, &board, last_not_lost, depth, stack->count + 1, nodes_searched, seconds);
-
-        //     BotResult result = {board_to_move(&board, &stack->boards[last_not_lost].board), move_scores[depth][last_not_lost], depth};
-        //     destroy_board_stack(stack);
-        //     return result;
-        // }
 
         // if no move is unknown
         bool all_moves_known = true;
@@ -269,8 +244,9 @@ BotResult run_bot(BotFlags flags, Board board)
         }
 
         depth++;
-        if (depth == MAX_DEPTH)
+        if (depth == MAX_DEPTH || (use_max_depth && depth == max_depth))
         {
+            depth--;
             if (DEBUG_INFO)
                 print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
             BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
@@ -278,4 +254,20 @@ BotResult run_bot(BotFlags flags, Board board)
             return result;
         }
     }
+}
+
+BotResult run_depth_bot(Board board, uint8_t depth)
+{
+    return run_bot(board, false, 0, true, depth);
+}
+
+BotResult run_time_bot(Board board, int wtime, int btime, int winc, int binc)
+{
+    double seconds = get_time_allocation(wtime, btime, winc, binc, board.side_to_move);
+    return run_bot(board, true, seconds, false, 0);
+}
+
+BotResult run_movetime_bot(Board board, int movetime)
+{
+    return run_bot(board, true, movetime / 1000.0, false, 0);
 }

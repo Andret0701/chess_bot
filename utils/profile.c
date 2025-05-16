@@ -12,7 +12,10 @@
 void play_game(double time_seconds, double increment_seconds)
 {
     Board board = fen_to_board(STARTFEN);
-    BotFlags flags = {time_seconds * 1000, time_seconds * 1000, increment_seconds * 1000, increment_seconds * 1000, -1};
+    int wtime = time_seconds * 1000;
+    int btime = time_seconds * 1000;
+    int winc = increment_seconds * 1000;
+    int binc = increment_seconds * 1000;
 
     reset_game_history();
     push_game_history(board);
@@ -20,29 +23,29 @@ void play_game(double time_seconds, double increment_seconds)
     while (true)
     {
         clock_t start = clock();
-        BotResult result = run_bot(flags, board);
+        BotResult result = run_time_bot(board, wtime, btime, winc, binc);
         clock_t end = clock();
         double time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
         // take away the time from flags and add increment
         if (board.side_to_move == WHITE)
         {
-            flags.wtime -= time_used * 1000;
-            if (flags.wtime < 0)
+            wtime -= time_used * 1000;
+            if (wtime < 0)
             {
                 printf("White ran out of time\n");
                 break;
             }
-            flags.wtime += flags.winc;
+            wtime += winc;
         }
         else
         {
-            flags.btime -= time_used * 1000;
-            if (flags.btime < 0)
+            btime -= time_used * 1000;
+            if (btime < 0)
             {
                 printf("Black ran out of time\n");
                 break;
             }
-            flags.btime += flags.binc;
+            btime += binc;
         }
 
         Color side_to_move = board.side_to_move;
@@ -58,7 +61,7 @@ void play_game(double time_seconds, double increment_seconds)
         board_state = board_to_board_state(&board);
         print_board(&board);
         printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result.score.result == WON ? "WON" : (result.score.result == LOST ? "LOST" : (result.score.result == DRAW ? "DRAW" : "UNKNOWN")));
-        printf("White time: %.1f, Black time: %.1f\n", flags.wtime / 1000.0, flags.btime / 1000.0);
+        printf("White time: %.1f, Black time: %.1f\n", wtime / 1000.0, btime / 1000.0);
 
         if (threefold_repetition())
         {

@@ -1,5 +1,6 @@
-#include <stdlib.h>
+#include "uci.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -71,9 +72,9 @@ void parse_position(char *input)
     }
 }
 
-BotFlags parse_go(char *input)
+UCIGoFlags parse_go(char *input)
 {
-    BotFlags flags = {0};
+    UCIGoFlags flags = {0};
 
     char *token = strtok(input, " ");
     token = strtok(NULL, " ");
@@ -84,26 +85,37 @@ BotFlags parse_go(char *input)
         {
             token = strtok(NULL, " ");
             flags.wtime = atoi(token);
+            flags.search_option = BOT_SEARCH_TIME;
         }
         else if (strcmp(token, "btime") == 0)
         {
             token = strtok(NULL, " ");
             flags.btime = atoi(token);
+            flags.search_option = BOT_SEARCH_TIME;
         }
         else if (strcmp(token, "winc") == 0)
         {
             token = strtok(NULL, " ");
             flags.winc = atoi(token);
+            flags.search_option = BOT_SEARCH_TIME;
         }
         else if (strcmp(token, "binc") == 0)
         {
             token = strtok(NULL, " ");
             flags.binc = atoi(token);
+            flags.search_option = BOT_SEARCH_TIME;
         }
-        else if (strcmp(token, "movestogo") == 0)
+        else if (strcmp(token, "depth") == 0)
         {
             token = strtok(NULL, " ");
-            flags.movestogo = atoi(token);
+            flags.depth = atoi(token);
+            flags.search_option = BOT_SEARCH_DEPTH;
+        }
+        else if (strcmp(token, "movetime") == 0)
+        {
+            token = strtok(NULL, " ");
+            flags.movetime = atoi(token);
+            flags.search_option = BOT_SEARCH_MOVETIME;
         }
 
         token = strtok(NULL, " ");
@@ -220,8 +232,20 @@ void uci_loop()
         else if (strncmp(input, "go", 2) == 0)
         {
             // Instead of searching, return a dummy move
-            BotFlags flags = parse_go(input);
-            BotResult result = run_bot(flags, current_board);
+            UCIGoFlags flags = parse_go(input);
+            BotResult result;
+            switch (flags.search_option)
+            {
+            case BOT_SEARCH_TIME:
+                result = run_time_bot(current_board, flags.wtime, flags.btime, flags.winc, flags.binc);
+                break;
+            case BOT_SEARCH_DEPTH:
+                result = run_depth_bot(current_board, flags.depth);
+                break;
+            case BOT_SEARCH_MOVETIME:
+                result = run_movetime_bot(current_board, flags.movetime);
+                break;
+            }
             respond("bestmove %s", result.move);
         }
         else if (strcmp(input, "quit") == 0)

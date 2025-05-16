@@ -11,9 +11,9 @@
 #include "transposition_table.h"
 #include "zobrist_hash.h"
 
-SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, clock_t start, double seconds)
+SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds)
 {
-    if (has_timed_out(start, seconds))
+    if (use_max_time && has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
 
     push_game_history(board_state->board);
@@ -28,7 +28,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool found_tt = TT_lookup(hash, &tt_entry);
-    // if (found_tt && tt_entry.depth >= remaining_depth)
+    // if (found_tt && tt_entry.depth == remaining_depth)
     // {
     //     BoardScore tt_score = {tt_entry.score, tt_entry.result, tt_entry.depth + depth};
     //     if (tt_entry.type == EXACT)
@@ -102,7 +102,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         SearchResult search_result;
         if (first_move)
         {
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), start, seconds);
+            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -110,7 +110,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         else
         {
             // Null window search
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), start, seconds);
+            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -118,7 +118,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             if (is_greater_score(search_result.board_score, alpha) && is_less_score(search_result.board_score, beta))
             {
                 // If the score is greater than alpha but less than beta, we can do a full window search
-                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), start, seconds);
+                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
                 search_result.board_score = invert_score(search_result.board_score);
                 if (search_result.valid == INVALID)
                     goto invalid;
