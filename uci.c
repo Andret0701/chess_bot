@@ -10,6 +10,7 @@
 #include "utils/move.h"
 #include "algorithm/bot.h"
 
+#define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
 #define INPUT_BUFFER_SIZE 8192
 
@@ -234,17 +235,22 @@ void uci_loop()
             // Instead of searching, return a dummy move
             UCIGoFlags flags = parse_go(input);
             BotResult result;
-            switch (flags.search_option)
+            if (IS_JUNIOR)
+                result = run_depth_bot(current_board, 3);
+            else
             {
-            case BOT_SEARCH_TIME:
-                result = run_time_bot(current_board, flags.wtime, flags.btime, flags.winc, flags.binc);
-                break;
-            case BOT_SEARCH_DEPTH:
-                result = run_depth_bot(current_board, flags.depth);
-                break;
-            case BOT_SEARCH_MOVETIME:
-                result = run_movetime_bot(current_board, flags.movetime);
-                break;
+                switch (flags.search_option)
+                {
+                case BOT_SEARCH_TIME:
+                    result = run_time_bot(current_board, flags.wtime, flags.btime, flags.winc, flags.binc);
+                    break;
+                case BOT_SEARCH_DEPTH:
+                    result = run_depth_bot(current_board, flags.depth);
+                    break;
+                case BOT_SEARCH_MOVETIME:
+                    result = run_movetime_bot(current_board, flags.movetime);
+                    break;
+                }
             }
             respond("bestmove %s", result.move);
         }
