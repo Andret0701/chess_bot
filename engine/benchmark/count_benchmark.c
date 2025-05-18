@@ -74,8 +74,9 @@ void run_count_benchmark()
     printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
     for (uint8_t i = 1; i <= 6; i++)
     {
+        volatile uint64_t result = 0;
         clock_t start = clock();
-        uint64_t result = count_recursive(&board_state, i, stack);
+        result += count_recursive(&board_state, i, stack);
         result += count_recursive(&flipped_board_state, i, stack);
         result += count_recursive(&board_state, i, stack);
         result += count_recursive(&flipped_board_state, i, stack);
