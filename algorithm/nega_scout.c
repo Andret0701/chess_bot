@@ -11,6 +11,8 @@
 #include "transposition_table.h"
 #include "zobrist_hash.h"
 
+#include <math.h>
+
 SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds)
 {
     if (use_max_time && has_timed_out(start, seconds))
@@ -87,13 +89,26 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     uint16_t best_move = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
-        bool first_move = i == base;
+        uint16_t move_number = i - base;
+        bool first_move = move_number == 0;
 
         BoardState *next_board_state = &stack->boards[i];
 
         // Classify the move
+        bool is_capture = is_move_capture(board_state, next_board_state);
+        bool is_promo = is_move_promotion(board_state, next_board_state);
         bool is_check = is_move_check(next_board_state);
         bool is_threatening_promo = is_move_threatening_promotion(board_state, next_board_state);
+        bool is_quiet = !is_capture && !is_promo && !is_check;
+
+        int reduction = 0;
+        bool do_reduction = is_quiet && (move_number >= 2) && (depth >= 2);
+        if (do_reduction)
+        {
+            double r = 1.35 + log(depth) * log(move_number) / 2.75;
+            reduction = (int)(r + 0.5);
+            //  printf("Move number: %d, Depth: %d, Reduction: %d, Max depth: %d\n", move_number, depth, reduction, max_depth);
+        }
 
         int extension = 0;
         if (is_check || is_threatening_promo)
@@ -110,12 +125,16 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         else
         {
             // Null window search
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds);
+            int new_max_depth = max_depth + extension - reduction;
+            if (new_max_depth < 0)
+                new_max_depth = 0;
+            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
 
-            if (is_greater_score(search_result.board_score, alpha) && is_less_score(search_result.board_score, beta))
+            bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
+            if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || (do_reduction && alpha_cutoff))
             {
                 // If the score is greater than alpha but less than beta, we can do a full window search
                 search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
