@@ -2,11 +2,11 @@
 #include "heuristic_values.h"
 
 // Evaluate a single piece's position
-static int evaluate_piece_position(uint64_t pieces, const double *middlegame_table, const double *endgame_table, bool is_white, double game_phase)
+static double evaluate_piece_position(uint64_t pieces, const double *middlegame_table, const double *endgame_table, bool is_white, double game_phase)
 {
     if (is_white)
         pieces = flip_bitboard(pieces);
-    int score = 0;
+    double score = 0;
     while (pieces)
     {
         int square = __builtin_ctzll(pieces);
