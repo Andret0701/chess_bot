@@ -195,7 +195,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
                 return result;
             }
         }
-        TT_store(hash_board(&board_state.board), depth, best_score.score, best_score.result, EXACT, best_board->move);
+        //   TT_store(hash_board(&board_state.board), board_state.board, depth, best_score.score, best_score.result, EXACT, best_board->move);
 
         // Sort the stack by score
         for (uint16_t i = 0; i < stack->count; i++)

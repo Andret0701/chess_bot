@@ -7,18 +7,19 @@
 typedef enum
 {
     EXACT,
-    LOWERBOUND
+    LOWERBOUND,
+    UPPERBOUND
 } TT_Entry_Type;
 
 typedef struct
 {
-    uint64_t hash;      // Zobrist hash of the position.
-    uint8_t depth;      // Remaining depth at which this evaluation was computed.
-    double score;       // The evaluation score.
-    Result result;      // The result of the evaluation.
-    TT_Entry_Type type; // The type of the evaluation.
-    uint16_t move;      // The best move for this position.
-    uint8_t generation; // The generation of the entry.
+    uint64_t hash;       // Zobrist hash of the position.
+    uint8_t depth;       // Remaining depth at which this evaluation was computed.
+    double score;        // The evaluation score.
+    Result result;       // The result of the evaluation.
+    TT_Entry_Type type;  // The type of the evaluation.
+    uint16_t move;       // The best move for this position.
+    uint64_t generation; // The generation of the entry.
 } TT_Entry;
 
 void TT_clear_generation();

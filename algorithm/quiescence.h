@@ -10,4 +10,5 @@
 double quiescence(BoardState *board_state,
                   BoardStack *stack,
                   double alpha,
-                  double beta);
+                  double beta,
+                  int depth_in_quiescence);

@@ -5,17 +5,17 @@
 enum
 {
     WHITE_PAWN = 0,
-    WHITE_KNIGHT,
-    WHITE_BISHOP,
-    WHITE_ROOK,
-    WHITE_QUEEN,
-    WHITE_KING,
-    BLACK_PAWN,
-    BLACK_KNIGHT,
-    BLACK_BISHOP,
-    BLACK_ROOK,
-    BLACK_QUEEN,
-    BLACK_KING
+    WHITE_KNIGHT = 1,
+    WHITE_BISHOP = 2,
+    WHITE_ROOK = 3,
+    WHITE_QUEEN = 4,
+    WHITE_KING = 5,
+    BLACK_PAWN = 6,
+    BLACK_KNIGHT = 7,
+    BLACK_BISHOP = 8,
+    BLACK_ROOK = 9,
+    BLACK_QUEEN = 10,
+    BLACK_KING = 11
 };
 
 uint64_t zobrist_table[NUM_PIECE_TYPES][NUM_SQUARES];

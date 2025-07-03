@@ -91,7 +91,7 @@ int compare_boards(const void *left, const void *right)
     return ((BoardState *)right)->mvvlva_score - ((BoardState *)left)->mvvlva_score;
 }
 
-void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
+void sort_moves_tt(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
 {
     for (uint16_t i = base; i < stack->count; i++)
     {
@@ -99,6 +99,17 @@ void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_
             stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
         else
             stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
+    }
+
+    //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));
+    qsort(stack->boards + base, stack->count - base, sizeof(BoardState), compare_boards);
+}
+
+void sort_moves(BoardState *from, BoardStack *stack, uint16_t base)
+{
+    for (uint16_t i = base; i < stack->count; i++)
+    {
+        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
     }
 
     //  void __cdecl qsort(void *_Base,size_t _NumOfElements,size_t _SizeOfElements,int (__cdecl *_PtFuncCompare)(const void *, const void *));

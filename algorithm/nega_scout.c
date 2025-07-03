@@ -27,27 +27,32 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     }
 
     uint8_t remaining_depth = max_depth - depth;
+    BoardScore alpha_orig = alpha; // Save original alpha
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool found_tt = TT_lookup(hash, &tt_entry);
-    // if (found_tt && tt_entry.depth == remaining_depth)
-    // {
-    //     BoardScore tt_score = {tt_entry.score, tt_entry.result, tt_entry.depth + depth};
-    //     if (tt_entry.type == EXACT)
-    //     {
-    //         pop_game_history();
-    //         return (SearchResult){tt_score, VALID};
-    //     }
-    //     // else if (tt_entry.type == LOWERBOUND)
-    //     // {
-    //     //     alpha = max_score(alpha, tt_score);
-    //     //     if (is_greater_equal_score(alpha, beta))
-    //     //     {
-    //     //         pop_game_history();
-    //     //         return (SearchResult){tt_score, VALID};
-    //     //     }
-    //     // }
-    // }
+
+    // TT cutoff with proper bounds checking
+    if (found_tt && tt_entry.depth >= remaining_depth)
+    {
+        BoardScore tt_score = {tt_entry.score, tt_entry.result, depth + tt_entry.depth};
+
+        if (tt_entry.type == EXACT)
+        {
+            pop_game_history();
+            return (SearchResult){tt_score, VALID};
+        }
+        else if (tt_entry.type == LOWERBOUND && is_greater_equal_score(tt_score, beta))
+        {
+            pop_game_history();
+            return (SearchResult){tt_score, VALID};
+        }
+        else if (tt_entry.type == UPPERBOUND && is_less_equal_score(tt_score, alpha))
+        {
+            pop_game_history();
+            return (SearchResult){tt_score, VALID};
+        }
+    }
 
     if (depth >= max_depth)
     {
@@ -58,11 +63,11 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         BoardScore score;
         if (!finished)
         {
-            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score);
+            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0);
             score = (BoardScore){quiescence_score, UNKNOWN, depth};
         }
         else
-            score = (BoardScore){0, result, depth}; // I think the score can be 0 here, as it's not used when comparing known results
+            score = (BoardScore){0, result, depth};
 
         pop_game_history();
         TT_store(hash, 0, score.score, result, EXACT, 0);
@@ -77,13 +82,16 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     finished |= result != UNKNOWN;
     if (finished)
     {
-        BoardScore score = (BoardScore){0, result, depth}; // I think the score can be 0 here, as it's not used when comparing known results
+        BoardScore score = (BoardScore){0, result, depth};
         stack->count = base;
         pop_game_history();
         return (SearchResult){score, VALID};
     }
 
-    sort_moves(board_state, stack, base, found_tt ? tt_entry.move : 0);
+    if (found_tt)
+        sort_moves_tt(board_state, stack, base, tt_entry.move);
+    else
+        sort_moves(board_state, stack, base);
 
     BoardScore best_score = WORST_SCORE;
     uint16_t best_move = 0;
@@ -107,12 +115,11 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         {
             double r = 1.35 + log(depth) * log(move_number) / 2.75;
             reduction = (int)(r + 0.5);
-            //  printf("Move number: %d, Depth: %d, Reduction: %d, Max depth: %d\n", move_number, depth, reduction, max_depth);
         }
 
         int extension = 0;
         if (is_check || is_threatening_promo)
-            extension = 1; // Extend depth by 1
+            extension = 1;
 
         SearchResult search_result;
         if (first_move)
@@ -136,7 +143,6 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
             if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || (do_reduction && alpha_cutoff))
             {
-                // If the score is greater than alpha but less than beta, we can do a full window search
                 search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
                 search_result.board_score = invert_score(search_result.board_score);
                 if (search_result.valid == INVALID)
@@ -154,16 +160,31 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         alpha = max_score(alpha, score);
         if (is_greater_equal_score(alpha, beta))
         {
-            stack->count = base;
-            pop_game_history();
-            TT_store(hash, remaining_depth, best_score.score, result, LOWERBOUND, best_move);
-            return (SearchResult){best_score, VALID};
+            break; // Beta cutoff
         }
     }
 
     stack->count = base;
     pop_game_history();
-    TT_store(hash, remaining_depth, best_score.score, result, EXACT, best_move);
+
+    // Determine TT entry type
+    TT_Entry_Type type;
+    if (is_less_equal_score(best_score, alpha_orig))
+    {
+        type = UPPERBOUND;
+    }
+    else if (is_greater_equal_score(best_score, beta))
+    {
+        type = LOWERBOUND;
+    }
+    else
+    {
+        type = EXACT;
+    }
+
+    TT_store(hash, remaining_depth, best_score.score,
+             best_score.result, type, best_move);
+
     return (SearchResult){best_score, VALID};
 
 invalid:

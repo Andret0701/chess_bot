@@ -57,6 +57,14 @@ bool is_less_score(BoardScore a, BoardScore b)
     return !is_greater_equal_score(a, b);
 }
 
+bool is_less_equal_score(BoardScore a, BoardScore b)
+{
+    if (is_equal_score(a, b))
+        return true;
+
+    return is_less_score(a, b);
+}
+
 BoardScore max_score(BoardScore a, BoardScore b)
 {
     if (is_greater_score(a, b))
