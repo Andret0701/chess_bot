@@ -11,7 +11,6 @@
 
 #define DEBUG_INFO false
 
-#define BOARD_STACK_SIZE 65535
 #define MAX_DEPTH 150
 #define MAX_MOVES 300
 
@@ -160,7 +159,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
 
             BoardState *current_board_state = &stack->boards[i];
-            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds);
+            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds, true);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
             {

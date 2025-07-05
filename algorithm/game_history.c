@@ -1,6 +1,7 @@
+// game_history.c
 #include "game_history.h"
 
-#define MAX_GAME_HISTORY 10000
+#define MAX_GAME_HISTORY 20000
 
 uint8_t moves_since_permanent_change[MAX_GAME_HISTORY];
 Board board_history[MAX_GAME_HISTORY];
@@ -31,8 +32,16 @@ void reset_game_history()
 {
     move_count = 0;
 }
+
 void push_game_history(Board board)
 {
+    // Critical bounds check to prevent overflow
+    if (move_count >= MAX_GAME_HISTORY)
+    {
+        fprintf(stderr, "Game history overflow! Max history: %d\n", MAX_GAME_HISTORY);
+        exit(1);
+    }
+
     board_history[move_count] = board;
     if (move_count == 0)
         moves_since_permanent_change[0] = 0;
@@ -48,6 +57,12 @@ void push_game_history(Board board)
 
 void pop_game_history()
 {
+    if (move_count == 0)
+    {
+        fprintf(stderr, "Game history underflow!");
+        exit(1);
+    }
+
     move_count--;
 }
 

@@ -64,7 +64,7 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
 
 void run_count_benchmark()
 {
-    BoardStack *stack = create_board_stack(65535);
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
     BoardState board_state = board_to_board_state(&board);
 

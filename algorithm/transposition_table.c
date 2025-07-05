@@ -29,6 +29,12 @@ void TT_store(uint64_t hash, uint8_t depth, double score,
               Result result, TT_Entry_Type type, uint16_t move)
 {
     TT_Entry *entry = &transposition_table[hash % NUM_TT_ENTRIES];
+    if (entry->hash == hash && entry->depth > depth && entry->type == EXACT)
+    {
+        // If the entry is already present and has a greater depth, we do not overwrite it.
+        entry->generation = current_generation;
+        return;
+    }
 
     // Replacement scheme: prefer higher depth or exact scores
     if (entry->generation != current_generation ||

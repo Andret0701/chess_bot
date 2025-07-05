@@ -10,10 +10,26 @@
 #include "move_categorization.h"
 #include "transposition_table.h"
 #include "zobrist_hash.h"
+#include "null_move.h"
 
 #include <math.h>
 
-SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds)
+static bool has_non_pawn_material(BoardState *board_state)
+{
+    // Count non-pawn material for both sides
+    uint64_t non_pawn_white = board_state->board.white_pieces.knights |
+                              board_state->board.white_pieces.bishops |
+                              board_state->board.white_pieces.rooks |
+                              board_state->board.white_pieces.queens;
+    uint64_t non_pawn_black = board_state->board.black_pieces.knights |
+                              board_state->board.black_pieces.bishops |
+                              board_state->board.black_pieces.rooks |
+                              board_state->board.black_pieces.queens;
+
+    return (non_pawn_white | non_pawn_black) != 0;
+}
+
+SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds, bool allow_null_move)
 {
     if (use_max_time && has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
@@ -26,7 +42,10 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         return (SearchResult){score, VALID};
     }
 
+    if (depth > max_depth)
+        max_depth = depth;
     uint8_t remaining_depth = max_depth - depth;
+
     BoardScore alpha_orig = alpha; // Save original alpha
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
@@ -54,6 +73,36 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         }
     }
 
+    uint8_t NULL_MOVE_R = 2;
+    if (allow_null_move &&
+        remaining_depth > NULL_MOVE_R &&
+        !board_state->white_check && !board_state->black_check &&
+        has_non_pawn_material(board_state))
+    {
+        BoardState null_board_state = apply_null_move(board_state);
+        uint8_t null_max_depth = max_depth - NULL_MOVE_R;
+
+        BoardScore child_alpha = invert_score(beta);
+        BoardScore child_beta = child_alpha;
+        child_beta.score += 1; // Set child alpha to beta - 1
+
+        SearchResult null_search_result = nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, false);
+        null_search_result.board_score = invert_score(null_search_result.board_score);
+        if (null_search_result.valid == INVALID)
+        {
+            pop_game_history();
+            return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+        }
+
+        /* Fail-high?  => prune. */
+        if (is_greater_equal_score(null_search_result.board_score, beta))
+        {
+            pop_game_history();
+            return (SearchResult){null_search_result.board_score, VALID};
+        }
+    }
+    // =============== END NULL MOVE PRUNING ===============
+
     if (depth >= max_depth)
     {
         bool finished = is_finished(board_state);
@@ -72,6 +121,13 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         pop_game_history();
         TT_store(hash, 0, score.score, result, EXACT, 0);
         return (SearchResult){score, VALID};
+    }
+
+    if (stack->count + MAX_MOVES >= stack->size)
+    {
+        fprintf(stderr, "Board stack overflow at depth %d\n", depth);
+        pop_game_history();
+        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
     }
 
     uint16_t base = stack->count;
@@ -124,7 +180,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         SearchResult search_result;
         if (first_move)
         {
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
+            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -135,7 +191,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             int new_max_depth = max_depth + extension - reduction;
             if (new_max_depth < 0)
                 new_max_depth = 0;
-            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds);
+            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -143,7 +199,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
             if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || (do_reduction && alpha_cutoff))
             {
-                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds);
+                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
                 search_result.board_score = invert_score(search_result.board_score);
                 if (search_result.valid == INVALID)
                     goto invalid;

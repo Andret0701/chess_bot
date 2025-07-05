@@ -168,7 +168,7 @@ bool recursive_can_move(BoardState *board_state, uint8_t depth, BoardStack *stac
 
 void run_can_move_tests()
 {
-    BoardStack *stack = create_board_stack(65535);
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     uint16_t number_of_tests = sizeof(tests) / sizeof(Test);
     uint16_t passed_tests = 0;
     for (uint16_t i = 0; i < number_of_tests; i++)

@@ -12,7 +12,7 @@ BoardState board_to_board_state(Board *board)
 
 Result get_game_result(BoardState *board_state)
 {
-    BoardStack *stack = create_board_stack(65535);
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(board_state, stack);
     bool is_finished = stack->count == 0;
     destroy_board_stack(stack);
