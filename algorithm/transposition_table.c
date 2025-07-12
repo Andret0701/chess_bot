@@ -16,7 +16,7 @@ void TT_clear_generation()
 static TT_Entry transposition_table[NUM_TT_ENTRIES] = {0};
 static bool TT_lookup(uint64_t hash, TT_Entry *entry)
 {
-    TT_Entry *tt = &transposition_table[hash % NUM_TT_ENTRIES];
+    TT_Entry *tt = &transposition_table[hash & TT_MASK];
     __builtin_prefetch(tt, 0, 1);
     if (tt->hash != hash)
         return false;
@@ -25,10 +25,11 @@ static bool TT_lookup(uint64_t hash, TT_Entry *entry)
     tt->generation = current_generation;
     return true;
 }
+
 void TT_store(uint64_t hash, uint8_t depth, double score,
               Result result, TT_Entry_Type type, uint16_t move)
 {
-    TT_Entry *entry = &transposition_table[hash % NUM_TT_ENTRIES];
+    TT_Entry *entry = &transposition_table[hash & TT_MASK];
     if (entry->hash == hash && entry->depth > depth && entry->type == EXACT)
     {
         // If the entry is already present and has a greater depth, we do not overwrite it.

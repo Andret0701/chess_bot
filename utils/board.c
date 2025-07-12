@@ -15,7 +15,7 @@ bool pieces_equals(const Pieces *a, const Pieces *b)
 
 bool board_equals(const Board *a, const Board *b)
 {
-    return pieces_equals(&a->white_pieces, &b->white_pieces) && pieces_equals(&a->black_pieces, &b->black_pieces) && a->en_passant == b->en_passant && a->castling_rights == b->castling_rights && a->side_to_move == b->side_to_move;
+    return memcmp(a, b, sizeof(Board)) == 0;
 }
 
 void copy_board(const Board *from, Board *to)
