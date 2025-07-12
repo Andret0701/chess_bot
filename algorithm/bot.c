@@ -9,7 +9,7 @@
 #include "game_history.h"
 #include "transposition_table.h"
 
-#define DEBUG_INFO true
+#define DEBUG_INFO false
 
 #define MAX_DEPTH 150
 #define MAX_MOVES 300

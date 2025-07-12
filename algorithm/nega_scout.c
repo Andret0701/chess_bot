@@ -79,9 +79,9 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         }
     }
 
-    uint8_t NULL_MOVE_R = 2;
+    uint8_t NULL_MOVE_R = 3;
     if (allow_null_move &&
-        remaining_depth > NULL_MOVE_R &&
+        remaining_depth >= NULL_MOVE_R &&
         !board_state->white_check && !board_state->black_check &&
         has_non_pawn_material(board_state))
     {
