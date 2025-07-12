@@ -35,9 +35,15 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
 
     push_game_history(board_state->board);
-    if (threefold_repetition() || has_50_move_rule_occurred())
+    if (threefold_repetition())
     {
-        BoardScore score = (BoardScore){0, DRAW, depth};
+        BoardScore score = (BoardScore){0, THREEFOLD_REPETITION, depth};
+        pop_game_history();
+        return (SearchResult){score, VALID};
+    }
+    if (has_50_move_rule_occurred())
+    {
+        BoardScore score = (BoardScore){0, FIFTY_MOVE_RULE, depth};
         pop_game_history();
         return (SearchResult){score, VALID};
     }

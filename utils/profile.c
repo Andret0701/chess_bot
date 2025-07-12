@@ -60,7 +60,7 @@ void play_game(double time_seconds, double increment_seconds)
         push_game_history(board);
         board_state = board_to_board_state(&board);
         print_board(&board);
-        printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result.score.result == WON ? "WON" : (result.score.result == LOST ? "LOST" : (result.score.result == DRAW ? "DRAW" : "UNKNOWN")));
+        printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result_to_string(result.score.result));
         printf("White time: %.1f, Black time: %.1f\n", wtime / 1000.0, btime / 1000.0);
 
         if (threefold_repetition())
@@ -92,9 +92,24 @@ void play_game(double time_seconds, double increment_seconds)
             printf("Black checkmated white\n");
             break;
         }
-        else if (game_result == DRAW)
+        else if (game_result == STALEMATE)
         {
             printf("Stalemate\n");
+            break;
+        }
+        else if (game_result == INSUFFICIENT_MATERIAL)
+        {
+            printf("Draw by insufficient material\n");
+            break;
+        }
+        else if (game_result == FIFTY_MOVE_RULE)
+        {
+            printf("Draw by 50 move rule\n");
+            break;
+        }
+        else if (game_result == THREEFOLD_REPETITION)
+        {
+            printf("Draw by threefold repetition\n");
             break;
         }
 

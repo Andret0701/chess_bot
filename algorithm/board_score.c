@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include <limits.h>
 
+bool is_draw(Result result)
+{
+    return result == STALEMATE || result == THREEFOLD_REPETITION || result == FIFTY_MOVE_RULE || result == INSUFFICIENT_MATERIAL;
+}
+
 BoardScore invert_score(BoardScore score)
 {
     BoardScore inverted_score;
@@ -11,10 +16,32 @@ BoardScore invert_score(BoardScore score)
     return inverted_score;
 }
 
+const char *result_to_string(Result result)
+{
+    switch (result)
+    {
+    case WON:
+        return "Won";
+    case LOST:
+        return "Lost";
+    case STALEMATE:
+        return "Stalemate";
+    case THREEFOLD_REPETITION:
+        return "Threefold repetition";
+    case FIFTY_MOVE_RULE:
+        return "Fifty move rule";
+    case INSUFFICIENT_MATERIAL:
+        return "Insufficient material";
+    case UNKNOWN:
+        return "Unknown";
+    default:
+        return "Invalid result";
+    }
+}
+
 void print_score(BoardScore score)
 {
-    const char *results[] = {"Won", "Lost", "Draw", "Unknown"};
-    printf("Score: %.2f, Result: %s, Depth: %d\n", score.score, results[score.result], score.depth);
+    printf("Score: %.2f, Result: %s, Depth: %d\n", score.score, result_to_string(score.result), score.depth);
 }
 
 bool is_greater_score(BoardScore a, BoardScore b)

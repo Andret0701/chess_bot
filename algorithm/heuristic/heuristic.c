@@ -43,13 +43,13 @@ Result get_result(BoardState *board_state, bool is_finished)
 {
     Result result = UNKNOWN;
     if (has_insufficient_material(&board_state->board))
-        result = DRAW;
+        result = INSUFFICIENT_MATERIAL;
     else if (is_finished)
     {
         if (board_state->white_check || board_state->black_check)
             result = LOST;
         else
-            result = DRAW;
+            result = STALEMATE;
     }
     return result;
 }

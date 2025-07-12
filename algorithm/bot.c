@@ -9,7 +9,7 @@
 #include "game_history.h"
 #include "transposition_table.h"
 
-#define DEBUG_INFO false
+#define DEBUG_INFO true
 
 #define MAX_DEPTH 150
 #define MAX_MOVES 300
@@ -21,7 +21,7 @@ void print_bot_result(BotResult result)
            result.depth,
            result.score.score,
            result.score.depth,
-           result.score.result == WON ? "WON" : (result.score.result == LOST ? "LOST" : (result.score.result == DRAW ? "DRAW" : "UNKNOWN")));
+           result_to_string(result.score.result));
 }
 
 BoardScore move_scores[MAX_DEPTH][MAX_MOVES];
@@ -52,9 +52,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
             board_to_move(board, &best_board->board),
             best_score.score,
             best_score.depth,
-            best_score.result == WON ? "WON" : best_score.result == LOST ? "LOST"
-                                           : best_score.result == DRAW   ? "DRAW"
-                                                                         : "UNKNOWN");
+            result_to_string(best_score.result));
 
     fprintf(file, "Move: | ");
     for (int16_t d = depth; d >= 0; d--)
@@ -82,8 +80,7 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
                             move_scores[d][i].depth);
                 else
                     fprintf(file, "%-10s Depth: %-2d",
-                            move_scores[d][i].result == WON ? "WON" : move_scores[d][i].result == LOST ? "LOST"
-                                                                                                       : "DRAW",
+                            result_to_string(move_scores[d][i].result),
                             move_scores[d][i].depth);
             }
             if (d != 0)

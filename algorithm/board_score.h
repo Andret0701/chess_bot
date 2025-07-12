@@ -9,7 +9,10 @@ typedef enum
 {
     WON,
     LOST,
-    DRAW,
+    STALEMATE,
+    THREEFOLD_REPETITION,
+    FIFTY_MOVE_RULE,
+    INSUFFICIENT_MATERIAL,
     UNKNOWN
 } Result;
 
@@ -22,7 +25,9 @@ typedef struct
 
 static const BoardScore BEST_SCORE = {DBL_MAX, WON, 0};
 static const BoardScore WORST_SCORE = {DBL_MIN, LOST, 0};
+bool is_draw(Result result);
 BoardScore invert_score(BoardScore score);
+const char *result_to_string(Result result);
 void print_score(BoardScore score);
 
 bool is_greater_score(BoardScore a, BoardScore b);

@@ -20,9 +20,9 @@ Result get_game_result(BoardState *board_state)
     if (is_finished)
     {
         if (board_state->board.side_to_move == WHITE)
-            return board_state->white_check ? LOST : DRAW;
+            return board_state->white_check ? LOST : STALEMATE;
         else
-            return board_state->black_check ? LOST : DRAW;
+            return board_state->black_check ? LOST : STALEMATE;
     }
     return UNKNOWN;
 }
