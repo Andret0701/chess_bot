@@ -5,12 +5,9 @@ import chess.pgn
 import chess.engine
 
 from stockfish import Stockfish
+from tqdm import tqdm
 
-# Initialize Stockfish with the path to the Stockfish executable
-stockfish = Stockfish("C:/Users/andre/OneDrive/Dokumenter/stockfish/stockfish-windows-x86-64-avx2.exe")
 
-#make sure the engine is ready
-stockfish.set_depth(25)
 
 def generate_king_positions():
     positions = []
@@ -26,105 +23,112 @@ def generate_king_positions():
                 board.set_piece_at(i, chess.Piece.from_symbol('K'))
                 board.set_piece_at(j, chess.Piece.from_symbol('k'))
                 if board.is_valid():
-                    positions.append(board.fen())
+                    positions.append(board)
 
     return positions
 
 
 def add_piece(positions: list):
     new_positions = []
-    for piece in ['p', 'r', 'n', 'b', 'q','P', 'R', 'N', 'B', 'Q']:
-        for i in range(64):
-            for position in positions:
-                board = chess.Board(fen=position)
-                if board.piece_at(i) is not None:
-                    continue
-                board.set_piece_at(i, chess.Piece.from_symbol(piece))
-                if board.is_valid():
-                    new_positions.append(board.fen())
+    pieces = ['p', 'r', 'n', 'b', 'q', 'P', 'R', 'N', 'B', 'Q']
+    total = len(pieces) * 64 * len(positions)
+    with tqdm(total=total, desc="Adding pieces") as pbar:
+        for piece in pieces:
+            for i in range(64):
+                for position in positions:
+                    board = position.copy()
+                    if board.piece_at(i) is not None:
+                        pbar.update(1)
+                        continue
+                    board.set_piece_at(i, chess.Piece.from_symbol(piece))
+                    if board.is_valid() and not board.is_game_over():
+                        new_positions.append(board)
+                    pbar.update(1)
     return new_positions
 
-def get_winner(fen):
-    board = chess.Board(fen=fen)
-    if board.is_checkmate():
+def get_winner(board: chess.Board):
+    if board.is_game_over():
         result = board.result()
         if result == "1-0":
-            return "white", 0
+            return "white"
         elif result == "0-1":
-            return "black", 0
+            return "black"
         elif result == "1/2-1/2":
-            return "draw", 0
+            return "draw"
     
-    stockfish.set_fen_position(fen)
-    evaluation = stockfish.get_evaluation()
-    if evaluation["type"] == "mate":
-        if evaluation["value"] > 0:
-            return "white", evaluation["value"]
-        elif evaluation["value"] < 0:
-            return "black", evaluation["value"]
-    return "draw", evaluation["value"]
+    return "unknown"
 
 
-def has_insufficient_material(board: chess.Board) -> bool:
+def choose_result(color: str, result1: tuple[str, int], result2: tuple[str, int]) -> tuple[str, int]:
     """
-    Check if the position on the board has insufficient material to continue the game.
+    Pick the more desirable (outcome, depth) for the side `color`.
 
-    Args:
-        board (chess.Board): The chess board to evaluate.
+    Outcome meanings
+    ----------------
+    * color         – a win for the side we care about
+    * draw          – stalemate / repetition / etc.
+    * other colour  – a loss for `color`
+    * unknown       – the search hasn’t resolved this branch
 
-    Returns:
-        bool: True if the position has insufficient material, False otherwise.
+    Depth is the number of plies to reach the outcome (0 = immediate).
+
+    Policy
+    ------
+    1. Prefer a win over anything else.
+       • For wins, an earlier mate is better (smaller depth).
+    2. Prefer a draw over a loss or unknown.
+       • Earlier draws are better (smaller depth).
+    3. Prefer “unknown” over a confirmed loss (there is still hope).
+       • Deeper unknowns are *slightly* better than shallow ones.
+    4. Between two losses, delay defeat as long as possible
+       (larger depth is better).
     """
-    # Check for pawns, rooks, or queens - if any exist, material is sufficient
-    for piece_type in [chess.PAWN, chess.ROOK, chess.QUEEN]:
-        if board.pieces(piece_type, chess.WHITE) or board.pieces(piece_type, chess.BLACK):
-            return False
+    def score(res: tuple[str, int]) -> tuple[int, int]:
+        outcome, depth = res
+        if outcome == color:                # guaranteed win
+            return (3, -depth)              # bigger first element beats smaller;
+                                            # negate depth so earlier-win > later-win
+        if outcome == "draw":               # draw
+            return (2, -depth)
+        if outcome == "unknown":            # maybe good, maybe bad
+            return (1, -depth)              # prefer deeper “unknown” slightly
+        # everything else is a loss for `color`
+        return (0, depth)                   # delay the loss ⇒ larger depth preferred
 
-    # Count minor pieces (knights and bishops)
-    white_knights = len(board.pieces(chess.KNIGHT, chess.WHITE))
-    black_knights = len(board.pieces(chess.KNIGHT, chess.BLACK))
-    white_bishops = len(board.pieces(chess.BISHOP, chess.WHITE))
-    black_bishops = len(board.pieces(chess.BISHOP, chess.BLACK))
+    # max() with the custom key picks the higher-scoring result
+    return max(result1, result2, key=score)
 
-    # King vs King
-    if white_knights + black_knights + white_bishops + black_bishops == 0:
-        return True
-
-    # King + minor piece vs King
-    if white_knights + black_knights + white_bishops + black_bishops == 1:
-        return True
-
-    # King + Bishop vs King + Bishop (check if bishops are on same color squares)
-    if white_knights + black_knights == 0 and white_bishops == 1 and black_bishops == 1:
-        white_bishop_square = next(iter(board.pieces(chess.BISHOP, chess.WHITE)))
-        black_bishop_square = next(iter(board.pieces(chess.BISHOP, chess.BLACK)))
-
-        # Determine square color (light or dark)
-        white_bishop_on_light = (white_bishop_square % 2) == ((white_bishop_square // 8) % 2)
-        black_bishop_on_light = (black_bishop_square % 2) == ((black_bishop_square // 8) % 2)
-
-        return white_bishop_on_light == black_bishop_on_light
-
-    return False
-
-
-def filter_positions(positions: list) -> list:
-    return [position for position in positions if not has_insufficient_material(chess.Board(fen=position))]
+    
+    
 
 if __name__ == "__main__":
-    positions = generate_king_positions()
-    three_pieces = add_piece(positions)
-    #four_pieces = add_piece(three_pieces)
-    positions = positions + three_pieces
-    print(len(positions))
-    positions = filter_positions(positions)
-    print(len(positions))
-    # Evaluate the positions
-    with open("evaluated_positions.txt", "w") as file:
-        for position in positions:
-            winner = get_winner(position)
-            file.write(f"{position}, {winner}\n")
-            print(f"{position}, {winner}")
+    boards = generate_king_positions()
+    print(len(boards))
+    boards = add_piece(boards)
+    print(len(boards))
+
+    results = {}
+    for board in boards:
+        results[board.fen()] = ("unknown", 0)
+    print("Starting evaluation...")
     
+    for board in tqdm(boards, desc="Evaluating boards"):
+        for move in board.legal_moves:
+            new_board = board.copy()
+            new_board.push(move)
+            result = get_winner(new_board)
+            if result == "unknown":
+                result = results[new_board.fen()]
+            side = "white" if board.turn == chess.WHITE else "black" 
+            results[board.fen()] = choose_result(side,results[board.fen()],result)
+
+            
+    print("Evaluation complete.")
     
+    count_not_unknown = 0
+    for board in tqdm(boards, desc="Counting unknown boards"):
+        if results[board.fen()][0]!="unknown":
+            count_not_unknown+=1
+            
+    print(count_not_unknown)
     
