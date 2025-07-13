@@ -164,27 +164,29 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
         //   TT_store(hash_board(&board_state.board), board_state.board, depth, best_score.score, best_score.result, EXACT, best_board->move);
 
         // Sort the stack by score
-        for (uint16_t i = 0; i < stack->count; i++)
+        // Use insertion sort for better cache locality and efficiency on small arrays
+        for (uint16_t i = 1; i < stack->count; i++)
         {
-            for (uint16_t j = i + 1; j < stack->count; j++)
+            BoardState key_board = stack->boards[i];
+            BoardScore key_scores[MAX_DEPTH];
+            for (uint8_t d = 0; d <= depth; d++)
             {
-                BoardScore a = move_scores[depth][i];
-                BoardScore b = move_scores[depth][j];
-                if (is_greater_score(b, a))
+                key_scores[d] = move_scores[d][i];
+            }
+            int j = i - 1;
+            while (j >= 0 && is_greater_score(key_scores[depth], move_scores[depth][j]))
+            {
+                stack->boards[j + 1] = stack->boards[j];
+                for (uint8_t d = 0; d <= depth; d++)
                 {
-                    // Swap the boards
-                    BoardState temp_board = stack->boards[i];
-                    stack->boards[i] = stack->boards[j];
-                    stack->boards[j] = temp_board;
-
-                    // Swap the scores
-                    for (uint8_t d = 0; d <= depth; d++)
-                    {
-                        BoardScore temp_score = move_scores[d][i];
-                        move_scores[d][i] = move_scores[d][j];
-                        move_scores[d][j] = temp_score;
-                    }
+                    move_scores[d][j + 1] = move_scores[d][j];
                 }
+                j--;
+            }
+            stack->boards[j + 1] = key_board;
+            for (uint8_t d = 0; d <= depth; d++)
+            {
+                move_scores[d][j + 1] = key_scores[d];
             }
         }
 
