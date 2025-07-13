@@ -8,6 +8,7 @@
 #include "../utils/move.h"
 #include "game_history.h"
 #include "transposition_table.h"
+#include "time_manager.h"
 
 #define DEBUG_INFO false
 
@@ -91,37 +92,6 @@ void print_out_search_info(BoardStack *stack, Board *board, BoardState *best_boa
     fprintf(file, "\n");
 
     fclose(file);
-}
-
-double get_time_allocation(int wtime, int btime, int winc, int binc, Color side_to_move)
-{
-    // Base minimal time allocation (in seconds) to avoid zero-time moves
-    double base_time = 0.05; // Adjust as needed
-
-    // Choose the appropriate values based on side to move
-    double remaining_time = (side_to_move == WHITE) ? wtime : btime;
-    double increment = (side_to_move == WHITE) ? winc : binc;
-
-    // Convert remaining time and increment from milliseconds to seconds
-    remaining_time /= 1000.0;
-    increment /= 1000.0;
-
-    // Calculate an initial allocation:
-    // Divide remaining time evenly among moves left, then add half of the increment
-    double time_per_move = remaining_time / 40.0; // Assuming 40 moves left
-    double allocated_time = time_per_move + (increment * 0.7);
-
-    // Avoid spending too much on one move:
-    // For example, cap the allocation to 20% of the total remaining time.
-    double max_allocation = remaining_time * 0.2;
-    if (allocated_time > max_allocation)
-        allocated_time = max_allocation;
-
-    // Ensure a minimum time usage even if remaining time is very low
-    if (allocated_time < base_time)
-        allocated_time = base_time;
-
-    return allocated_time;
 }
 
 void updated_best_board(BoardState **best_board, BoardScore *best_score, BoardState *current_board_state, BoardScore score)
