@@ -3,6 +3,12 @@
 
 typedef struct
 {
+    BoardState *board;
+    BoardScore score;
+} BotMove;
+
+typedef struct
+{
     char *move;
     BoardScore score;
     uint8_t depth;
