@@ -9,10 +9,10 @@ double get_time_allocation(int wtime, int btime,
 
     // (1) Estimate moves‑to‑go (mtg).
     int mtg = DEFAULT_MTG;
-    if (remaining < 60)
-        mtg = 25; // low clock – fewer moves left
-    else if (remaining < 15)
+    if (remaining < 15)
         mtg = 12;
+    else if (remaining < 60)
+        mtg = 25; // low clock – fewer moves left
 
     // (2) Base allocation: even split + 80 % of increment.
     double alloc = remaining / mtg + inc * INC_USAGE;
