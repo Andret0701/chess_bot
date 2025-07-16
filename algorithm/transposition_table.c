@@ -14,10 +14,15 @@ void TT_clear_generation()
 }
 
 static TT_Entry transposition_table[NUM_TT_ENTRIES] = {0};
+void TT_prefetch(uint64_t hash)
+{
+    TT_Entry *tt = &transposition_table[hash & TT_MASK];
+    __builtin_prefetch(tt, 0, 3); // Prefetch for read with temporal locality
+}
+
 static bool TT_lookup(uint64_t hash, TT_Entry *entry)
 {
     TT_Entry *tt = &transposition_table[hash & TT_MASK];
-    __builtin_prefetch(tt, 0, 1);
     if (tt->hash != hash)
         return false;
 

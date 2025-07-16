@@ -17,6 +17,7 @@
 #include "engine/tests/can_move_test.h"
 #include "engine/tests/capture_move_test.h"
 #include "engine/tests/encoded_move_test.h"
+#include "algorithm/heuristic/tests/symetric_heuristic_test.h"
 
 #include "utils/bitboard.h"
 #include "uci.h"
@@ -26,10 +27,12 @@
 #include "algorithm/heuristic/heuristic.h"
 #include "algorithm/heuristic/pawn_structure_score.h"
 #include "engine/encoded_move.h"
+#include "algorithm/reductions.h"
 
 int main(int argc, char *argv[])
 {
     init_zobrist_keys();
+    init_reductions();
 
     // Board board = fen_to_board(STARTFEN);
     // Board next_board = apply_move(&board, "e2e4");
@@ -87,11 +90,16 @@ int main(int argc, char *argv[])
 
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
+        play_game(3, 0.05);
+        play_game(5, 0.1);
+        play_game(10, 0.2);
         play_game(30, 0.5);
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
     {
+        printf("Running heuristic tests\n");
+        run_heuristic_eval_tests();
         printf("Running count tests\n");
         run_count_tests();
         printf("Running can move tests\n");

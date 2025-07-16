@@ -9,6 +9,7 @@
 #include "game_history.h"
 #include "transposition_table.h"
 #include "time_manager.h"
+#include "zobrist_hash.h"
 
 #define DEBUG_INFO false
 
@@ -116,8 +117,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
     for (uint16_t i = 0; i < num_moves; i++)
         moves[i].board = &stack->boards[i];
 
-    uint8_t depth = 0;
-    while (true)
+    for (uint8_t depth = 0;; depth++)
     {
         BoardScore best_score = WORST_SCORE;
         BoardState *best_board = moves[0].board;
@@ -167,12 +167,18 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             {
                 // if (DEBUG_INFO)
                 //     print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
+
+                TT_store(hash_board(&board_state.board), depth, best_score.score,
+                         best_score.result, EXACT, best_board->move);
+
                 BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
                 destroy_board_stack(stack);
                 return result;
             }
         }
-        //   TT_store(hash_board(&board_state.board), board_state.board, depth, best_score.score, best_score.result, EXACT, best_board->move);
+
+        TT_store(hash_board(&board_state.board), depth, best_score.score,
+                 best_score.result, EXACT, best_board->move);
 
         // Sort moves array using insertion sort based on the score at current depth
         for (uint16_t i = 1; i < num_moves; ++i)
@@ -208,28 +214,14 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             return result;
         }
 
-        depth++;
-        if (depth == MAX_DEPTH || (use_max_depth && depth == max_depth))
+        if (depth + 1 == MAX_DEPTH || (use_max_depth && depth + 1 == max_depth))
         {
-            depth--;
             // if (DEBUG_INFO)
             //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
             BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
             destroy_board_stack(stack);
             return result;
         }
-
-        // qsort(moves, num_moves, sizeof(BotMove), compare_bot_moves);
-        // printf("Sorted moves for depth %d:\n", depth);
-        // for (uint16_t i = 0; i < num_moves; i++)
-        // {
-        //     printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n",
-        //            board_to_move(&board, &moves[i].board->board),
-        //            moves[i].score.score,
-        //            moves[i].score.depth,
-        //            result_to_string(moves[i].score.result));
-        // }
-        // printf("\n");
     }
 }
 

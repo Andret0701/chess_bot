@@ -34,6 +34,9 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     if (use_max_time && has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
 
+    uint64_t hash = hash_board(&board_state->board);
+    TT_prefetch(hash);
+
     push_game_history(board_state->board);
     if (threefold_repetition())
     {
@@ -53,7 +56,6 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     uint8_t remaining_depth = max_depth - depth;
 
     BoardScore alpha_orig = alpha; // Save original alpha
-    uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool found_tt = TT_lookup(hash, &tt_entry);
 
@@ -129,13 +131,6 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         return (SearchResult){score, VALID};
     }
 
-    if (stack->count + MAX_MOVES >= stack->size)
-    {
-        fprintf(stderr, "Board stack overflow at depth %d\n", depth);
-        pop_game_history();
-        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
-    }
-
     uint16_t base = stack->count;
     generate_moves(board_state, stack);
 
@@ -164,22 +159,9 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
 
         BoardState *next_board_state = &stack->boards[i];
 
-        // Classify the move
-        bool is_capture = is_move_capture(board_state, next_board_state);
-        bool is_promo = is_move_promotion(board_state, next_board_state);
+        int extension = 0;
         bool is_check = is_move_check(next_board_state);
         bool is_threatening_promo = is_move_threatening_promotion(board_state, next_board_state);
-        bool is_quiet = !is_capture && !is_promo && !is_check;
-
-        int reduction = 0;
-        bool do_reduction = is_quiet && (move_number >= 2) && (depth >= 2);
-        if (do_reduction)
-        {
-            double r = 1.35 + log(depth) * log(move_number) / 2.75;
-            reduction = (int)(r + 0.5);
-        }
-
-        int extension = 0;
         if (is_check || is_threatening_promo)
             extension = 1;
 
@@ -193,6 +175,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         }
         else
         {
+            uint8_t reduction = calculate_reduction(board_state, next_board_state, remaining_depth, move_number);
             // Null window search
             int new_max_depth = max_depth + extension - reduction;
             if (new_max_depth < 0)
@@ -203,7 +186,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
                 goto invalid;
 
             bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
-            if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || (do_reduction && alpha_cutoff))
+            if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || ((reduction != 0) && alpha_cutoff))
             {
                 search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
                 search_result.board_score = invert_score(search_result.board_score);

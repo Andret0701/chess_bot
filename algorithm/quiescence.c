@@ -1,5 +1,7 @@
 #include "quiescence.h"
 #include "heuristic/heuristic.h"
+#include "transposition_table.h"
+#include "zobrist_hash.h"
 
 #define MAX_QUIESCENCE_DEPTH 6
 
@@ -11,6 +13,9 @@ double quiescence(BoardState *board_state,
 {
     if (depth_in_quiescence >= MAX_QUIESCENCE_DEPTH)
         return score_board(board_state);
+
+    uint64_t hash = hash_board(&board_state->board);
+    TT_prefetch(hash);
 
     // 1) Stand-pat
     double stand_pat = score_board(board_state);
@@ -27,6 +32,19 @@ double quiescence(BoardState *board_state,
     uint16_t base = stack->count;
     generate_captures(board_state, stack);
     sort_moves(board_state, stack, base);
+
+    TT_Entry tt_entry;
+    if (TT_lookup(hash, &tt_entry))
+    {
+        if (tt_entry.type == EXACT)
+            return tt_entry.score;
+
+        if (tt_entry.type == LOWERBOUND && tt_entry.score >= beta)
+            return tt_entry.score;
+
+        if (tt_entry.type == UPPERBOUND && tt_entry.score <= alpha)
+            return tt_entry.score;
+    }
 
     for (uint16_t i = base; i < stack->count; i++)
     {
