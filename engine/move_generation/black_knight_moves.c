@@ -21,10 +21,9 @@ void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.black_pieces.knights |= position_to_bitboard(new_x, new_y);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_white_piece(board_state, new_x, new_y));
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
         }
     }

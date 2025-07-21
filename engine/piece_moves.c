@@ -1,6 +1,67 @@
 #include "piece_moves.h"
 #include "attack_generation/attack_generation.h"
 
+// TODO: Only recalculate attacks when you have to
+// Promotion might be weird
+// Always calculate the attack for the piece that moved
+// Make a mask for squares need to recalcualte sliding pieces.
+// If rook attack & affected_mask then recalculate rook attacks
+// En passant might add a square to the affected mask
+
+static inline void init_white_move(BoardState *board_state, BoardStack *stack)
+{
+    board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
+    board_state->black_pieces = board_state->board.black_pieces.pawns | board_state->board.black_pieces.knights | board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens | board_state->board.black_pieces.king;
+    board_state->occupied = board_state->white_pieces | board_state->black_pieces;
+
+    // check for castling rights
+    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(7, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(0, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(7, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(0, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
+
+    generate_black_attacks(board_state);
+    board_state->white_check = board_state->black_attack & board_state->board.white_pieces.king;
+    if (!__builtin_expect(!stack->boards[stack->count].white_check, 1))
+        return;
+
+    stack->count++;
+
+    generate_white_attacks(board_state);
+    board_state->black_check = board_state->white_attack & board_state->board.black_pieces.king;
+}
+
+static inline void init_black_move(BoardState *board_state, BoardStack *stack)
+{
+    board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
+    board_state->black_pieces = board_state->board.black_pieces.pawns | board_state->board.black_pieces.knights | board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens | board_state->board.black_pieces.king;
+    board_state->occupied = board_state->white_pieces | board_state->black_pieces;
+
+    // check for castling rights
+    if (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(7, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE && (board_state->board.white_pieces.rooks & position_to_bitboard(0, 0)) == 0)
+        board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(7, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_KINGSIDE_CASTLE;
+    if (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE && (board_state->board.black_pieces.rooks & position_to_bitboard(0, 7)) == 0)
+        board_state->board.castling_rights &= ~BLACK_QUEENSIDE_CASTLE;
+
+    generate_white_attacks(board_state);
+    board_state->black_check = board_state->white_attack & board_state->board.black_pieces.king;
+    if (!__builtin_expect(!stack->boards[stack->count].black_check, 1))
+        return;
+
+    stack->count++;
+
+    generate_black_attacks(board_state);
+    board_state->white_check = board_state->black_attack & board_state->board.white_pieces.king;
+}
+
 static inline void init_board(BoardState *board_state)
 {
     board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
@@ -23,16 +84,35 @@ static inline void init_board(BoardState *board_state)
     board_state->black_check = board_state->white_attack & board_state->board.black_pieces.king;
 }
 
+uint64_t accepted_moves = 0;
+uint64_t total_moves = 0;
+
 static inline void validate_white_move(BoardStack *stack)
 {
     if (__builtin_expect(!stack->boards[stack->count].white_check, 1))
+    {
+        accepted_moves++;
         stack->count++;
+    }
+    total_moves++;
 }
 
 static inline void validate_black_move(BoardStack *stack)
 {
     if (__builtin_expect(!stack->boards[stack->count].black_check, 1))
+    {
+        accepted_moves++;
         stack->count++;
+    }
+    total_moves++;
+}
+
+void print_move_statistics()
+{
+    printf("Accepted moves: %llu\n", accepted_moves);
+    printf("Total moves: %llu\n", total_moves);
+    if (total_moves > 0)
+        printf("Acceptance rate: %.2f%%\n", (double)accepted_moves / total_moves * 100);
 }
 
 static inline void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)

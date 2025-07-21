@@ -16,9 +16,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(i, y);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -38,9 +37,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(i, y);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -60,9 +58,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x, i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -82,9 +79,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x, i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -105,9 +101,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x + i, y + i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -127,9 +122,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x - i, y + i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -149,9 +143,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x + i, y - i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }
@@ -171,9 +164,8 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.black_pieces.queens |= position_to_bitboard(x - i, y - i);
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
-                validate_black_move(stack);
+                init_black_move(new_board_state, stack);
             }
             break;
         }

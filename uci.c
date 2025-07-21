@@ -127,16 +127,20 @@ UCIGoFlags parse_go(char *input)
 
 void log_uci(const char *format, ...)
 {
+    if (format == NULL)
+        return; // guard against NULL format
+
     FILE *file = fopen(UCI_LOG_FILE, "a");
-    if (file != NULL)
-    {
-        va_list args = NULL;
-        va_start(args, format);
-        vfprintf(file, format, args);
-        fprintf(file, "\n");
-        va_end(args);
-        fclose(file);
-    }
+    if (!file)
+        return;
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(file, format, args);
+    fputc('\n', file);
+    va_end(args);
+
+    fclose(file);
 }
 
 void log_board(Board board)
@@ -148,6 +152,9 @@ void log_board(Board board)
 
 void respond(const char *format, ...)
 {
+    if (format == NULL)
+        return; // guard against NULL format
+
     va_list args;
     va_start(args, format);
 
@@ -156,15 +163,18 @@ void respond(const char *format, ...)
     printf("\n");
     fflush(stdout);
 
+    va_list copy;
+    va_copy(copy, args);
     // Log to file
     FILE *file = fopen(UCI_LOG_FILE, "a");
-    if (file != NULL)
+    if (file)
     {
-        vfprintf(file, format, args);
-        fprintf(file, "\n");
+        vfprintf(file, format, copy);
+        fputc('\n', file);
         fclose(file);
     }
 
+    va_end(copy);
     va_end(args);
 }
 

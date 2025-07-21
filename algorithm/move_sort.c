@@ -11,14 +11,14 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
     if (from->board.side_to_move == WHITE)
     {
         if (from->black_pieces == to->black_pieces)
-            return 0;
+            return to->black_check || to->white_check;
         moved_piece = from->white_pieces & ~to->white_pieces;
         captured_piece = from->black_pieces & ~to->black_pieces;
     }
     else
     {
         if (from->white_pieces == to->white_pieces)
-            return 0;
+            return from->white_check || to->white_check;
         moved_piece = from->black_pieces & ~to->black_pieces;
         captured_piece = from->white_pieces & ~to->white_pieces;
     }

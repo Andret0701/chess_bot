@@ -8,4 +8,5 @@
 
 bool has_insufficient_material(Board *board);
 Result get_result(BoardState *board_state, bool is_finished);
+double get_game_phase(Board *board);
 double score_board(BoardState *board_state);

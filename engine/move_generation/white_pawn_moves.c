@@ -11,10 +11,9 @@ void white_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
         new_board_state->board.white_pieces.pawns |= position_to_bitboard(x, y + 1);
         new_board_state->board.en_passant = 0;
         new_board_state->board.side_to_move = BLACK;
-        init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y + 1), false);
-        validate_white_move(stack);
+        init_white_move(new_board_state, stack);
 
         // Two steps forward
         if (y == 1)
@@ -27,10 +26,9 @@ void white_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
                 new_board_state->board.white_pieces.pawns |= position_to_bitboard(x, y + 2);
                 new_board_state->board.en_passant = position_to_bitboard(x, y + 1);
                 new_board_state->board.side_to_move = BLACK;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y + 2), false);
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
         }
     }
@@ -51,10 +49,9 @@ void white_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack
             new_board_state->board.en_passant = 0;
             new_board_state->board.side_to_move = BLACK;
 
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1), true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
         }
     }
 
@@ -70,10 +67,9 @@ void white_pawn_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack
 
             new_board_state->board.en_passant = 0;
             new_board_state->board.side_to_move = BLACK;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1), true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
         }
     }
 }
@@ -90,10 +86,9 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.knights |= position_to_bitboard(x, y + 1);
     new_board_state->board.side_to_move = BLACK;
     new_board_state->board.en_passant = 0;
-    init_board(new_board_state);
     new_board_state->has_castled = board_state->has_castled;
     new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x, y + 1), PROMOTION_KNIGHT, false);
-    validate_white_move(stack);
+    init_white_move(new_board_state, stack);
 
     // Promote to bishop
     new_board_state = &stack->boards[stack->count];
@@ -102,10 +97,9 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.bishops |= position_to_bitboard(x, y + 1);
     new_board_state->board.side_to_move = BLACK;
     new_board_state->board.en_passant = 0;
-    init_board(new_board_state);
     new_board_state->has_castled = board_state->has_castled;
     new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x, y + 1), PROMOTION_BISHOP, false);
-    validate_white_move(stack);
+    init_white_move(new_board_state, stack);
 
     // Promote to rook
     new_board_state = &stack->boards[stack->count];
@@ -114,10 +108,9 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.rooks |= position_to_bitboard(x, y + 1);
     new_board_state->board.side_to_move = BLACK;
     new_board_state->board.en_passant = 0;
-    init_board(new_board_state);
     new_board_state->has_castled = board_state->has_castled;
     new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x, y + 1), PROMOTION_ROOK, false);
-    validate_white_move(stack);
+    init_white_move(new_board_state, stack);
 
     // Promote to queen
     new_board_state = &stack->boards[stack->count];
@@ -126,10 +119,9 @@ void white_pawn_promote(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
     new_board_state->board.white_pieces.queens |= position_to_bitboard(x, y + 1);
     new_board_state->board.side_to_move = BLACK;
     new_board_state->board.en_passant = 0;
-    init_board(new_board_state);
     new_board_state->has_castled = board_state->has_castled;
     new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x, y + 1), PROMOTION_QUEEN, false);
-    validate_white_move(stack);
+    init_white_move(new_board_state, stack);
 }
 
 void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack)
@@ -147,10 +139,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1), PROMOTION_KNIGHT, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to bishop
             new_board_state = &stack->boards[stack->count];
@@ -161,10 +152,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1), PROMOTION_BISHOP, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to rook
             new_board_state = &stack->boards[stack->count];
@@ -175,10 +165,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1), PROMOTION_ROOK, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to queen
             new_board_state = &stack->boards[stack->count];
@@ -189,10 +178,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1), PROMOTION_QUEEN, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
         }
     }
 
@@ -209,10 +197,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1), PROMOTION_KNIGHT, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to bishop
             new_board_state = &stack->boards[stack->count];
@@ -223,10 +210,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1), PROMOTION_BISHOP, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to rook
             new_board_state = &stack->boards[stack->count];
@@ -237,10 +223,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1), PROMOTION_ROOK, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
 
             // Promote to queen
             new_board_state = &stack->boards[stack->count];
@@ -251,10 +236,9 @@ void white_pawn_promotion_attack(BoardState *board_state, uint8_t x, uint8_t y, 
 
             new_board_state->board.side_to_move = BLACK;
             new_board_state->board.en_passant = 0;
-            init_board(new_board_state);
             new_board_state->has_castled = board_state->has_castled;
             new_board_state->move = new_promotion_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1), PROMOTION_QUEEN, true);
-            validate_white_move(stack);
+            init_white_move(new_board_state, stack);
         }
     }
 }
@@ -274,10 +258,9 @@ void white_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, BoardS
                 new_board_state->board.black_pieces.pawns &= ~position_to_bitboard(x - 1, y);
                 new_board_state->board.en_passant = 0;
                 new_board_state->board.side_to_move = BLACK;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_en_passant_encoded_move(position_to_index(x, y), position_to_index(x - 1, y + 1));
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
         }
 
@@ -292,10 +275,9 @@ void white_pawn_en_passant(BoardState *board_state, uint8_t x, uint8_t y, BoardS
                 new_board_state->board.black_pieces.pawns &= ~position_to_bitboard(x + 1, y);
                 new_board_state->board.en_passant = 0;
                 new_board_state->board.side_to_move = BLACK;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_en_passant_encoded_move(position_to_index(x, y), position_to_index(x + 1, y + 1));
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
         }
     }

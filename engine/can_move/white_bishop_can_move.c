@@ -18,7 +18,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
                 new_board_state.board.white_pieces.bishops |= target_pos;
 
-                uint64_t attacks = generate_black_attacks(&new_board_state.board);
+                uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
                 if ((attacks & new_board_state.board.white_pieces.king) == 0)
                     return true;
             }
@@ -30,7 +30,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
         new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
         new_board_state.board.white_pieces.bishops |= target_pos;
 
-        uint64_t attacks = generate_black_attacks(&new_board_state.board);
+        uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
         if (!(attacks & new_board_state.board.white_pieces.king))
             return true;
     }
@@ -49,7 +49,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
                 new_board_state.board.white_pieces.bishops |= target_pos;
 
-                uint64_t attacks = generate_black_attacks(&new_board_state.board);
+                uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
                 if ((attacks & new_board_state.board.white_pieces.king) == 0)
                     return true;
             }
@@ -61,7 +61,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
         new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
         new_board_state.board.white_pieces.bishops |= target_pos;
 
-        uint64_t attacks = generate_black_attacks(&new_board_state.board);
+        uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
         if ((attacks & new_board_state.board.white_pieces.king) == 0)
             return true;
     }
@@ -80,7 +80,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
                 new_board_state.board.white_pieces.bishops |= target_pos;
 
-                uint64_t attacks = generate_black_attacks(&new_board_state.board);
+                uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
                 if ((attacks & new_board_state.board.white_pieces.king) == 0)
                     return true;
             }
@@ -92,7 +92,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
         new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
         new_board_state.board.white_pieces.bishops |= target_pos;
 
-        uint64_t attacks = generate_black_attacks(&new_board_state.board);
+        uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
         if ((attacks & new_board_state.board.white_pieces.king) == 0)
             return true;
     }
@@ -111,7 +111,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
                 new_board_state.board.white_pieces.bishops |= target_pos;
 
-                uint64_t attacks = generate_black_attacks(&new_board_state.board);
+                uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
                 if ((attacks & new_board_state.board.white_pieces.king) == 0)
                     return true;
             }
@@ -123,7 +123,7 @@ bool white_bishop_can_move(BoardState *board_state, uint8_t x, uint8_t y)
         new_board_state.board.white_pieces.bishops &= ~position_to_bitboard(x, y);
         new_board_state.board.white_pieces.bishops |= target_pos;
 
-        uint64_t attacks = generate_black_attacks(&new_board_state.board);
+        uint64_t attacks = generate_black_attacks_mask(&new_board_state.board);
         if ((attacks & new_board_state.board.white_pieces.king) == 0)
             return true;
     }

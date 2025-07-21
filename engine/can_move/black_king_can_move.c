@@ -23,7 +23,7 @@ bool black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.black_pieces.king &= ~position_to_bitboard(x, y);
                 new_board_state.board.black_pieces.king |= position_to_bitboard(new_x, new_y);
 
-                uint64_t attacks = generate_white_attacks(&new_board_state.board);
+                uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
                 if (!(attacks & new_board_state.board.black_pieces.king))
                     return true;
             }

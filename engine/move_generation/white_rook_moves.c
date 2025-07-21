@@ -15,10 +15,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.white_pieces.rooks |= position_to_bitboard(i, y);
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), true);
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
 
             break;
@@ -30,10 +29,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.white_pieces.rooks |= position_to_bitboard(i, y);
         new_board_state->board.side_to_move = BLACK;
         new_board_state->board.en_passant = 0;
-        init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), false);
-        validate_white_move(stack);
+        init_white_move(new_board_state, stack);
     }
 
     for (uint8_t i = x - 1; i < 8; i--)
@@ -49,10 +47,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.white_pieces.rooks |= position_to_bitboard(i, y);
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), true);
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
 
             break;
@@ -64,10 +61,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.white_pieces.rooks |= position_to_bitboard(i, y);
         new_board_state->board.side_to_move = BLACK;
         new_board_state->board.en_passant = 0;
-        init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), false);
-        validate_white_move(stack);
+        init_white_move(new_board_state, stack);
     }
 
     for (uint8_t i = y + 1; i < 8; i++)
@@ -83,10 +79,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.white_pieces.rooks |= position_to_bitboard(x, i);
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), true);
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
 
             break;
@@ -98,10 +93,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.white_pieces.rooks |= position_to_bitboard(x, i);
         new_board_state->board.side_to_move = BLACK;
         new_board_state->board.en_passant = 0;
-        init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), false);
-        validate_white_move(stack);
+        init_white_move(new_board_state, stack);
     }
 
     for (uint8_t i = y - 1; i < 8; i--)
@@ -117,10 +111,9 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.white_pieces.rooks |= position_to_bitboard(x, i);
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
-                init_board(new_board_state);
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), true);
-                validate_white_move(stack);
+                init_white_move(new_board_state, stack);
             }
 
             break;
@@ -132,9 +125,8 @@ void generate_white_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.white_pieces.rooks |= position_to_bitboard(x, i);
         new_board_state->board.side_to_move = BLACK;
         new_board_state->board.en_passant = 0;
-        init_board(new_board_state);
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), false);
-        validate_white_move(stack);
+        init_white_move(new_board_state, stack);
     }
 }

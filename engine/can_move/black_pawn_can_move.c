@@ -10,7 +10,7 @@ bool black_pawn_advance_can_move(BoardState *board_state, uint8_t x, uint8_t y)
         new_board_state.board.black_pieces.pawns &= ~position_to_bitboard(x, y);
         new_board_state.board.black_pieces.pawns |= position_to_bitboard(x, y - 1);
 
-        uint64_t attacks = generate_white_attacks(&new_board_state.board);
+        uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
         if (!(attacks & new_board_state.board.black_pieces.king))
             return true;
 
@@ -23,7 +23,7 @@ bool black_pawn_advance_can_move(BoardState *board_state, uint8_t x, uint8_t y)
                 new_board_state.board.black_pieces.pawns &= ~position_to_bitboard(x, y);
                 new_board_state.board.black_pieces.pawns |= position_to_bitboard(x, y - 2);
 
-                attacks = generate_white_attacks(&new_board_state.board);
+                attacks = generate_white_attacks_mask(&new_board_state.board);
                 if (!(attacks & new_board_state.board.black_pieces.king))
                     return true;
             }
@@ -45,7 +45,7 @@ bool black_pawn_attack_can_move(BoardState *board_state, uint8_t x, uint8_t y)
             new_board_state.board.black_pieces.pawns |= position_to_bitboard(x - 1, y - 1);
             remove_white_piece(&new_board_state, x - 1, y - 1);
 
-            uint64_t attacks = generate_white_attacks(&new_board_state.board);
+            uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
             if (!(attacks & new_board_state.board.black_pieces.king))
                 return true;
         }
@@ -61,7 +61,7 @@ bool black_pawn_attack_can_move(BoardState *board_state, uint8_t x, uint8_t y)
             new_board_state.board.black_pieces.pawns |= position_to_bitboard(x + 1, y - 1);
             remove_white_piece(&new_board_state, x + 1, y - 1);
 
-            uint64_t attacks = generate_white_attacks(&new_board_state.board);
+            uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
             if (!(attacks & new_board_state.board.black_pieces.king))
                 return true;
         }
@@ -81,7 +81,7 @@ bool black_pawn_promote_can_move(BoardState *board_state, uint8_t x, uint8_t y)
     new_board_state.board.black_pieces.pawns &= ~position_to_bitboard(x, y);
     new_board_state.board.black_pieces.knights |= position_to_bitboard(x, y - 1);
 
-    uint64_t attacks = generate_white_attacks(&new_board_state.board);
+    uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
     if (!(attacks & new_board_state.board.black_pieces.king))
         return true;
 
@@ -99,7 +99,7 @@ bool black_pawn_promotion_attack_can_move(BoardState *board_state, uint8_t x, ui
         new_board_state.board.black_pieces.knights |= position_to_bitboard(x - 1, y - 1);
         remove_white_piece(&new_board_state, x - 1, y - 1);
 
-        uint64_t attacks = generate_white_attacks(&new_board_state.board);
+        uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
         if (!(attacks & new_board_state.board.black_pieces.king))
             return true;
     }
@@ -113,7 +113,7 @@ bool black_pawn_promotion_attack_can_move(BoardState *board_state, uint8_t x, ui
         new_board_state.board.black_pieces.knights |= position_to_bitboard(x + 1, y - 1);
         remove_white_piece(&new_board_state, x + 1, y - 1);
 
-        uint64_t attacks = generate_white_attacks(&new_board_state.board);
+        uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
         if (!(attacks & new_board_state.board.black_pieces.king))
             return true;
     }
@@ -135,7 +135,7 @@ bool black_pawn_en_passant_can_move(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state.board.black_pieces.pawns |= position_to_bitboard(x - 1, y - 1);
                 new_board_state.board.white_pieces.pawns &= ~position_to_bitboard(x - 1, y);
 
-                uint64_t attacks = generate_white_attacks(&new_board_state.board);
+                uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
                 if (!(attacks & new_board_state.board.black_pieces.king))
                     return true;
             }
@@ -151,7 +151,7 @@ bool black_pawn_en_passant_can_move(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state.board.black_pieces.pawns |= position_to_bitboard(x + 1, y - 1);
                 new_board_state.board.white_pieces.pawns &= ~position_to_bitboard(x + 1, y);
 
-                uint64_t attacks = generate_white_attacks(&new_board_state.board);
+                uint64_t attacks = generate_white_attacks_mask(&new_board_state.board);
                 if (!(attacks & new_board_state.board.black_pieces.king))
                     return true;
             }
