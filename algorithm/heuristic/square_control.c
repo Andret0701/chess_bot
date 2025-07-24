@@ -7,28 +7,58 @@ double get_square_control(BoardState *board_state, double game_phase)
     double score = 0;
 
     uint64_t white_bishops = board_state->board.white_pieces.bishops;
-    uint64_t white_bishop_attacks = generate_bishop_attacks(board_state->occupied, white_bishops);
-    score += __builtin_popcountll(white_bishop_attacks) * ((1 - game_phase) * BISHOP_ATTACKS_MIDDLEGAME + game_phase * BISHOP_ATTACKS_ENDGAME);
+    while (white_bishops)
+    {
+        int square = __builtin_ctzll(white_bishops);
+        uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->white_pieces;
+        score += __builtin_popcountll(attacks) * ((1 - game_phase) * BISHOP_ATTACKS_MIDDLEGAME + game_phase * BISHOP_ATTACKS_ENDGAME);
+        white_bishops &= white_bishops - 1;
+    }
 
     uint64_t black_bishops = board_state->board.black_pieces.bishops;
-    uint64_t black_bishop_attacks = generate_bishop_attacks(board_state->occupied, black_bishops);
-    score -= __builtin_popcountll(black_bishop_attacks) * ((1 - game_phase) * BISHOP_ATTACKS_MIDDLEGAME + game_phase * BISHOP_ATTACKS_ENDGAME);
+    while (black_bishops)
+    {
+        int square = __builtin_ctzll(black_bishops);
+        uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->black_pieces;
+        score -= __builtin_popcountll(attacks) * ((1 - game_phase) * BISHOP_ATTACKS_MIDDLEGAME + game_phase * BISHOP_ATTACKS_ENDGAME);
+        black_bishops &= black_bishops - 1;
+    }
 
     uint64_t white_rooks = board_state->board.white_pieces.rooks;
-    uint64_t white_rook_attacks = generate_rook_attacks(board_state->occupied, white_rooks);
-    score += __builtin_popcountll(white_rook_attacks) * ((1 - game_phase) * ROOK_ATTACKS_MIDDLEGAME + game_phase * ROOK_ATTACKS_ENDGAME);
+    while (white_rooks)
+    {
+        int square = __builtin_ctzll(white_rooks);
+        uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->white_pieces;
+        score += __builtin_popcountll(attacks) * ((1 - game_phase) * ROOK_ATTACKS_MIDDLEGAME + game_phase * ROOK_ATTACKS_ENDGAME);
+        white_rooks &= white_rooks - 1;
+    }
 
     uint64_t black_rooks = board_state->board.black_pieces.rooks;
-    uint64_t black_rook_attacks = generate_rook_attacks(board_state->occupied, black_rooks);
-    score -= __builtin_popcountll(black_rook_attacks) * ((1 - game_phase) * ROOK_ATTACKS_MIDDLEGAME + game_phase * ROOK_ATTACKS_ENDGAME);
+    while (black_rooks)
+    {
+        int square = __builtin_ctzll(black_rooks);
+        uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->black_pieces;
+        score -= __builtin_popcountll(attacks) * ((1 - game_phase) * ROOK_ATTACKS_MIDDLEGAME + game_phase * ROOK_ATTACKS_ENDGAME);
+        black_rooks &= black_rooks - 1;
+    }
 
     uint64_t white_queens = board_state->board.white_pieces.queens;
-    uint64_t white_queen_attacks = generate_queen_attacks(board_state->occupied, white_queens);
-    score += __builtin_popcountll(white_queen_attacks) * ((1 - game_phase) * QUEEN_ATTACKS_MIDDLEGAME + game_phase * QUEEN_ATTACKS_ENDGAME);
+    while (white_queens)
+    {
+        int square = __builtin_ctzll(white_queens);
+        uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->white_pieces;
+        score += __builtin_popcountll(attacks) * ((1 - game_phase) * QUEEN_ATTACKS_MIDDLEGAME + game_phase * QUEEN_ATTACKS_ENDGAME);
+        white_queens &= white_queens - 1;
+    }
 
     uint64_t black_queens = board_state->board.black_pieces.queens;
-    uint64_t black_queen_attacks = generate_queen_attacks(board_state->occupied, black_queens);
-    score -= __builtin_popcountll(black_queen_attacks) * ((1 - game_phase) * QUEEN_ATTACKS_MIDDLEGAME + game_phase * QUEEN_ATTACKS_ENDGAME);
+    while (black_queens)
+    {
+        int square = __builtin_ctzll(black_queens);
+        uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->black_pieces;
+        score -= __builtin_popcountll(attacks) * ((1 - game_phase) * QUEEN_ATTACKS_MIDDLEGAME + game_phase * QUEEN_ATTACKS_ENDGAME);
+        black_queens &= black_queens - 1;
+    }
 
     return score;
 }

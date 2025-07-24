@@ -11,6 +11,10 @@ static inline uint64_t generate_rook_attacks(uint64_t occupied, uint64_t pieces)
 static inline uint64_t generate_queen_attacks(uint64_t occupied, uint64_t pieces);
 static inline uint64_t generate_king_attacks(uint64_t kings);
 
+static inline uint64_t generate_bishop_attack(uint64_t occupied, int index);
+static inline uint64_t generate_rook_attack(uint64_t occupied, int index);
+static inline uint64_t generate_queen_attack(uint64_t occupied, int index);
+
 void generate_attacks(BoardState *board_state);
 void generate_white_attacks(const BoardState *from, BoardState *to);
 void generate_black_attacks(const BoardState *from, BoardState *to);
