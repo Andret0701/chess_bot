@@ -17,6 +17,7 @@
 #include "engine/tests/can_move_test.h"
 #include "engine/tests/capture_move_test.h"
 #include "engine/tests/encoded_move_test.h"
+#include "engine/tests/attack_test.h"
 #include "algorithm/heuristic/tests/symetric_heuristic_test.h"
 
 #include "utils/bitboard.h"
@@ -98,16 +99,18 @@ int main(int argc, char *argv[])
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
     {
-        printf("Running heuristic tests\n");
-        run_heuristic_eval_tests();
+        printf("Running attack tests\n");
+        run_attack_tests();
         printf("Running count tests\n");
         run_count_tests();
-        printf("Running can move tests\n");
-        run_can_move_tests();
-        printf("Running capture move tests\n");
-        run_capture_move_tests();
         printf("Running encoded move tests\n");
         run_encoded_move_tests();
+        printf("Running capture move tests\n");
+        run_capture_move_tests();
+        printf("Running heuristic tests\n");
+        run_heuristic_eval_tests();
+        printf("Running can move tests\n");
+        run_can_move_tests();
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "benchmark") == 0)

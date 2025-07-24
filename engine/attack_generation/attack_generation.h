@@ -12,8 +12,8 @@ static inline uint64_t generate_queen_attacks(uint64_t occupied, uint64_t pieces
 static inline uint64_t generate_king_attacks(uint64_t kings);
 
 void generate_attacks(BoardState *board_state);
-void generate_white_attacks(BoardState *board_state);
-void generate_black_attacks(BoardState *board_state);
+void generate_white_attacks(const BoardState *from, BoardState *to);
+void generate_black_attacks(const BoardState *from, BoardState *to);
 
 uint64_t generate_white_attacks_mask(Board *board);
 uint64_t generate_black_attacks_mask(Board *board);

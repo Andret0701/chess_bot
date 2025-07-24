@@ -17,7 +17,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), true);
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -31,7 +31,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.en_passant = 0;
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), false);
-        init_black_move(new_board_state, stack);
+        push_black_move(board_state, new_board_state, stack);
     }
 
     for (uint8_t i = x - 1; i < 8; i--)
@@ -49,7 +49,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), true);
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -63,7 +63,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.en_passant = 0;
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(i, y), false);
-        init_black_move(new_board_state, stack);
+        push_black_move(board_state, new_board_state, stack);
     }
 
     for (uint8_t i = y + 1; i < 8; i++)
@@ -81,7 +81,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), true);
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -95,7 +95,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.en_passant = 0;
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), false);
-        init_black_move(new_board_state, stack);
+        push_black_move(board_state, new_board_state, stack);
     }
 
     for (uint8_t i = y - 1; i < 8; i--)
@@ -113,7 +113,7 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), true);
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -127,6 +127,6 @@ void generate_black_rook_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.en_passant = 0;
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, i), false);
-        init_black_move(new_board_state, stack);
+        push_black_move(board_state, new_board_state, stack);
     }
 }

@@ -23,7 +23,7 @@ void generate_black_knight_moves(BoardState *board_state, uint8_t x, uint8_t y, 
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
                 new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_white_piece(board_state, new_x, new_y));
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
         }
     }

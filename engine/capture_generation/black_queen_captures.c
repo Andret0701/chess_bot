@@ -17,7 +17,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -38,7 +38,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -59,7 +59,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -80,7 +80,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -102,7 +102,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -123,7 +123,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -144,7 +144,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }
@@ -165,7 +165,7 @@ void generate_black_queen_captures(BoardState *board_state, uint8_t x, uint8_t y
                 new_board_state->board.side_to_move = WHITE;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_black_move(new_board_state, stack);
+                push_black_move(board_state, new_board_state, stack);
             }
             break;
         }

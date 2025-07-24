@@ -19,7 +19,7 @@ void generate_white_bishop_captures(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_white_move(new_board_state, stack);
+                push_white_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -43,7 +43,7 @@ void generate_white_bishop_captures(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_white_move(new_board_state, stack);
+                push_white_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -67,7 +67,7 @@ void generate_white_bishop_captures(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_white_move(new_board_state, stack);
+                push_white_move(board_state, new_board_state, stack);
             }
 
             break;
@@ -91,7 +91,7 @@ void generate_white_bishop_captures(BoardState *board_state, uint8_t x, uint8_t 
                 new_board_state->board.side_to_move = BLACK;
                 new_board_state->board.en_passant = 0;
                 new_board_state->has_castled = board_state->has_castled;
-                init_white_move(new_board_state, stack);
+                push_white_move(board_state, new_board_state, stack);
             }
 
             break;

@@ -8,8 +8,8 @@
 #include "attack_generation/attack_generation.h"
 #include "encoded_move.h"
 
-static inline void init_white_move(BoardState *board_state, BoardStack *stack);
-static inline void init_black_move(BoardState *board_state, BoardStack *stack);
+static inline void push_white_move(const BoardState *from, BoardState *to, BoardStack *stack);
+static inline void push_black_move(const BoardState *from, BoardState *to, BoardStack *stack);
 static inline void init_board(BoardState *board_state);
 static inline void validate_white_move(BoardStack *stack);
 static inline void validate_black_move(BoardStack *stack);

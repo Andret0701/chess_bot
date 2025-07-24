@@ -24,7 +24,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
         new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
         new_board_state->has_castled = board_state->has_castled;
         new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(new_x, new_y), is_black_piece(board_state, new_x, new_y));
-        init_white_move(new_board_state, stack);
+        push_white_move(board_state, new_board_state, stack);
     }
 
     // Castling
@@ -52,7 +52,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                     new_board_state->has_castled = board_state->has_castled | WHITE_KINGSIDE_CASTLE;
                     new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(6, 0));
-                    init_white_move(new_board_state, stack);
+                    push_white_move(board_state, new_board_state, stack);
                 }
             }
 
@@ -78,7 +78,7 @@ void generate_white_king_moves(BoardState *board_state, uint8_t x, uint8_t y, Bo
                     new_board_state->board.castling_rights &= ~WHITE_QUEENSIDE_CASTLE;
                     new_board_state->has_castled = board_state->has_castled | WHITE_QUEENSIDE_CASTLE;
                     new_board_state->move = new_castling_encoded_move(position_to_index(x, y), position_to_index(2, 0));
-                    init_white_move(new_board_state, stack);
+                    push_white_move(board_state, new_board_state, stack);
                 }
             }
         }

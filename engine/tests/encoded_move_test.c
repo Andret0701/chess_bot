@@ -5,13 +5,7 @@
 #include "count_tests.h"
 #include "../encoded_move.h"
 #include <stdio.h>
-
-typedef struct
-{
-    uint64_t passed;
-    uint64_t count;
-} TestResults;
-
+#include "test_utils.h"
 TestResults check_encoded_move_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
     uint32_t base = stack->count;
