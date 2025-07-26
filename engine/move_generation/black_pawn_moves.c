@@ -26,7 +26,7 @@ void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
                     new_board_state->white_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.white_pieces.bishops);
                 else
                     new_board_state->white_attacks.bishops = board_state->white_attacks.bishops;
-                if (new_board_state->board.white_pieces.rooks != board_state->board.white_pieces.rooks || occupied_delta & board_state->white_attacks.rooks)
+                if (occupied_delta & board_state->white_attacks.rooks)
                     new_board_state->white_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.white_pieces.rooks);
                 else
                     new_board_state->white_attacks.rooks = board_state->white_attacks.rooks;
@@ -96,7 +96,7 @@ void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
                             new_board_state->white_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.white_pieces.bishops);
                         else
                             new_board_state->white_attacks.bishops = board_state->white_attacks.bishops;
-                        if (new_board_state->board.white_pieces.rooks != board_state->board.white_pieces.rooks || occupied_delta & board_state->white_attacks.rooks)
+                        if (occupied_delta & board_state->white_attacks.rooks)
                             new_board_state->white_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.white_pieces.rooks);
                         else
                             new_board_state->white_attacks.rooks = board_state->white_attacks.rooks;
