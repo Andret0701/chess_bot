@@ -1,9 +1,24 @@
 #include "count_benchmark.h"
-
 #include "../../utils/fen.h"
-#include <time.h>
+#include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../piece_moves.h"
+#include "../tests/count_tests.h"
+
+static double now_seconds(void)
+{
+    static LARGE_INTEGER freq;
+    static BOOL initialized = FALSE;
+    if (!initialized)
+    {
+        QueryPerformanceFrequency(&freq);
+        initialized = TRUE;
+    }
+    LARGE_INTEGER counter;
+    QueryPerformanceCounter(&counter);
+    return (double)counter.QuadPart / (double)freq.QuadPart;
+}
 
 uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {
@@ -17,7 +32,7 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
         return 0;
 
     uint64_t total = 0;
-    for (uint16_t i = base; i < stack->count; i++)
+    for (uint32_t i = base; i < stack->count; i++)
     {
         total += count_recursive(&stack->boards[i], depth - 1, stack);
     }
@@ -26,65 +41,59 @@ uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *sta
     return total;
 }
 
-// Benchmark results v1:
-// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
-// 1       20            0.000       inf               0.000
-// 2       400           0.001       0.400             2.500
-// 3       8902          0.002       4.451             0.225
-// 4       197281        0.062       3.182             0.314
-// 5       4865609       1.290       3.772             0.265
-// 6       119060324     32.686      3.643             0.275
-
-// Benchmark results v2 (Added magic bitboards):
-// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
-// 1       20            0.000       inf               0.000
-// 2       400           0.000       1.600             0.625
-// 3       8902          0.001       8.902             0.112
-// 4       197281        0.028       7.109             0.141
-// 5       4865609       0.664       7.322             0.137
-// 6       119060324     16.248      7.328             0.136
-
-// Benchmark results v3 (Improved attack generation):
-// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
-// 1       20            0.000       inf               0.000
-// 2       400           0.000       1.600             0.625
-// 3       8902          0.001       11.869            0.084
-// 4       197281        0.022       8.768             0.114
-// 5       4865609       0.537       9.065             0.110
-// 6       119060324     13.611      8.748             0.114
-
-// Benchmark results v4 (Improved attack generation):
-// Depth   Nodes         Time (s)    Million boards/s  Microseconds/board
-// 1       20            0.000       inf               0.000
-// 2       400           0.000       inf               0.000
-// 3       8902          0.000       inf               0.000
-// 4       197281        0.014       14.091            0.071
-// 5       4865609       0.347       14.022            0.071
-// 6       119060324     8.449       14.092            0.071
-
 void run_count_benchmark()
 {
-    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
-    Board board = fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
-    BoardState board_state = board_to_board_state(&board);
+    const size_t num_tests = sizeof(tests) / sizeof(Test);
+    const size_t total_positions = num_tests * 2;
 
-    Board flipped_board = flip_board(&board);
-    BoardState flipped_board_state = board_to_board_state(&flipped_board);
-
-    printf("%-7s %-13s %-11s %-17s %-17s\n", "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
-    for (uint8_t i = 1; i <= 6; i++)
+    // Pre-allocate BoardState array to avoid parsing inside the timed loop
+    BoardState *states = malloc(total_positions * sizeof(BoardState));
+    if (!states)
     {
-        volatile uint64_t result = 0;
-        clock_t start = clock();
-        result += count_recursive(&board_state, i, stack);
-        result += count_recursive(&flipped_board_state, i, stack);
-        result += count_recursive(&board_state, i, stack);
-        result += count_recursive(&flipped_board_state, i, stack);
-        clock_t end = clock();
-        result /= 4;
-        double time_spent = (double)(end - start) / (CLOCKS_PER_SEC * 4);
-        double million_boards_per_second = result / (time_spent * 1e6);
-        double microseconds_per_board = (time_spent * 1e6) / result;
-        printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n", i, result, time_spent, million_boards_per_second, microseconds_per_board);
+        fprintf(stderr, "Failed to allocate states array\n");
+        return;
     }
+
+    // Fill in all positions (original + flipped)
+    for (size_t i = 0; i < num_tests; i++)
+    {
+        Board b1 = fen_to_board(tests[i].fen);
+        states[i] = board_to_board_state(&b1);
+        Board b2 = flip_board(&b1);
+        states[i + num_tests] = board_to_board_state(&b2);
+    }
+
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
+    if (!stack)
+    {
+        fprintf(stderr, "Failed to create board stack\n");
+        free(states);
+        return;
+    }
+
+    printf("%-7s %-13s %-11s %-17s %-17s\n",
+           "Depth", "Nodes", "Time (s)", "Million boards/s", "Microseconds/board");
+
+    for (uint8_t depth = 1; depth <= 3; depth++)
+    {
+        uint64_t total_nodes = 0;
+        double t0 = now_seconds();
+
+        for (size_t i = 0; i < total_positions; i++)
+        {
+            total_nodes += count_recursive(&states[i], depth, stack);
+        }
+
+        double t1 = now_seconds();
+        double elapsed = t1 - t0;
+        double mbps = total_nodes / (elapsed * 1e6);
+        double us_per = (elapsed * 1e6) / (double)total_nodes;
+
+        printf("%-7u %-13llu %-11.3f %-17.3f %-17.3f\n",
+               depth, (unsigned long long)total_nodes,
+               elapsed, mbps, us_per);
+    }
+
+    destroy_board_stack(stack);
+    free(states);
 }

@@ -3,7 +3,8 @@ CC = gcc
 # -O3 -march=native -flto -fno-plt -mpopcnt -funroll-loops
 
 CFLAGS = -Wall -Wextra -std=c11 -O3 -funroll-loops -ffast-math -falign-functions=32 -fprefetch-loop-arrays -fomit-frame-pointer -DNDEBUG -Iengine -mpopcnt -flto -fno-plt
-PROFILE_FLAGS = -pg -no-pie -fno-builtin -O3 #-fno-inline
+PROFILE_FLAGS = -pg -no-pie -fno-builtin -fno-omit-frame-pointer -O3 -Wall -Wextra -std=c11 -Iengine -DNDEBUG -mpopcnt -falign-functions=32 -fno-plt #-fno-inline
+
 TARGET = andobot.exe
 BUILD_DIR = build
 UNITY_SRC = $(BUILD_DIR)/unity.c

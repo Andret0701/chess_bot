@@ -9,11 +9,66 @@ void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
         copy_board(&board_state->board, &new_board_state->board);
         new_board_state->board.black_pieces.pawns &= ~position_to_bitboard(x, y);
         new_board_state->board.black_pieces.pawns |= position_to_bitboard(x, y - 1);
-        new_board_state->board.en_passant = 0;
-        new_board_state->board.side_to_move = WHITE;
-        new_board_state->has_castled = board_state->has_castled;
-        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y - 1), false);
-        push_black_move(board_state, new_board_state, stack);
+        // push_black_move (written out for optimization)
+        {
+            new_board_state->black_pieces = (board_state->black_pieces & ~board_state->board.black_pieces.pawns) | new_board_state->board.black_pieces.pawns;
+            new_board_state->white_pieces = board_state->white_pieces;
+            new_board_state->occupied = new_board_state->white_pieces | new_board_state->black_pieces;
+            // generate_white_attacks (written out for optimization)
+            uint64_t occupied = new_board_state->occupied;
+            uint64_t occupied_delta = board_state->occupied ^ new_board_state->occupied;
+            {
+                new_board_state->white_attacks.pawns = board_state->white_attacks.pawns;
+                new_board_state->white_attacks.knights = board_state->white_attacks.knights;
+                new_board_state->white_attacks.king = board_state->white_attacks.king;
+
+                if (occupied_delta & board_state->white_attacks.bishops)
+                    new_board_state->white_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.white_pieces.bishops);
+                else
+                    new_board_state->white_attacks.bishops = board_state->white_attacks.bishops;
+                if (new_board_state->board.white_pieces.rooks != board_state->board.white_pieces.rooks || occupied_delta & board_state->white_attacks.rooks)
+                    new_board_state->white_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.white_pieces.rooks);
+                else
+                    new_board_state->white_attacks.rooks = board_state->white_attacks.rooks;
+                if (occupied_delta & board_state->white_attacks.queens)
+                    new_board_state->white_attacks.queens = generate_queen_attacks(occupied, new_board_state->board.white_pieces.queens);
+                else
+                    new_board_state->white_attacks.queens = board_state->white_attacks.queens;
+
+                new_board_state->white_attack = new_board_state->white_attacks.pawns | new_board_state->white_attacks.knights | new_board_state->white_attacks.bishops | new_board_state->white_attacks.rooks | new_board_state->white_attacks.queens | new_board_state->white_attacks.king;
+            }
+            new_board_state->black_check = new_board_state->white_attack & new_board_state->board.black_pieces.king;
+            if (__builtin_expect(!new_board_state->black_check, 1))
+            {
+                stack->count++;
+                // generate_black_attacks (written out for optimization)
+                {
+                    new_board_state->black_attacks.pawns = generate_black_pawn_attacks(new_board_state->board.black_pieces.pawns);
+                    new_board_state->black_attacks.knights = board_state->black_attacks.knights;
+                    new_board_state->black_attacks.king = board_state->black_attacks.king;
+                    if (occupied_delta & board_state->black_attacks.bishops)
+                        new_board_state->black_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.black_pieces.bishops);
+                    else
+                        new_board_state->black_attacks.bishops = board_state->black_attacks.bishops;
+                    if (occupied_delta & board_state->black_attacks.rooks)
+                        new_board_state->black_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.black_pieces.rooks);
+                    else
+                        new_board_state->black_attacks.rooks = board_state->black_attacks.rooks;
+                    if (occupied_delta & board_state->black_attacks.queens)
+                        new_board_state->black_attacks.queens = generate_queen_attacks(occupied, new_board_state->board.black_pieces.queens);
+                    else
+                        new_board_state->black_attacks.queens = board_state->black_attacks.queens;
+
+                    new_board_state->black_attack = new_board_state->black_attacks.pawns | new_board_state->black_attacks.knights | new_board_state->black_attacks.bishops | new_board_state->black_attacks.rooks | new_board_state->black_attacks.queens | new_board_state->black_attacks.king;
+                }
+                new_board_state->white_check = new_board_state->black_attack & new_board_state->board.white_pieces.king;
+
+                new_board_state->board.en_passant = 0;
+                new_board_state->board.side_to_move = WHITE;
+                new_board_state->has_castled = board_state->has_castled;
+                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y - 1), false);
+            }
+        }
 
         // Two steps forward
         if (y == 6)
@@ -24,11 +79,66 @@ void black_pawn_advance(BoardState *board_state, uint8_t x, uint8_t y, BoardStac
                 copy_board(&board_state->board, &new_board_state->board);
                 new_board_state->board.black_pieces.pawns &= ~position_to_bitboard(x, y);
                 new_board_state->board.black_pieces.pawns |= position_to_bitboard(x, y - 2);
-                new_board_state->board.en_passant = position_to_bitboard(x, y - 1);
-                new_board_state->board.side_to_move = WHITE;
-                new_board_state->has_castled = board_state->has_castled;
-                new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y - 2), false);
-                push_black_move(board_state, new_board_state, stack);
+                // push_black_move (written out for optimization)
+                {
+                    new_board_state->black_pieces = (board_state->black_pieces & ~board_state->board.black_pieces.pawns) | new_board_state->board.black_pieces.pawns;
+                    new_board_state->white_pieces = board_state->white_pieces;
+                    new_board_state->occupied = new_board_state->white_pieces | new_board_state->black_pieces;
+                    // generate_white_attacks (written out for optimization)
+                    uint64_t occupied = new_board_state->occupied;
+                    uint64_t occupied_delta = board_state->occupied ^ new_board_state->occupied;
+                    {
+                        new_board_state->white_attacks.pawns = board_state->white_attacks.pawns;
+                        new_board_state->white_attacks.knights = board_state->white_attacks.knights;
+                        new_board_state->white_attacks.king = board_state->white_attacks.king;
+
+                        if (occupied_delta & board_state->white_attacks.bishops)
+                            new_board_state->white_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.white_pieces.bishops);
+                        else
+                            new_board_state->white_attacks.bishops = board_state->white_attacks.bishops;
+                        if (new_board_state->board.white_pieces.rooks != board_state->board.white_pieces.rooks || occupied_delta & board_state->white_attacks.rooks)
+                            new_board_state->white_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.white_pieces.rooks);
+                        else
+                            new_board_state->white_attacks.rooks = board_state->white_attacks.rooks;
+                        if (occupied_delta & board_state->white_attacks.queens)
+                            new_board_state->white_attacks.queens = generate_queen_attacks(occupied, new_board_state->board.white_pieces.queens);
+                        else
+                            new_board_state->white_attacks.queens = board_state->white_attacks.queens;
+
+                        new_board_state->white_attack = new_board_state->white_attacks.pawns | new_board_state->white_attacks.knights | new_board_state->white_attacks.bishops | new_board_state->white_attacks.rooks | new_board_state->white_attacks.queens | new_board_state->white_attacks.king;
+                    }
+                    new_board_state->black_check = new_board_state->white_attack & new_board_state->board.black_pieces.king;
+                    if (__builtin_expect(!new_board_state->black_check, 1))
+                    {
+                        stack->count++;
+                        // generate_black_attacks (written out for optimization)
+                        {
+                            new_board_state->black_attacks.pawns = generate_black_pawn_attacks(new_board_state->board.black_pieces.pawns);
+                            new_board_state->black_attacks.knights = board_state->black_attacks.knights;
+                            new_board_state->black_attacks.king = board_state->black_attacks.king;
+                            if (occupied_delta & board_state->black_attacks.bishops)
+                                new_board_state->black_attacks.bishops = generate_bishop_attacks(occupied, new_board_state->board.black_pieces.bishops);
+                            else
+                                new_board_state->black_attacks.bishops = board_state->black_attacks.bishops;
+                            if (occupied_delta & board_state->black_attacks.rooks)
+                                new_board_state->black_attacks.rooks = generate_rook_attacks(occupied, new_board_state->board.black_pieces.rooks);
+                            else
+                                new_board_state->black_attacks.rooks = board_state->black_attacks.rooks;
+                            if (occupied_delta & board_state->black_attacks.queens)
+                                new_board_state->black_attacks.queens = generate_queen_attacks(occupied, new_board_state->board.black_pieces.queens);
+                            else
+                                new_board_state->black_attacks.queens = board_state->black_attacks.queens;
+
+                            new_board_state->black_attack = new_board_state->black_attacks.pawns | new_board_state->black_attacks.knights | new_board_state->black_attacks.bishops | new_board_state->black_attacks.rooks | new_board_state->black_attacks.queens | new_board_state->black_attacks.king;
+                        }
+                        new_board_state->white_check = new_board_state->black_attack & new_board_state->board.white_pieces.king;
+
+                        new_board_state->board.en_passant = position_to_bitboard(x, y - 1);
+                        new_board_state->board.side_to_move = WHITE;
+                        new_board_state->has_castled = board_state->has_castled;
+                        new_board_state->move = new_simple_encoded_move(position_to_index(x, y), position_to_index(x, y - 2), false);
+                    }
+                }
             }
         }
     }

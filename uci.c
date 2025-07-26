@@ -179,7 +179,7 @@ void respond(const char *format, ...)
 }
 
 // get message
-void listen(char *message)
+void listen_uci(char *message)
 {
     while (fgets(message, INPUT_BUFFER_SIZE, stdin) == NULL)
         ;
@@ -204,7 +204,7 @@ void uci_loop()
 
     while (1)
     {
-        listen(input);
+        listen_uci(input);
         if (strcmp(input, "uci") == 0)
         {
             // Engine identification
