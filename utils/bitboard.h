@@ -98,6 +98,9 @@
 uint64_t flip_bitboard(uint64_t bitboard);
 void print_bitboard(uint64_t bitboard);
 uint64_t position_to_bitboard(uint8_t x, uint8_t y);
+uint64_t move_bit(uint64_t bitboard, uint64_t from, uint64_t to);
+uint64_t set_bit(uint64_t bitboard, uint8_t x, uint8_t y);
+uint64_t clear_bit(uint64_t bitboard, uint8_t x, uint8_t y);
 uint64_t decrement_file(uint64_t bitboard);
 uint64_t increment_file(uint64_t bitboard);
 uint64_t decrement_rank(uint64_t bitboard);

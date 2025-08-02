@@ -1,9 +1,5 @@
 #include "../engine/piece_moves.h"
-
-void set_bit(uint64_t *board, int square)
-{
-    *board |= (1ULL << square);
-}
+#include "bitboard.h"
 
 Board fen_to_board(const char *fen)
 {
@@ -19,51 +15,53 @@ Board fen_to_board(const char *fen)
         switch (fen[i])
         {
         case 'P':
-            set_bit(&board.white_pieces.pawns, rank * 8 + file);
+            board.white_pieces.pawns = set_bit(board.white_pieces.pawns, file, rank);
             file++;
             break;
         case 'N':
-            set_bit(&board.white_pieces.knights, rank * 8 + file);
+            board.white_pieces.knights = set_bit(board.white_pieces.knights, file, rank);
             file++;
             break;
         case 'B':
-            set_bit(&board.white_pieces.bishops, rank * 8 + file);
+            board.white_pieces.bishops = set_bit(board.white_pieces.bishops, file, rank);
             file++;
             break;
         case 'R':
-            set_bit(&board.white_pieces.rooks, rank * 8 + file);
+            board.white_pieces.rooks = set_bit(board.white_pieces.rooks, file, rank);
             file++;
             break;
         case 'Q':
-            set_bit(&board.white_pieces.queens, rank * 8 + file);
+            board.white_pieces.queens = set_bit(board.white_pieces.queens, file, rank);
             file++;
             break;
         case 'K':
-            set_bit(&board.white_pieces.king, rank * 8 + file);
+            board.white_pieces.king = set_bit(board.white_pieces.king, file, rank);
             file++;
             break;
         case 'p':
-            set_bit(&board.black_pieces.pawns, rank * 8 + file);
+            board.black_pieces.pawns = set_bit(board.black_pieces.pawns, file, rank);
             file++;
             break;
         case 'n':
-            set_bit(&board.black_pieces.knights, rank * 8 + file);
+            board.black_pieces.knights = set_bit(board.black_pieces.knights, file, rank);
             file++;
             break;
         case 'b':
-            set_bit(&board.black_pieces.bishops, rank * 8 + file);
+            board.black_pieces.bishops = set_bit(board.black_pieces.bishops, file, rank);
             file++;
             break;
         case 'r':
-            set_bit(&board.black_pieces.rooks, rank * 8 + file);
+            board.black_pieces.rooks = set_bit(board.black_pieces.rooks, file, rank);
             file++;
             break;
         case 'q':
-            set_bit(&board.black_pieces.queens, rank * 8 + file);
+            board.black_pieces.queens = set_bit(board.black_pieces.queens, file, rank);
             file++;
             break;
         case 'k':
-            set_bit(&board.black_pieces.king, rank * 8 + file);
+            board.black_pieces.king = set_bit(board.black_pieces.king, file, rank);
+            file++;
+            break;
             file++;
             break;
         case '/':

@@ -36,6 +36,22 @@ uint64_t position_to_bitboard(uint8_t x, uint8_t y)
     return 1ULL << (x + y * 8);
 }
 
+uint64_t move_bit(uint64_t bitboard, uint64_t from, uint64_t to)
+{
+    bitboard &= ~from;
+    bitboard |= to;
+    return bitboard;
+}
+
+uint64_t set_bit(uint64_t bitboard, uint8_t x, uint8_t y)
+{
+    return bitboard | position_to_bitboard(x, y);
+}
+uint64_t clear_bit(uint64_t bitboard, uint8_t x, uint8_t y)
+{
+    return bitboard & ~position_to_bitboard(x, y);
+}
+
 uint64_t decrement_file(uint64_t bitboard)
 {
     return (bitboard & ~FILE_A_MASK) >> 1;

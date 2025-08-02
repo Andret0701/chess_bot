@@ -56,6 +56,43 @@ Board flip_board(Board *board)
     return flipped;
 }
 
+bool is_en_passant(const Board *board, uint8_t x, uint8_t y)
+{
+    uint64_t position = position_to_bitboard(x, y);
+    return (board->en_passant & position) != 0;
+}
+
+Piece get_white_piece(const Board *board, uint64_t position)
+{
+    if (board->white_pieces.pawns & position)
+        return PAWN;
+    if (board->white_pieces.knights & position)
+        return KNIGHT;
+    if (board->white_pieces.bishops & position)
+        return BISHOP;
+    if (board->white_pieces.rooks & position)
+        return ROOK;
+    if (board->white_pieces.queens & position)
+        return QUEEN;
+
+    return KING;
+}
+
+Piece get_black_piece(const Board *board, uint64_t position)
+{
+    if (board->black_pieces.pawns & position)
+        return PAWN;
+    if (board->black_pieces.knights & position)
+        return KNIGHT;
+    if (board->black_pieces.bishops & position)
+        return BISHOP;
+    if (board->black_pieces.rooks & position)
+        return ROOK;
+    if (board->black_pieces.queens & position)
+        return QUEEN;
+    return KING;
+}
+
 void print_board_to_file(Board *board, FILE *file)
 {
     for (int y = 7; y >= 0; y--)
@@ -88,7 +125,13 @@ void print_board_to_file(Board *board, FILE *file)
             if (board->black_pieces.king & position)
                 fprintf(file, "k");
             if (!((board->white_pieces.pawns | board->white_pieces.knights | board->white_pieces.bishops | board->white_pieces.rooks | board->white_pieces.queens | board->white_pieces.king | board->black_pieces.pawns | board->black_pieces.knights | board->black_pieces.bishops | board->black_pieces.rooks | board->black_pieces.queens | board->black_pieces.king) & position))
-                fprintf(file, ".");
+            {
+                // . if normal , if en passant
+                if (is_en_passant(board, x, y))
+                    fprintf(file, "-");
+                else
+                    fprintf(file, ".");
+            }
             fprintf(file, " ");
         }
         fprintf(file, "\n");

@@ -291,24 +291,27 @@ void print_move(uint16_t move)
     char to_rank = '1' + (to / 8);
 
     printf("Move: %c%c%c%c, ", from_file, from_rank, to_file, to_rank);
-    printf("Promotion: ");
-    switch (promotion)
+    if (special)
     {
-    case PROMOTION_KNIGHT:
-        printf("knight, ");
-        break;
-    case PROMOTION_BISHOP:
-        printf("bishop, ");
-        break;
-    case PROMOTION_ROOK:
-        printf("rook, ");
-        break;
-    case PROMOTION_QUEEN:
-        printf("queen, ");
-        break;
-    default:
-        printf("?, ");
-        return;
+        printf("Promotion: ");
+        switch (promotion)
+        {
+        case PROMOTION_KNIGHT:
+            printf("knight, ");
+            break;
+        case PROMOTION_BISHOP:
+            printf("bishop, ");
+            break;
+        case PROMOTION_ROOK:
+            printf("rook, ");
+            break;
+        case PROMOTION_QUEEN:
+            printf("queen, ");
+            break;
+        default:
+            printf("?, ");
+            return;
+        }
     }
     printf("Capture: %d, ", capture);
     printf("Special: %d", special);

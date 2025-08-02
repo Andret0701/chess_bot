@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "../utils/board.h"
 #include "board_stack.h"
+#include "move_stack.h"
 #include "../utils/utils.h"
 #include "../utils/bitboard.h"
 #include "attack_generation/attack_generation.h"
@@ -20,10 +21,12 @@ static inline void remove_black_piece(BoardState *board_state, uint8_t x, uint8_
 
 static inline bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y);
 static inline bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y);
+static inline bool is_piece(BoardState *board_state, uint8_t x, uint8_t y);
 
 void generate_moves(BoardState *board_state, BoardStack *stack);
 void generate_captures(BoardState *board_state, BoardStack *stack);
 bool is_finished(BoardState *board_state);
+void generate_psudo_legal_moves(BoardState *board_state, MoveStack *stack);
 
 void generate_white_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
 void generate_black_pawn_moves(BoardState *board_state, uint8_t x, uint8_t y, BoardStack *stack);
@@ -63,3 +66,16 @@ bool white_queen_can_move(BoardState *board_state, uint8_t x, uint8_t y);
 bool black_queen_can_move(BoardState *board_state, uint8_t x, uint8_t y);
 bool white_king_can_move(BoardState *board_state, uint8_t x, uint8_t y);
 bool black_king_can_move(BoardState *board_state, uint8_t x, uint8_t y);
+
+void generate_white_pawn_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_white_knight_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_white_bishop_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_white_rook_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_white_queen_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_white_king_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_pawn_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_knight_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_bishop_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_rook_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_queen_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);
+void generate_black_king_psudo_moves(BoardState *board_state, uint8_t x, uint8_t y, MoveStack *stack);

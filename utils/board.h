@@ -14,6 +14,16 @@ typedef enum
     BLACK
 } Color;
 
+typedef enum
+{
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING
+} Piece;
+
 typedef struct
 {
     uint64_t pawns;
@@ -38,6 +48,10 @@ bool pieces_equals(const Pieces *a, const Pieces *b);
 bool board_equals(const Board *a, const Board *b);
 void copy_board(const Board *from, Board *to);
 Board flip_board(Board *board);
+
+bool is_en_passant(const Board *board, uint8_t x, uint8_t y);
+Piece get_white_piece(const Board *board, uint64_t position);
+Piece get_black_piece(const Board *board, uint64_t position);
 
 void print_board_to_file(Board *board, FILE *file);
 void print_board(Board *board);

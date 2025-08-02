@@ -27,3 +27,5 @@ typedef struct
 
 BoardState board_to_board_state(Board *board);
 Result get_game_result(BoardState *board_state);
+BoardState do_move(const BoardState *board_state, uint16_t move);
+bool is_legal_move(const BoardState *board_state);

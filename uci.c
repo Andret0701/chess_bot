@@ -24,7 +24,7 @@ void new_game(char *input)
     push_game_history(current_board);
 }
 
-void do_move(char *move)
+void uci_do_move(char *move)
 {
     if (can_move(&current_board, move))
     {
@@ -68,7 +68,7 @@ void parse_position(char *input)
     {
         while ((token = strtok(NULL, " ")) != NULL)
         {
-            do_move(token);
+            uci_do_move(token);
         }
     }
 }

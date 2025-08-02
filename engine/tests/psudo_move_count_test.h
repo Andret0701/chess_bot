@@ -4,4 +4,4 @@
 #include "../../utils/board.h"
 #include "../board_stack.h"
 
-void run_count_benchmark();
+void run_psudo_move_count_tests();

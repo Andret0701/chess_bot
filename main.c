@@ -15,6 +15,7 @@
 #include "utils/move.h"
 #include "utils/profile.h"
 #include "engine/tests/can_move_test.h"
+#include "engine/tests/psudo_move_count_test.h"
 #include "engine/tests/capture_move_test.h"
 #include "engine/tests/encoded_move_test.h"
 #include "engine/tests/attack_test.h"
@@ -36,56 +37,18 @@ int main(int argc, char *argv[])
     init_reductions();
 
     // Board board = fen_to_board(STARTFEN);
-    // Board next_board = apply_move(&board, "e2e4");
-
-    // uint16_t move = board_to_encoded_move(&board, &next_board);
-    // print_move(move);
-    // exit(0);
-
-    // Board board = fen_to_board(STARTFEN);
     // BoardState board_state = board_to_board_state(&board);
-    // print_board(&board);
-    // get_pawn_structure_score(&board_state);
-    // printf("\n");
-    // board = fen_to_board("rnbqkbnr/pppppp2/6p1/8/7P/8/PPPPPPP1/RNBQKBNR w KQkq - 0 1");
-    // board_state = board_to_board_state(&board);
-    // print_board(&board);
-    // get_pawn_structure_score(&board_state);
-    // printf("\n");
-    // board = fen_to_board("rnbqkbnr/pppppp2/6p1/8/7P/8/PPPPPP2/RNBQKBNR b KQkq - 0 1");
-    // board_state = board_to_board_state(&board);
-    // print_board(&board);
-    // get_pawn_structure_score(&board_state);
-    // printf("\n");
-    // exit(0);
-
-    // for (int square = 0; square < 64; square++)
+    // MoveStack *move_stack = create_move_stack(BOARD_STACK_SIZE);
+    // generate_psudo_legal_moves(&board_state, move_stack);
+    // for (uint32_t i = 0; i < move_stack->count; i++)
     // {
-    //     uint64_t bitboard = position_to_bitboard(square % 8, square / 8);
-    //     printf("Square: %d\n", square);
-    //     print_bitboard(bitboard);
-    //     printf("Backward pawn mask white:\n");
-    //     print_bitboard(get_white_front_file_mask(bitboard));
-    //     printf("Backward pawn mask black:\n");
-    //     print_bitboard(get_black_front_file_mask(bitboard));
-    // }
-    // exit(0);
-
-    // Board board = fen_to_board("3k1b1r/ppp1ppp1/6p1/6P1/8/P4n1q/1PP2P1B/7K b - -");
-    // print_board(&board);
-    // BotResult result = run_bot((BotFlags){30000, 30000, 0, 0}, board);
-    // print_bot_result(result);
-    // board = apply_move(&board, "f7f3");
-    // print_board(&board);
-    // result = run_bot((BotFlags){10000, 10000, 0, 0}, board);
-    // print_bot_result(result);
-    // print_board(&board);
-
-    // for (int i = 0; i < 20; i++)
-    // {
-    //     board = apply_move(&board, result.move);
-    //     print_bot_result(result);
-    //     print_board(&board);
+    //     uint16_t move = move_stack->moves[i];
+    //     print_move(move);
+    //     BoardState new_board_state = do_move(&board_state, move);
+    //     validate_board(&new_board_state.board);
+    //     validate_castling(&board_state, &new_board_state);
+    //     print_board(&new_board_state.board);
+    //     printf("\n");
     // }
     // exit(0);
 
@@ -99,6 +62,8 @@ int main(int argc, char *argv[])
     }
     else if (argc >= 2 && strcmp(argv[1], "test") == 0)
     {
+        printf("Running psudo move count tests\n");
+        run_psudo_move_count_tests();
         printf("Running attack tests\n");
         run_attack_tests();
         printf("Running count tests\n");
