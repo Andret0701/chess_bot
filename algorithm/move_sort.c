@@ -86,11 +86,6 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
     return piece_values[captured_piece_index] - piece_values[moved_piece_index] + 10000;
 }
 
-int compare_boards(const void *left, const void *right)
-{
-    return ((BoardState *)right)->mvvlva_score - ((BoardState *)left)->mvvlva_score;
-}
-
 void sort_moves_tt(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
 {
     for (uint16_t i = base; i < stack->count; i++)
