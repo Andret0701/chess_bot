@@ -263,6 +263,6 @@ double get_pawn_structure_score(BoardState *board_state, double game_phase)
     score += get_backward_pawn_penalty(board_state, game_phase);
     score += get_passed_pawn_bonus(board_state, game_phase);
     score += get_pawn_chain_bonus(board_state, game_phase);
-    score += get_bishop_block_score(board_state, game_phase);
+    // score += get_bishop_block_score(board_state, game_phase);
     return score;
 }
