@@ -1,5 +1,0 @@
-position startpos moves e2e4 c7c5 b1c3 e7e6 g1f3 g8f6 e4e5 f6d5 c3e4 b7b6 c2c4 d5b4 d2d4 c8b7 d4d5 e6d5 e4d6 f8d6 e5d6 e8g8 a2a3 f8e8 f1e2 d5c4 a3b4 b7f3 g2f3 c5b4 e1g1 c4c3 e2d3 b8c6 f3f4 d8f6 b2c3 b4c3 d1b3 a8c8 a1a4 c6a5 b3c2 g7g6 a4a3 g8g7 d3a6 c8c6 a6b5 c6d6 c2c3 f6c3 a3c3 d6d5 c1b2 g7g8 b5a6 b6b5 c3c1 a5c4 b2c3 e8e2 c3a1 c4d6 c1c7 e2e7 f1b1 e7e8 c7d7 g8f8 a1e5 e8e6 a6b7 d5d2 b1b5 f8e8 b7c8 d2c2 e5d6 c2c8 b5b7 c8c1 g1g2 c1d1 d7e7 e6e7 b7e7 e8d8 d6c5 d1c1 e7e5 f7f5 c5a7 c1d1 h2h4 d8d7 h4h5 d1d2 g2f3 d2d1 a7c5 d7c6 c5e3 c6d6 e5e8 d1h1 h5g6 h7g6 e8a8 h1g1 a8b8 d6d5 b8b6 d5c4 f3e2 g1g2 b6d6 g2g1 f2f3 g1g2 e3f2 c4b3 e2f1 g2h2 d6g6 b3c4 g6g5 h2h3 f1e2 h3h8 g5f5 h8c8 f5e5 c4b3 f4f5 c8c2 e2e3 c2c6 e3e4 c6f6 e5e6 f6f7 f3f4 f7d7 f5f6 d7f7 f2d4 b3c4 e6e7 f7f8 f6f7 c4b3 d4g7 f8f7 e7f7 b3c2 f7c7 c2b3 f4f5 b3b4 g7h8 b4a5 h8d4 a5b4 c7b7 b4c4 b7c7 c4b4 c7b7 b4c4 b7c7 c4b4
-
-
-go wtime 27749 btime 13070 winc 1000 binc 1000
-bestmove d4c3

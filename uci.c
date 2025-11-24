@@ -13,6 +13,7 @@
 #define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
 #define INPUT_BUFFER_SIZE 8192
+#define LOG_UCI false
 
 Board current_board;
 int move_overhead = 50;
@@ -127,6 +128,9 @@ UCIGoFlags parse_go(char *input)
 
 void log_uci(const char *format, ...)
 {
+    if (!LOG_UCI)
+        return;
+
     if (format == NULL)
         return; // guard against NULL format
 
@@ -145,6 +149,9 @@ void log_uci(const char *format, ...)
 
 void log_board(Board board)
 {
+    if (!LOG_UCI)
+        return;
+
     FILE *file = fopen(UCI_LOG_FILE, "a");
     print_board_to_file(&board, file);
     fclose(file);
@@ -165,13 +172,17 @@ void respond(const char *format, ...)
 
     va_list copy;
     va_copy(copy, args);
+
     // Log to file
-    FILE *file = fopen(UCI_LOG_FILE, "a");
-    if (file)
+    if (LOG_UCI)
     {
-        vfprintf(file, format, copy);
-        fputc('\n', file);
-        fclose(file);
+        FILE *file = fopen(UCI_LOG_FILE, "a");
+        if (file)
+        {
+            vfprintf(file, format, copy);
+            fputc('\n', file);
+            fclose(file);
+        }
     }
 
     va_end(copy);

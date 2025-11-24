@@ -29,6 +29,7 @@
 #include "algorithm/heuristic/pawn_structure_score.h"
 #include "engine/encoded_move.h"
 #include "algorithm/reductions.h"
+#include "algorithm/heuristic/heuristic_values.h"
 
 int main(int argc, char *argv[])
 {
