@@ -95,6 +95,9 @@
 #define CENTER_SQUARES_MASK (E4_MASK | D4_MASK | E5_MASK | D5_MASK)
 #define EXTENDED_CENTER_MASK (C3_MASK | D3_MASK | E3_MASK | F3_MASK | C4_MASK | D4_MASK | E4_MASK | F4_MASK | C5_MASK | D5_MASK | E5_MASK | F5_MASK | C6_MASK | D6_MASK | E6_MASK | F6_MASK)
 
+#define WHITE_SIDE_MASK (RANK_1_MASK | RANK_2_MASK | RANK_3_MASK | RANK_4_MASK)
+#define BLACK_SIDE_MASK (RANK_5_MASK | RANK_6_MASK | RANK_7_MASK | RANK_8_MASK)
+
 uint64_t flip_bitboard(uint64_t bitboard);
 void print_bitboard(uint64_t bitboard);
 uint64_t position_to_bitboard(uint8_t x, uint8_t y);
