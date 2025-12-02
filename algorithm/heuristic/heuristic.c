@@ -77,8 +77,13 @@ double get_game_phase(Board *board)
     phase += PHASE_ROOK * __builtin_popcountll(board->black_pieces.rooks);
     phase += PHASE_QUEEN * __builtin_popcountll(board->black_pieces.queens);
 
-    // Flip to endgame = 1.0, opening = 0.0
-    return 1.0 - ((double)phase / MAX_PHASE);
+    double game_phase = 1 - (double)phase / (double)MAX_PHASE;
+
+    if (game_phase < 0)
+        game_phase = 0;
+    else if (game_phase > 1)
+        game_phase = 1;
+    return game_phase;
 }
 
 double score_board(BoardState *board_state)
