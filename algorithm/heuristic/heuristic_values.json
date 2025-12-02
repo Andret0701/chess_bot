@@ -1,447 +1,447 @@
 {
   "PAWN_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "pawn", "mg"]
   },
   "PAWN_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "pawn", "eg"]
   },
   "KNIGHT_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "knight", "mg"]
   },
   "KNIGHT_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "knight", "eg"]
   },
   "BISHOP_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "bishop", "mg"]
   },
   "BISHOP_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "bishop", "eg"]
   },
   "ROOK_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "rook", "mg"]
   },
   "ROOK_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "rook", "eg"]
   },
   "QUEEN_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "queen", "mg"]
   },
   "QUEEN_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "queen", "eg"]
   },
   "KING_TABLE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "king", "mg"]
   },
   "KING_TABLE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["pst", "king", "eg"]
   },
 
   "CENTER_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "center", "mg"]
   },
   "CENTER_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "center", "eg"]
   },
 
   "BISHOP_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "bishop", "mg"]
   },
   "BISHOP_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "bishop", "eg"]
   },
 
   "KNIGHT_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "knight", "mg"]
   },
   "KNIGHT_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "knight", "eg"]
   },
 
   "ROOK_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "rook", "mg"]
   },
   "ROOK_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["pawn", "rook", "eg"]
   },
 
   "KNIGHT_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 500.0,
     "tags": ["material", "knight", "mg"]
   },
   "KNIGHT_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 500.0,
     "tags": ["material", "knight", "eg"]
   },
 
   "BISHOP_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 500.0,
     "tags": ["material", "bishop", "mg"]
   },
   "BISHOP_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 500.0,
     "tags": ["material", "bishop", "eg"]
   },
 
   "FIRST_ROOK_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 300.0,
+    "max": 800.0,
     "tags": ["material", "rook", "first", "mg"]
   },
   "FIRST_ROOK_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 300.0,
+    "max": 800.0,
     "tags": ["material", "rook", "first", "eg"]
   },
 
   "ADDITIONAL_ROOK_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 800.0,
     "tags": ["material", "rook", "additional", "mg"]
   },
   "ADDITIONAL_ROOK_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 200.0,
+    "max": 800.0,
     "tags": ["material", "rook", "additional", "eg"]
   },
 
   "FIRST_QUEEN_MIDDLEGAME": {
-    "min": -1000.0,
+    "min": 600.0,
     "max": 1000.0,
     "tags": ["material", "queen", "first", "mg"]
   },
   "FIRST_QUEEN_ENDGAME": {
-    "min": -1000.0,
+    "min": 600.0,
     "max": 1000.0,
     "tags": ["material", "queen", "first", "eg"]
   },
 
   "ADDITIONAL_QUEEN_MIDDLEGAME": {
-    "min": -1000.0,
+    "min": 500.0,
     "max": 1000.0,
     "tags": ["material", "queen", "additional", "mg"]
   },
   "ADDITIONAL_QUEEN_ENDGAME": {
-    "min": -1000.0,
+    "min": 500.0,
     "max": 1000.0,
     "tags": ["material", "queen", "additional", "eg"]
   },
 
   "BISHOP_PAIR_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["structure", "bishop_pair", "mg"]
   },
   "BISHOP_PAIR_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 200.0,
     "tags": ["structure", "bishop_pair", "eg"]
   },
 
   "DOUBLE_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["structure", "pawn", "double", "mg"]
   },
   "DOUBLE_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["structure", "pawn", "double", "eg"]
   },
 
   "ISOLATED_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["structure", "pawn", "isolated", "mg"]
   },
   "ISOLATED_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -100.0,
+    "max": 100.0,
     "tags": ["structure", "pawn", "isolated", "eg"]
   },
 
   "BACKWARD_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -60.0,
+    "max": 60.0,
     "tags": ["structure", "pawn", "backward", "mg"]
   },
   "BACKWARD_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -60.0,
+    "max": 60.0,
     "tags": ["structure", "pawn", "backward", "eg"]
   },
 
   "PASSED_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 300.0,
     "tags": ["pawn", "passed", "mg"]
   },
   "PASSED_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": 0.0,
+    "max": 300.0,
     "tags": ["pawn", "passed", "eg"]
   },
 
   "PROTECTED_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "protected", "mg"]
   },
   "PROTECTED_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "protected", "eg"]
   },
 
   "PROTECTED_BY_PROTECTED_PAWN_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "protected", "chain", "mg"]
   },
   "PROTECTED_BY_PROTECTED_PAWN_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "protected", "chain", "eg"]
   },
 
   "BISHOP_PAWN_FRIENDLY_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "bishop", "friendly", "mg"]
   },
   "BISHOP_PAWN_FRIENDLY_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "bishop", "friendly", "eg"]
   },
 
   "BISHOP_PAWN_ENEMY_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "bishop", "enemy", "mg"]
   },
   "BISHOP_PAWN_ENEMY_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 50.0,
     "tags": ["pawn", "bishop", "enemy", "eg"]
   },
 
   "CAN_CASTLE_KINGSIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "kingside", "mg"]
   },
   "CAN_CASTLE_KINGSIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "kingside", "eg"]
   },
 
   "CAN_CASTLE_QUEENSIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "queenside", "mg"]
   },
   "CAN_CASTLE_QUEENSIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "queenside", "eg"]
   },
 
   "CAN_CASTLE_BOTH_SIDES_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "both", "mg"]
   },
   "CAN_CASTLE_BOTH_SIDES_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 80.0,
     "tags": ["king_safety", "rights", "both", "eg"]
   },
 
   "HAS_CASTLED_KINGSIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 120.0,
     "tags": ["king_safety", "castled", "kingside", "mg"]
   },
   "HAS_CASTLED_KINGSIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 120.0,
     "tags": ["king_safety", "castled", "kingside", "eg"]
   },
 
   "HAS_CASTLED_QUEENSIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 120.0,
     "tags": ["king_safety", "castled", "queenside", "mg"]
   },
   "HAS_CASTLED_QUEENSIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -50.0,
+    "max": 120.0,
     "tags": ["king_safety", "castled", "queenside", "eg"]
   },
 
   "FRONT_PAWN_BONUS_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "front", "mg"]
   },
   "FRONT_PAWN_BONUS_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "front", "eg"]
   },
 
   "AHEAD_PAWN_BONUS_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "ahead", "mg"]
   },
   "AHEAD_PAWN_BONUS_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "ahead", "eg"]
   },
 
   "LEFT_PAWN_BONUS_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "left", "mg"]
   },
   "LEFT_PAWN_BONUS_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "left", "eg"]
   },
 
   "RIGHT_PAWN_BONUS_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "right", "mg"]
   },
   "RIGHT_PAWN_BONUS_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -40.0,
+    "max": 80.0,
     "tags": ["pawn", "right", "eg"]
   },
 
   "ATTACKING_KING_SQUARES_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -200.0,
+    "max": 0.0,
     "tags": ["king_safety", "attack_count", "mg"]
   },
   "ATTACKING_KING_SQUARES_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -200.0,
+    "max": 0.0,
     "tags": ["king_safety", "attack_count", "eg"]
   },
 
   "BISHOP_ATTACKS_MY_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["bishop", "attacks", "my_side", "mg"]
   },
   "BISHOP_ATTACKS_MY_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["bishop", "attacks", "my_side", "eg"]
   },
 
   "BISHOP_ATTACKS_OPPONENT_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["bishop", "attacks", "opp_side", "mg"]
   },
   "BISHOP_ATTACKS_OPPONENT_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["bishop", "attacks", "opp_side", "eg"]
   },
 
   "ROOK_ATTACKS_MY_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["rook", "attacks", "my_side", "mg"]
   },
   "ROOK_ATTACKS_MY_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["rook", "attacks", "my_side", "eg"]
   },
 
   "ROOK_ATTACKS_OPPONENT_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["rook", "attacks", "opp_side", "mg"]
   },
   "ROOK_ATTACKS_OPPONENT_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["rook", "attacks", "opp_side", "eg"]
   },
 
   "QUEEN_ATTACKS_MY_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["queen", "attacks", "my_side", "mg"]
   },
   "QUEEN_ATTACKS_MY_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["queen", "attacks", "my_side", "eg"]
   },
 
   "QUEEN_ATTACKS_OPPONENT_SIDE_MIDDLEGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["queen", "attacks", "opp_side", "mg"]
   },
   "QUEEN_ATTACKS_OPPONENT_SIDE_ENDGAME": {
-    "min": -1000.0,
-    "max": 1000.0,
+    "min": -20.0,
+    "max": 20.0,
     "tags": ["queen", "attacks", "opp_side", "eg"]
   }
 }
