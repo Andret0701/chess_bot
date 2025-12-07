@@ -20,32 +20,54 @@ bool has_bishop_pair(Board *board, Color color)
     return has_dark_square_bishop && has_light_square_bishop;
 }
 
-double get_material_score(Board *board, double game_phase)
+MaterialFeatures get_material_features(Board *board, double game_phase)
 {
-    double score = 0;
+    MaterialFeatures features;
 
-    score += __builtin_popcountll(board->white_pieces.pawns & CENTER_FILES_MASK) * ((1 - game_phase) * CENTER_PAWN_MIDDLEGAME + game_phase * CENTER_PAWN_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.pawns & CENTER_FILES_MASK) * ((1 - game_phase) * CENTER_PAWN_MIDDLEGAME + game_phase * CENTER_PAWN_ENDGAME);
-    score += __builtin_popcountll(board->white_pieces.pawns & BISHOP_FILES_MASK) * ((1 - game_phase) * BISHOP_PAWN_MIDDLEGAME + game_phase * BISHOP_PAWN_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.pawns & BISHOP_FILES_MASK) * ((1 - game_phase) * BISHOP_PAWN_MIDDLEGAME + game_phase * BISHOP_PAWN_ENDGAME);
-    score += __builtin_popcountll(board->white_pieces.pawns & KNIGHT_FILES_MASK) * ((1 - game_phase) * KNIGHT_PAWN_MIDDLEGAME + game_phase * KNIGHT_PAWN_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.pawns & KNIGHT_FILES_MASK) * ((1 - game_phase) * KNIGHT_PAWN_MIDDLEGAME + game_phase * KNIGHT_PAWN_ENDGAME);
-    score += __builtin_popcountll(board->white_pieces.pawns & ROOK_FILES_MASK) * ((1 - game_phase) * ROOK_PAWN_MIDDLEGAME + game_phase * ROOK_PAWN_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.pawns & ROOK_FILES_MASK) * ((1 - game_phase) * ROOK_PAWN_MIDDLEGAME + game_phase * ROOK_PAWN_ENDGAME);
-    score += __builtin_popcountll(board->white_pieces.knights) * ((1 - game_phase) * KNIGHT_MIDDLEGAME + game_phase * KNIGHT_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.knights) * ((1 - game_phase) * KNIGHT_MIDDLEGAME + game_phase * KNIGHT_ENDGAME);
-    score += __builtin_popcountll(board->white_pieces.bishops) * ((1 - game_phase) * BISHOP_MIDDLEGAME + game_phase * BISHOP_ENDGAME);
-    score -= __builtin_popcountll(board->black_pieces.bishops) * ((1 - game_phase) * BISHOP_MIDDLEGAME + game_phase * BISHOP_ENDGAME);
-    score += (__builtin_popcountll(board->white_pieces.rooks) > 0) ? FIRST_ROOK_MIDDLEGAME * (1 - game_phase) + FIRST_ROOK_ENDGAME * game_phase : 0;
-    score -= (__builtin_popcountll(board->black_pieces.rooks) > 0) ? FIRST_ROOK_MIDDLEGAME * (1 - game_phase) + FIRST_ROOK_ENDGAME * game_phase : 0;
-    score += (__builtin_popcountll(board->white_pieces.rooks) > 1) ? (__builtin_popcountll(board->white_pieces.rooks) - 1) * ((1 - game_phase) * ADDITIONAL_ROOK_MIDDLEGAME + game_phase * ADDITIONAL_ROOK_ENDGAME) : 0;
-    score -= (__builtin_popcountll(board->black_pieces.rooks) > 1) ? (__builtin_popcountll(board->black_pieces.rooks) - 1) * ((1 - game_phase) * ADDITIONAL_ROOK_MIDDLEGAME + game_phase * ADDITIONAL_ROOK_ENDGAME) : 0;
-    score += (__builtin_popcountll(board->white_pieces.queens) > 0) ? FIRST_QUEEN_MIDDLEGAME * (1 - game_phase) + FIRST_QUEEN_ENDGAME * game_phase : 0;
-    score -= (__builtin_popcountll(board->black_pieces.queens) > 0) ? FIRST_QUEEN_MIDDLEGAME * (1 - game_phase) + FIRST_QUEEN_ENDGAME * game_phase : 0;
-    score += (__builtin_popcountll(board->white_pieces.queens) > 1) ? (__builtin_popcountll(board->white_pieces.queens) - 1) * ((1 - game_phase) * ADDITIONAL_QUEEN_MIDDLEGAME + game_phase * ADDITIONAL_QUEEN_ENDGAME) : 0;
-    score -= (__builtin_popcountll(board->black_pieces.queens) > 1) ? (__builtin_popcountll(board->black_pieces.queens) - 1) * ((1 - game_phase) * ADDITIONAL_QUEEN_MIDDLEGAME + game_phase * ADDITIONAL_QUEEN_ENDGAME) : 0;
-    score += has_bishop_pair(board, WHITE) ? BISHOP_PAIR_MIDDLEGAME * (1 - game_phase) + BISHOP_PAIR_ENDGAME * game_phase : 0;
-    score -= has_bishop_pair(board, BLACK) ? BISHOP_PAIR_MIDDLEGAME * (1 - game_phase) + BISHOP_PAIR_ENDGAME * game_phase : 0;
+    features.center_pawns = create_feature(
+        __builtin_popcountll(board->white_pieces.pawns & CENTER_FILES_MASK),
+        __builtin_popcountll(board->black_pieces.pawns & CENTER_FILES_MASK),
+        game_phase);
+    features.bishop_pawns = create_feature(
+        __builtin_popcountll(board->white_pieces.pawns & BISHOP_FILES_MASK),
+        __builtin_popcountll(board->black_pieces.pawns & BISHOP_FILES_MASK),
+        game_phase);
+    features.knight_pawns = create_feature(
+        __builtin_popcountll(board->white_pieces.pawns & KNIGHT_FILES_MASK),
+        __builtin_popcountll(board->black_pieces.pawns & KNIGHT_FILES_MASK),
+        game_phase);
+    features.rook_pawns = create_feature(
+        __builtin_popcountll(board->white_pieces.pawns & ROOK_FILES_MASK),
+        __builtin_popcountll(board->black_pieces.pawns & ROOK_FILES_MASK),
+        game_phase);
+    features.knights = create_feature(
+        __builtin_popcountll(board->white_pieces.knights),
+        __builtin_popcountll(board->black_pieces.knights),
+        game_phase);
+    features.bishops = create_feature(
+        __builtin_popcountll(board->white_pieces.bishops),
+        __builtin_popcountll(board->black_pieces.bishops),
+        game_phase);
+    features.first_rook = create_feature(
+        (__builtin_popcountll(board->white_pieces.rooks) > 0) ? 1.0 : 0.0,
+        (__builtin_popcountll(board->black_pieces.rooks) > 0) ? 1.0 : 0.0,
+        game_phase);
+    features.additional_rooks = create_feature(
+        (__builtin_popcountll(board->white_pieces.rooks) > 1) ? (__builtin_popcountll(board->white_pieces.rooks) - 1) : 0.0,
+        (__builtin_popcountll(board->black_pieces.rooks) > 1) ? (__builtin_popcountll(board->black_pieces.rooks) - 1) : 0.0,
+        game_phase);
+    features.first_queen = create_feature(
+        (__builtin_popcountll(board->white_pieces.queens) > 0) ? 1.0 : 0.0,
+        (__builtin_popcountll(board->black_pieces.queens) > 0) ? 1.0 : 0.0,
+        game_phase);
+    features.additional_queens = create_feature(
+        (__builtin_popcountll(board->white_pieces.queens) > 1) ? (__builtin_popcountll(board->white_pieces.queens) - 1) : 0.0,
+        (__builtin_popcountll(board->black_pieces.queens) > 1) ? (__builtin_popcountll(board->black_pieces.queens) - 1) : 0.0,
+        game_phase);
+    features.bishop_pair = create_feature(
+        has_bishop_pair(board, WHITE) ? 1.0 : 0.0,
+        has_bishop_pair(board, BLACK) ? 1.0 : 0.0,
+        game_phase);
 
-    return score;
+    return features;
 }

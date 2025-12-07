@@ -9,6 +9,7 @@
 #include "algorithm/game_history.h"
 #include "utils/move.h"
 #include "algorithm/bot.h"
+#include "algorithm/heuristic/heuristic_io.h"
 
 #define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
@@ -274,6 +275,10 @@ void uci_loop()
                 }
             }
             respond("bestmove %s", result.move);
+        }
+        else if (strcmp(input, "features") == 0)
+        {
+            print_features_for_board(&current_board);
         }
         else if (strcmp(input, "quit") == 0)
         {
