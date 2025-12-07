@@ -214,7 +214,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             return result;
         }
 
-        if (depth + 1 == MAX_DEPTH || (use_max_depth && depth + 1 == max_depth))
+        if (depth + 1 >= MAX_DEPTH || (use_max_depth && depth + 1 >= max_depth))
         {
             // if (DEBUG_INFO)
             //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
