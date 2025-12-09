@@ -2,9 +2,10 @@
 
 typedef enum
 {
-    BOT_SEARCH_TIME,    // Use wtime, btime, winc, binc
-    BOT_SEARCH_DEPTH,   // Use depth
-    BOT_SEARCH_MOVETIME // Use movetime
+    BOT_SEARCH_TIME,     // Use wtime, btime, winc, binc
+    BOT_SEARCH_DEPTH,    // Use depth
+    BOT_SEARCH_MOVETIME, // Use movetime
+    BOT_SEARCH_HEURISTIC // Use heuristic evaluation
 } UCIGoOption;
 
 typedef struct

@@ -10,6 +10,7 @@
 #include "transposition_table.h"
 #include "time_manager.h"
 #include "zobrist_hash.h"
+#include "heuristic/heuristic.h"
 
 #define DEBUG_INFO false
 
@@ -239,4 +240,26 @@ BotResult run_time_bot(Board board, int wtime, int btime, int winc, int binc)
 BotResult run_movetime_bot(Board board, int movetime)
 {
     return run_bot(board, true, movetime / 1000.0, false, 0);
+}
+
+BotResult run_heuristic_bot(Board board)
+{
+    BoardState board_state = board_to_board_state(&board);
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
+    generate_moves(&board_state, stack);
+    double best_score = -1e9;
+    uint16_t best_move_index = 0;
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        BoardState *next_board_state = &stack->boards[i];
+        double score = score_board(next_board_state);
+        if (score > best_score)
+        {
+            best_score = score;
+            best_move_index = i;
+        }
+    }
+    BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), (BoardScore){best_score, UNKNOWN, 0}, 0};
+    destroy_board_stack(stack);
+    return result;
 }

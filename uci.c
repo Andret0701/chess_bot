@@ -120,6 +120,10 @@ UCIGoFlags parse_go(char *input)
             flags.movetime = atoi(token);
             flags.search_option = BOT_SEARCH_MOVETIME;
         }
+        else if (strcmp(token, "heuristic") == 0)
+        {
+            flags.search_option = BOT_SEARCH_HEURISTIC;
+        }
 
         token = strtok(NULL, " ");
     }
@@ -258,23 +262,32 @@ void uci_loop()
             UCIGoFlags flags = parse_go(input);
             BotResult result;
             if (IS_JUNIOR)
+            {
                 result = run_depth_bot(current_board, 3);
+                respond("bestmove %s", result.move);
+            }
             else
             {
                 switch (flags.search_option)
                 {
                 case BOT_SEARCH_TIME:
                     result = run_time_bot(current_board, flags.wtime, flags.btime, flags.winc, flags.binc);
+                    respond("bestmove %s", result.move);
                     break;
                 case BOT_SEARCH_DEPTH:
                     result = run_depth_bot(current_board, flags.depth);
+                    respond("bestmove %s", result.move);
                     break;
                 case BOT_SEARCH_MOVETIME:
                     result = run_movetime_bot(current_board, flags.movetime);
+                    respond("bestmove %s", result.move);
+                    break;
+                case BOT_SEARCH_HEURISTIC:
+                    result = run_heuristic_bot(current_board);
+                    respond("bestmove %s score %lf", result.move, result.score.score);
                     break;
                 }
             }
-            respond("bestmove %s", result.move);
         }
         else if (strcmp(input, "features") == 0)
         {
