@@ -213,7 +213,7 @@ void set_option(char *name, char *value)
     }
 }
 
-void uci_loop()
+void uci_loop(bool debug_mode)
 {
     new_game(STARTFEN);
     char input[INPUT_BUFFER_SIZE];
@@ -262,32 +262,30 @@ void uci_loop()
             UCIGoFlags flags = parse_go(input);
             BotResult result;
             if (IS_JUNIOR)
-            {
                 result = run_depth_bot(current_board, 3);
-                respond("bestmove %s", result.move);
-            }
             else
             {
                 switch (flags.search_option)
                 {
                 case BOT_SEARCH_TIME:
                     result = run_time_bot(current_board, flags.wtime, flags.btime, flags.winc, flags.binc);
-                    respond("bestmove %s", result.move);
                     break;
                 case BOT_SEARCH_DEPTH:
                     result = run_depth_bot(current_board, flags.depth);
-                    respond("bestmove %s", result.move);
                     break;
                 case BOT_SEARCH_MOVETIME:
                     result = run_movetime_bot(current_board, flags.movetime);
-                    respond("bestmove %s", result.move);
                     break;
                 case BOT_SEARCH_HEURISTIC:
                     result = run_heuristic_bot(current_board);
-                    respond("bestmove %s score %lf", result.move, result.score.score);
                     break;
                 }
             }
+
+            if (debug_mode)
+                respond("bestmove %s score %lf depth %d result %s", result.move, result.score.score, result.depth, result_to_string(result.score.result));
+            else
+                respond("bestmove %s", result.move);
         }
         else if (strcmp(input, "features") == 0)
         {

@@ -26,4 +26,4 @@ typedef struct
     int movetime; // Time to think in milliseconds
 } UCIGoFlags;
 
-void uci_loop();
+void uci_loop(bool debug_mode);

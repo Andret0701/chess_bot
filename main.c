@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
     init_zobrist_keys();
     init_reductions();
 
+    bool debug_mode = false;
+
     if (argc >= 2 && strcmp(argv[1], "profile") == 0)
     {
         play_game(3, 0.05);
@@ -66,7 +68,11 @@ int main(int argc, char *argv[])
         run_count_benchmark();
         exit(0);
     }
+    else if (argc >= 2 && strcmp(argv[1], "debug") == 0)
+    {
+        debug_mode = true;
+    }
 
-    uci_loop();
+    uci_loop(debug_mode);
     return 0;
 }
