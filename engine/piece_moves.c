@@ -8,7 +8,7 @@
 // If rook attack & affected_mask then recalculate rook attacks
 // En passant might add a square to the affected mask
 
-static inline void push_white_move(const BoardState *from, BoardState *to, BoardStack *stack)
+void push_white_move(const BoardState *from, BoardState *to, BoardStack *stack)
 {
     to->white_pieces = to->board.white_pieces.pawns | to->board.white_pieces.knights | to->board.white_pieces.bishops | to->board.white_pieces.rooks | to->board.white_pieces.queens | to->board.white_pieces.king;
     to->black_pieces = to->board.black_pieces.pawns | to->board.black_pieces.knights | to->board.black_pieces.bishops | to->board.black_pieces.rooks | to->board.black_pieces.queens | to->board.black_pieces.king;
@@ -35,7 +35,7 @@ static inline void push_white_move(const BoardState *from, BoardState *to, Board
     to->black_check = to->white_attack & to->board.black_pieces.king;
 }
 
-static inline void push_black_move(const BoardState *from, BoardState *to, BoardStack *stack)
+void push_black_move(const BoardState *from, BoardState *to, BoardStack *stack)
 {
     to->black_pieces = to->board.black_pieces.pawns | to->board.black_pieces.knights | to->board.black_pieces.bishops | to->board.black_pieces.rooks | to->board.black_pieces.queens | to->board.black_pieces.king;
     to->white_pieces = to->board.white_pieces.pawns | to->board.white_pieces.knights | to->board.white_pieces.bishops | to->board.white_pieces.rooks | to->board.white_pieces.queens | to->board.white_pieces.king;
@@ -62,7 +62,7 @@ static inline void push_black_move(const BoardState *from, BoardState *to, Board
     to->white_check = to->black_attack & to->board.white_pieces.king;
 }
 
-static inline void init_board(BoardState *board_state)
+void init_board(BoardState *board_state)
 {
     board_state->white_pieces = board_state->board.white_pieces.pawns | board_state->board.white_pieces.knights | board_state->board.white_pieces.bishops | board_state->board.white_pieces.rooks | board_state->board.white_pieces.queens | board_state->board.white_pieces.king;
     board_state->black_pieces = board_state->board.black_pieces.pawns | board_state->board.black_pieces.knights | board_state->board.black_pieces.bishops | board_state->board.black_pieces.rooks | board_state->board.black_pieces.queens | board_state->board.black_pieces.king;
@@ -87,7 +87,7 @@ static inline void init_board(BoardState *board_state)
 uint64_t accepted_moves = 0;
 uint64_t total_moves = 0;
 
-static inline void validate_white_move(BoardStack *stack)
+void validate_white_move(BoardStack *stack)
 {
     if (__builtin_expect(!stack->boards[stack->count].white_check, 1))
     {
@@ -97,7 +97,7 @@ static inline void validate_white_move(BoardStack *stack)
     total_moves++;
 }
 
-static inline void validate_black_move(BoardStack *stack)
+void validate_black_move(BoardStack *stack)
 {
     if (__builtin_expect(!stack->boards[stack->count].black_check, 1))
     {
@@ -115,7 +115,7 @@ void print_move_statistics()
         printf("Acceptance rate: %.2f%%\n", (double)accepted_moves / total_moves * 100);
 }
 
-static inline void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
+void remove_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
     uint64_t position = position_to_bitboard(x, y);
     board_state->board.white_pieces.pawns &= ~position;
@@ -124,7 +124,8 @@ static inline void remove_white_piece(BoardState *board_state, uint8_t x, uint8_
     board_state->board.white_pieces.rooks &= ~position;
     board_state->board.white_pieces.queens &= ~position;
 }
-static inline void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
+
+void remove_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
     uint64_t position = position_to_bitboard(x, y);
     board_state->board.black_pieces.pawns &= ~position;
@@ -134,13 +135,13 @@ static inline void remove_black_piece(BoardState *board_state, uint8_t x, uint8_
     board_state->board.black_pieces.queens &= ~position;
 }
 
-static inline bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
+bool is_white_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
     uint64_t position = position_to_bitboard(x, y);
     return (board_state->white_pieces & position) != 0;
 }
 
-static inline bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
+bool is_black_piece(BoardState *board_state, uint8_t x, uint8_t y)
 {
     uint64_t position = position_to_bitboard(x, y);
     return (board_state->black_pieces & position) != 0;

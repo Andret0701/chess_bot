@@ -26,6 +26,6 @@ void TT_clear_generation();
 void init_transposition_table();
 
 void TT_prefetch(uint64_t hash);
-static bool TT_lookup(uint64_t hash, TT_Entry *entry);
-static void TT_store(uint64_t hash, uint8_t depth, double score, Result result, TT_Entry_Type type, uint16_t move);
+bool TT_lookup(uint64_t hash, TT_Entry *entry);
+void TT_store(uint64_t hash, uint8_t depth, double score, Result result, TT_Entry_Type type, uint16_t move);
 void TT_log_stats();

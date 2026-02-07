@@ -1,4 +1,6 @@
 #include "zobrist_hash.h"
+#include <stdlib.h>
+#include <time.h>
 
 #define NUM_PIECE_TYPES 12
 #define NUM_SQUARES 64

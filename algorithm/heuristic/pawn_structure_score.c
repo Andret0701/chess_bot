@@ -1,6 +1,7 @@
 #include "pawn_structure_score.h"
 #include "../../utils/bitboard.h"
 #include "heuristic_values.h"
+#include "../../engine/attack_generation/attack_generation.h"
 
 Feature get_double_pawn_feature(BoardState *board_state, double game_phase)
 {

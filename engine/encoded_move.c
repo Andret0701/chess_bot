@@ -1,4 +1,5 @@
 #include "encoded_move.h"
+#include "../utils/utils.h"
 
 uint8_t get_from_square(uint16_t move)
 {

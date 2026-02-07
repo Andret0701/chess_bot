@@ -1,24 +1,43 @@
 #include "count_benchmark.h"
 #include "../../utils/fen.h"
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../piece_moves.h"
 #include "../tests/count_tests.h"
 
-static double now_seconds(void)
-{
-    static LARGE_INTEGER freq;
-    static BOOL initialized = FALSE;
-    if (!initialized)
-    {
-        QueryPerformanceFrequency(&freq);
-        initialized = TRUE;
-    }
-    LARGE_INTEGER counter;
-    QueryPerformanceCounter(&counter);
-    return (double)counter.QuadPart / (double)freq.QuadPart;
-}
+#if defined(_WIN32)
+  #define WIN32_LEAN_AND_MEAN
+  #include <windows.h>
+
+  static double now_seconds(void)
+  {
+      static LARGE_INTEGER freq;
+      static int initialized = 0;
+      if (!initialized) {
+          QueryPerformanceFrequency(&freq);
+          initialized = 1;
+      }
+      LARGE_INTEGER counter;
+      QueryPerformanceCounter(&counter);
+      return (double)counter.QuadPart / (double)freq.QuadPart;
+  }
+
+#else
+  #include <time.h>
+
+  static double now_seconds(void)
+  {
+  #if defined(CLOCK_MONOTONIC)
+      struct timespec ts;
+      clock_gettime(CLOCK_MONOTONIC, &ts);
+      return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
+  #else
+      // Fallback if clock_gettime isn't available
+      return (double)clock() / (double)CLOCKS_PER_SEC;
+  #endif
+  }
+#endif
+
 
 uint64_t count_recursive(BoardState *board_state, uint8_t depth, BoardStack *stack)
 {

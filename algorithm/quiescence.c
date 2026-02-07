@@ -2,6 +2,8 @@
 #include "heuristic/heuristic.h"
 #include "transposition_table.h"
 #include "zobrist_hash.h"
+#include "../engine/piece_moves.h"
+#include "move_sort.h"
 
 #define MAX_QUIESCENCE_DEPTH 6
 

@@ -9,7 +9,7 @@ typedef struct
     uint64_t expected;
 } Test;
 
-Test tests[] = {
+static const Test tests[] = {
     // Position 1: Standard chess starting position
     {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 1, 20},
     {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 2, 400},

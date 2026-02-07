@@ -11,7 +11,7 @@
 #include "transposition_table.h"
 #include "zobrist_hash.h"
 #include "null_move.h"
-
+#include "reductions.h"
 #include <math.h>
 
 static bool has_non_pawn_material(BoardState *board_state)

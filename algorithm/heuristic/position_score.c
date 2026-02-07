@@ -1,5 +1,7 @@
 #include "position_score.h"
 #include "heuristic_values.h"
+#include <stdlib.h>
+#include "../../utils/bitboard.h"
 
 // Evaluate a single piece's position
 static double evaluate_piece_position(uint64_t pieces, const double *middlegame_table, const double *endgame_table, bool is_white, double game_phase)

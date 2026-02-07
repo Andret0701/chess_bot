@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "../../../engine/tests/count_tests.h"
 #include "../heuristic.h"
+#include "../position_score.h"
 
 #define EPS 1e-7 /* tolerance for double comparison */
 

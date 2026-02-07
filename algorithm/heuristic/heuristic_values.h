@@ -1,6 +1,6 @@
 #pragma once
 
-const double PAWN_TABLE_MIDDLEGAME[] = {
+static const double PAWN_TABLE_MIDDLEGAME[] = {
     0.000000,
     0.000000,
     0.000000,
@@ -67,7 +67,7 @@ const double PAWN_TABLE_MIDDLEGAME[] = {
     0.000000,
 };
 
-const double PAWN_TABLE_ENDGAME[] = {
+static const double PAWN_TABLE_ENDGAME[] = {
     0.000000,
     0.000000,
     0.000000,
@@ -134,7 +134,7 @@ const double PAWN_TABLE_ENDGAME[] = {
     0.000000,
 };
 
-const double KNIGHT_TABLE_MIDDLEGAME[] = {
+static const double KNIGHT_TABLE_MIDDLEGAME[] = {
     -49.995651,
     -39.999890,
     -29.976866,
@@ -201,7 +201,7 @@ const double KNIGHT_TABLE_MIDDLEGAME[] = {
     -49.996837,
 };
 
-const double KNIGHT_TABLE_ENDGAME[] = {
+static const double KNIGHT_TABLE_ENDGAME[] = {
     -49.991459,
     -39.998757,
     -29.969760,
@@ -268,7 +268,7 @@ const double KNIGHT_TABLE_ENDGAME[] = {
     -49.990885,
 };
 
-const double BISHOP_TABLE_MIDDLEGAME[] = {
+static const double BISHOP_TABLE_MIDDLEGAME[] = {
     -19.989477,
     -9.981894,
     -9.991985,
@@ -335,7 +335,7 @@ const double BISHOP_TABLE_MIDDLEGAME[] = {
     -19.992396,
 };
 
-const double BISHOP_TABLE_ENDGAME[] = {
+static const double BISHOP_TABLE_ENDGAME[] = {
     -19.983109,
     -9.972542,
     -9.977273,
@@ -402,7 +402,7 @@ const double BISHOP_TABLE_ENDGAME[] = {
     -19.978726,
 };
 
-const double ROOK_TABLE_MIDDLEGAME[] = {
+static const double ROOK_TABLE_MIDDLEGAME[] = {
     0.025296,
     0.060654,
     0.033544,
@@ -469,7 +469,7 @@ const double ROOK_TABLE_MIDDLEGAME[] = {
     0.041188,
 };
 
-const double ROOK_TABLE_ENDGAME[] = {
+static const double ROOK_TABLE_ENDGAME[] = {
     0.061481,
     0.125063,
     0.070576,
@@ -536,7 +536,7 @@ const double ROOK_TABLE_ENDGAME[] = {
     0.107741,
 };
 
-const double QUEEN_TABLE_MIDDLEGAME[] = {
+static const double QUEEN_TABLE_MIDDLEGAME[] = {
     -19.889527,
     -9.924504,
     -9.902059,
@@ -603,7 +603,7 @@ const double QUEEN_TABLE_MIDDLEGAME[] = {
     -19.993737,
 };
 
-const double QUEEN_TABLE_ENDGAME[] = {
+static const double QUEEN_TABLE_ENDGAME[] = {
     -19.848727,
     -9.886151,
     -9.856359,
@@ -670,7 +670,7 @@ const double QUEEN_TABLE_ENDGAME[] = {
     -19.985964,
 };
 
-const double KING_TABLE_MIDDLEGAME[] = {
+static const double KING_TABLE_MIDDLEGAME[] = {
     -80.000949,
     -70.005588,
     -70.003617,
@@ -737,7 +737,7 @@ const double KING_TABLE_MIDDLEGAME[] = {
     19.919050,
 };
 
-const double KING_TABLE_ENDGAME[] = {
+static const double KING_TABLE_ENDGAME[] = {
     -20.003999,
     -10.013814,
     -10.011796,

@@ -1,4 +1,9 @@
 #include "reductions.h"
+#include "move_categorization.h"
+#include <math.h>
+
+#define MAX_DEPTH 150
+#define MAX_MOVES 300
 
 uint8_t reductions[MAX_DEPTH][MAX_MOVES];
 void init_reductions()

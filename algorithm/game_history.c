@@ -1,5 +1,5 @@
-// game_history.c
 #include "game_history.h"
+#include <stdlib.h>
 
 #define MAX_GAME_HISTORY 20000
 

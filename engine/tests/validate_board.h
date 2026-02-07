@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../utils/board.h"
+#include "../board_state.h"
 
 void validate_kings(Board *board);
 void validate_pawns(Board *board);

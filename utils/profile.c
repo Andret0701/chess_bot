@@ -8,6 +8,8 @@
 #include "move.h"
 #include "../algorithm/game_history.h"
 #include "../algorithm/heuristic/heuristic.h"
+#include <stdlib.h>
+#include "../engine/piece_moves.h"
 
 void play_game(double time_seconds, double increment_seconds)
 {
