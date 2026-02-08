@@ -32,7 +32,7 @@ add_library(engine STATIC ${ENGINE_SRC})
 add_library(algorithm STATIC ${ALGO_SRC})
 add_library(utils STATIC ${UTILS_SRC})
 
-add_executable(andobot main.c uci.c)
+add_executable(andobot src/main.c src/uci.c)
 
 target_link_libraries(andobot PRIVATE engine algorithm utils m)
 
