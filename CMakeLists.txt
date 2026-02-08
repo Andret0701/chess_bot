@@ -108,3 +108,10 @@ endif()
 
 # Optional: emit compile_commands.json for easy inspection
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
+include(CTest)
+if(BUILD_TESTING)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

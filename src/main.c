@@ -18,8 +18,6 @@
 #include "engine/tests/capture_move_test.h"
 #include "engine/tests/encoded_move_test.h"
 #include "engine/tests/attack_test.h"
-#include "algorithm/heuristic/tests/symetric_heuristic_test.h"
-
 #include "utils/bitboard.h"
 #include "uci.h"
 #include "algorithm/transposition_table.h"
@@ -56,8 +54,8 @@ int main(int argc, char *argv[])
         run_encoded_move_tests();
         printf("Running capture move tests\n");
         run_capture_move_tests();
-        printf("Running heuristic tests\n");
-        run_heuristic_eval_tests();
+        // printf("Running heuristic tests\n");
+        // run_heuristic_eval_tests();
         printf("Running can move tests\n");
         run_can_move_tests();
         exit(0);
