@@ -11,4 +11,4 @@ double quiescence(BoardState *board_state,
                   BoardStack *stack,
                   double alpha,
                   double beta,
-                  int depth_in_quiescence);
+                  int depth_in_quiescence, uint64_t *nodes_searched);

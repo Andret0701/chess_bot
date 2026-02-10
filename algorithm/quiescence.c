@@ -11,8 +11,9 @@ double quiescence(BoardState *board_state,
                   BoardStack *stack,
                   double alpha,
                   double beta,
-                  int depth_in_quiescence)
+                  int depth_in_quiescence, uint64_t *nodes_searched)
 {
+    (*nodes_searched)++;
     if (depth_in_quiescence >= MAX_QUIESCENCE_DEPTH)
         return score_board(board_state);
 
@@ -51,7 +52,7 @@ double quiescence(BoardState *board_state,
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *child = &stack->boards[i];
-        double score = -quiescence(child, stack, -beta, -alpha, depth_in_quiescence + 1);
+        double score = -quiescence(child, stack, -beta, -alpha, depth_in_quiescence + 1, nodes_searched);
 
         if (score >= beta)
         {

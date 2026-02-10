@@ -106,9 +106,10 @@ void print_bot_result(BotResult result)
 // }
 
 BotMove moves[MAX_MOVES];
-BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_depth, uint8_t max_depth)
+BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_depth, uint8_t max_depth, bool use_max_nodes, uint64_t max_nodes)
 {
     clock_t start = clock();
+    uint64_t nodes_searched = 0;
     TT_clear_generation();
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
@@ -135,7 +136,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
 
             BoardState *current_board_state = moves[i].board;
-            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds, true);
+            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
             {
@@ -228,18 +229,23 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
 
 BotResult run_depth_bot(Board board, uint8_t depth)
 {
-    return run_bot(board, false, 0, true, depth);
+    return run_bot(board, false, 0, true, depth, false, 0);
 }
 
 BotResult run_time_bot(Board board, int wtime, int btime, int winc, int binc)
 {
     double seconds = get_time_allocation(wtime, btime, winc, binc, board.side_to_move);
-    return run_bot(board, true, seconds, false, 0);
+    return run_bot(board, true, seconds, false, 0, false, 0);
 }
 
 BotResult run_movetime_bot(Board board, int movetime)
 {
-    return run_bot(board, true, movetime / 1000.0, false, 0);
+    return run_bot(board, true, movetime / 1000.0, false, 0, false, 0);
+}
+
+BotResult run_nodes_bot(Board board, uint64_t nodes)
+{
+    return run_bot(board, false, 0, false, 0, true, nodes);
 }
 
 BotResult run_heuristic_bot(Board board)

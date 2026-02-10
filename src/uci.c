@@ -120,6 +120,12 @@ UCIGoFlags parse_go(char *input)
             flags.movetime = atoi(token);
             flags.search_option = BOT_SEARCH_MOVETIME;
         }
+        else if (strcmp(token, "nodes") == 0)
+        {
+            token = strtok(NULL, " ");
+            flags.nodes = strtoull(token, NULL, 10);
+            flags.search_option = BOT_SEARCH_NODES;
+        }
         else if (strcmp(token, "heuristic") == 0)
         {
             flags.search_option = BOT_SEARCH_HEURISTIC;
@@ -275,6 +281,9 @@ void uci_loop(bool debug_mode)
                     break;
                 case BOT_SEARCH_MOVETIME:
                     result = run_movetime_bot(current_board, flags.movetime);
+                    break;
+                case BOT_SEARCH_NODES:
+                    result = run_nodes_bot(current_board, flags.nodes);
                     break;
                 case BOT_SEARCH_HEURISTIC:
                     result = run_heuristic_bot(current_board);

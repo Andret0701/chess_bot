@@ -29,8 +29,12 @@ static bool has_non_pawn_material(BoardState *board_state)
     return (non_pawn_white | non_pawn_black) != 0;
 }
 
-SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds, bool allow_null_move)
+SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move)
 {
+    if (use_max_nodes && *nodes_searched >= max_nodes)
+        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+    (*nodes_searched)++;
+
     if (use_max_time && has_timed_out(start, seconds))
         return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
 
@@ -94,7 +98,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         BoardScore child_beta = child_alpha;
         child_beta.score += 1; // Set child alpha to beta - 1
 
-        SearchResult null_search_result = nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, false);
+        SearchResult null_search_result = nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, false);
         null_search_result.board_score = invert_score(null_search_result.board_score);
         if (null_search_result.valid == INVALID)
         {
@@ -120,7 +124,15 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         BoardScore score;
         if (!finished)
         {
-            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0);
+            uint64_t _nodes_searched = *nodes_searched;
+            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0, nodes_searched);
+            if (use_max_nodes && *nodes_searched > max_nodes)
+            {
+                pop_game_history();
+                *nodes_searched = _nodes_searched;
+                return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+            }
+
             score = (BoardScore){quiescence_score, UNKNOWN, depth};
         }
         else
@@ -168,7 +180,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         SearchResult search_result;
         if (first_move)
         {
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
+            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -180,7 +192,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             int new_max_depth = max_depth + extension - reduction;
             if (new_max_depth < 0)
                 new_max_depth = 0;
-            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
+            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
             search_result.board_score = invert_score(search_result.board_score);
             if (search_result.valid == INVALID)
                 goto invalid;
@@ -188,7 +200,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
             if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || ((reduction != 0) && alpha_cutoff))
             {
-                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, allow_null_move);
+                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
                 search_result.board_score = invert_score(search_result.board_score);
                 if (search_result.valid == INVALID)
                     goto invalid;
