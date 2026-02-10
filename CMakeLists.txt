@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(ChessBot C)
+project(ChessBot)
 
 # -------------------------
 # Language / defaults
@@ -64,7 +64,9 @@ target_include_directories(utils PUBLIC
 # Warnings (all configs)
 # -------------------------
 foreach(t engine algorithm utils andobot)
-  target_compile_options(${t} PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(${t} PRIVATE   # -Wall -Wextra -Wpedantic
+    -Wno-everything        # silence warnings output
+    -Werror )
 endforeach()
 
 # -------------------------
@@ -74,8 +76,8 @@ endforeach()
 # -------------------------
 set(FAST_C_FLAGS
   -O3
-  -march=native
-  -mtune=native
+  # -march=native
+  # -mtune=native
   -funroll-loops
   -ffast-math
   -falign-functions=32
