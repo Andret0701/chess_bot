@@ -10,6 +10,7 @@
 #include "utils/move.h"
 #include "algorithm/bot.h"
 #include "algorithm/heuristic/heuristic_io.h"
+#include "algorithm/zobrist_hash.h"
 
 #define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
@@ -23,7 +24,9 @@ void new_game(char *input)
 {
     current_board = fen_to_board(input);
     reset_game_history();
-    push_game_history(current_board);
+
+    uint64_t hash = hash_board(&current_board);
+    push_game_history(hash);
 }
 
 void do_move(char *move)
@@ -31,7 +34,8 @@ void do_move(char *move)
     if (can_move(&current_board, move))
     {
         current_board = apply_move(&current_board, move);
-        push_game_history(current_board);
+        uint64_t hash = hash_board(&current_board);
+        push_game_history(hash);
     }
 }
 
@@ -71,6 +75,8 @@ void parse_position(char *input)
         while ((token = strtok(NULL, " ")) != NULL)
         {
             do_move(token);
+            uint64_t hash = hash_board(&current_board);
+            push_game_history(hash);
         }
     }
 }

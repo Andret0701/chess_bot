@@ -41,17 +41,11 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     uint64_t hash = hash_board(&board_state->board);
     TT_prefetch(hash);
 
-    push_game_history(board_state->board);
+    push_game_history(hash);
     if (threefold_repetition())
     {
         BoardScore score = (BoardScore){0, THREEFOLD_REPETITION, depth};
-        pop_game_history();
-        return (SearchResult){score, VALID};
-    }
-    if (has_50_move_rule_occurred())
-    {
-        BoardScore score = (BoardScore){0, FIFTY_MOVE_RULE, depth};
-        pop_game_history();
+        pop_game_history(hash);
         return (SearchResult){score, VALID};
     }
 
@@ -70,17 +64,17 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
 
         if (tt_entry.type == EXACT)
         {
-            pop_game_history();
+            pop_game_history(hash);
             return (SearchResult){tt_score, VALID};
         }
         else if (tt_entry.type == LOWERBOUND && is_greater_equal_score(tt_score, beta))
         {
-            pop_game_history();
+            pop_game_history(hash);
             return (SearchResult){tt_score, VALID};
         }
         else if (tt_entry.type == UPPERBOUND && is_less_equal_score(tt_score, alpha))
         {
-            pop_game_history();
+            pop_game_history(hash);
             return (SearchResult){tt_score, VALID};
         }
     }
@@ -102,14 +96,14 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         null_search_result.board_score = invert_score(null_search_result.board_score);
         if (null_search_result.valid == INVALID)
         {
-            pop_game_history();
+            pop_game_history(hash);
             return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
         }
 
         /* Fail-high?  => prune. */
         if (is_greater_equal_score(null_search_result.board_score, beta))
         {
-            pop_game_history();
+            pop_game_history(hash);
             return (SearchResult){null_search_result.board_score, VALID};
         }
     }
@@ -128,7 +122,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
             double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0, nodes_searched);
             if (use_max_nodes && *nodes_searched > max_nodes)
             {
-                pop_game_history();
+                pop_game_history(hash);
                 *nodes_searched = _nodes_searched;
                 return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
             }
@@ -138,7 +132,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         else
             score = (BoardScore){0, result, depth};
 
-        pop_game_history();
+        pop_game_history(hash);
         TT_store(hash, 0, score.score, result, EXACT, 0);
         return (SearchResult){score, VALID};
     }
@@ -153,7 +147,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     {
         BoardScore score = (BoardScore){0, result, depth};
         stack->count = base;
-        pop_game_history();
+        pop_game_history(hash);
         return (SearchResult){score, VALID};
     }
 
@@ -222,7 +216,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     }
 
     stack->count = base;
-    pop_game_history();
+    pop_game_history(hash);
 
     // Determine TT entry type
     TT_Entry_Type type;
@@ -246,6 +240,6 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
 
 invalid:
     stack->count = base;
-    pop_game_history();
+    pop_game_history(hash);
     return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
 }

@@ -10,6 +10,7 @@
 #include "../algorithm/heuristic/heuristic.h"
 #include <stdlib.h>
 #include "../engine/piece_moves.h"
+#include "algorithm/zobrist_hash.h"
 
 void play_game(double time_seconds, double increment_seconds)
 {
@@ -19,8 +20,10 @@ void play_game(double time_seconds, double increment_seconds)
     int winc = increment_seconds * 1000;
     int binc = increment_seconds * 1000;
 
+    uint64_t hash = hash_board(&board);
+
     reset_game_history();
-    push_game_history(board);
+    push_game_history(hash);
     BoardState board_state = board_to_board_state(&board);
     while (true)
     {
@@ -52,6 +55,7 @@ void play_game(double time_seconds, double increment_seconds)
 
         Color side_to_move = board.side_to_move;
         board = apply_move(&board, result.move);
+        hash = hash_board(&board);
         if (board.side_to_move == side_to_move)
         {
             printf("Invalid move: %s\n", result.move);
@@ -59,7 +63,7 @@ void play_game(double time_seconds, double increment_seconds)
             exit(1);
         }
 
-        push_game_history(board);
+        push_game_history(hash);
         board_state = board_to_board_state(&board);
         print_board(&board);
         printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result_to_string(result.score.result));
@@ -71,11 +75,11 @@ void play_game(double time_seconds, double increment_seconds)
             break;
         }
 
-        if (has_50_move_rule_occurred())
-        {
-            printf("Draw by 50 move rule\n");
-            break;
-        }
+        // if (has_50_move_rule_occurred())
+        // {
+        //     printf("Draw by 50 move rule\n");
+        //     break;
+        // }
 
         if (has_insufficient_material(&board))
         {
