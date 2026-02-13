@@ -3,8 +3,10 @@
 #include "heuristic_values.h"
 #include "../../engine/attack_generation/attack_generation.h"
 
-Feature get_double_pawn_feature(BoardState *board_state, double game_phase)
+int32_t get_double_pawn_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
+    int32_t score = 0;
+
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
 
@@ -47,14 +49,16 @@ Feature get_double_pawn_feature(BoardState *board_state, double game_phase)
     black_double_pawns += (black_pawn_g_file > 1) ? (black_pawn_g_file - 1) : 0;
     black_double_pawns += (black_pawn_h_file > 1) ? (black_pawn_h_file - 1) : 0;
 
-    return create_feature(
-        white_double_pawns,
-        black_double_pawns,
-        game_phase);
+    score += white_double_pawns * (DOUBLE_PAWN_MIDDLEGAME * middlegame_phase + DOUBLE_PAWN_ENDGAME * endgame_phase);
+    score -= black_double_pawns * (DOUBLE_PAWN_MIDDLEGAME * middlegame_phase + DOUBLE_PAWN_ENDGAME * endgame_phase);
+
+    return score;
 }
 
-Feature get_isolated_pawn_feature(BoardState *board_state, double game_phase)
+int32_t get_isolated_pawn_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
+    int32_t score = 0;
+
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
 
@@ -97,14 +101,16 @@ Feature get_isolated_pawn_feature(BoardState *board_state, double game_phase)
     black_isolated_pawns += file_g_has_isolated_black_pawn ? 1 : 0;
     black_isolated_pawns += file_h_has_isolated_black_pawn ? 1 : 0;
 
-    return create_feature(
-        white_isolated_pawns,
-        black_isolated_pawns,
-        game_phase);
+    score += white_isolated_pawns * (ISOLATED_PAWN_MIDDLEGAME * middlegame_phase + ISOLATED_PAWN_ENDGAME * endgame_phase);
+    score -= black_isolated_pawns * (ISOLATED_PAWN_MIDDLEGAME * middlegame_phase + ISOLATED_PAWN_ENDGAME * endgame_phase);
+
+    return score;
 }
 
-Feature get_backward_pawn_feature(BoardState *board_state, double game_phase)
+int32_t get_backward_pawn_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
+    int32_t score = 0;
+
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
 
@@ -147,27 +153,15 @@ Feature get_backward_pawn_feature(BoardState *board_state, double game_phase)
             number_of_black_backward_pawns++;
     }
 
-    return create_feature(
-        number_of_white_backward_pawns,
-        number_of_black_backward_pawns,
-        game_phase);
+    score += number_of_white_backward_pawns * (BACKWARD_PAWN_MIDDLEGAME * middlegame_phase + BACKWARD_PAWN_ENDGAME * endgame_phase);
+    score -= number_of_black_backward_pawns * (BACKWARD_PAWN_MIDDLEGAME * middlegame_phase + BACKWARD_PAWN_ENDGAME * endgame_phase);
+
+    return score;
 }
 
-PassedPawnFeatures get_passed_pawn_features(BoardState *board_state, double game_phase)
+int32_t get_passed_pawn_score(BoardState *board_state)
 {
-    int8_t white_one_square_left = 0;
-    int8_t white_two_squares_left = 0;
-    int8_t white_three_squares_left = 0;
-    int8_t white_four_squares_left = 0;
-    int8_t white_five_squares_left = 0;
-    int8_t white_six_squares_left = 0;
-
-    int8_t black_one_square_left = 0;
-    int8_t black_two_squares_left = 0;
-    int8_t black_three_squares_left = 0;
-    int8_t black_four_squares_left = 0;
-    int8_t black_five_squares_left = 0;
-    int8_t black_six_squares_left = 0;
+    int32_t score = 0;
 
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
@@ -181,31 +175,7 @@ PassedPawnFeatures get_passed_pawn_features(BoardState *board_state, double game
         uint64_t passed_pawn_mask = get_passed_pawn_mask_white(position);
         uint8_t number_of_squares_from_promotion = 7 - (index / 8);
         if (!(passed_pawn_mask & board_state->board.black_pieces.pawns))
-        {
-            switch (number_of_squares_from_promotion)
-            {
-            case 1:
-                white_one_square_left++;
-                break;
-            case 2:
-                white_two_squares_left++;
-                break;
-            case 3:
-                white_three_squares_left++;
-                break;
-            case 4:
-                white_four_squares_left++;
-                break;
-            case 5:
-                white_five_squares_left++;
-                break;
-            case 6:
-                white_six_squares_left++;
-                break;
-            default:
-                break;
-            }
-        }
+            score += PASSED_PAWN_BONUS[number_of_squares_from_promotion];
     }
 
     while (black_pawns)
@@ -217,43 +187,16 @@ PassedPawnFeatures get_passed_pawn_features(BoardState *board_state, double game
         uint64_t passed_pawn_mask = get_passed_pawn_mask_black(position);
         uint8_t number_of_squares_from_promotion = index / 8;
         if (!(passed_pawn_mask & board_state->board.white_pieces.pawns))
-        {
-            switch (number_of_squares_from_promotion)
-            {
-            case 1:
-                black_one_square_left++;
-                break;
-            case 2:
-                black_two_squares_left++;
-                break;
-            case 3:
-                black_three_squares_left++;
-                break;
-            case 4:
-                black_four_squares_left++;
-                break;
-            case 5:
-                black_five_squares_left++;
-                break;
-            case 6:
-                black_six_squares_left++;
-                break;
-            default:
-                break;
-            }
-        }
+            score -= PASSED_PAWN_BONUS[number_of_squares_from_promotion];
     }
-    return (PassedPawnFeatures){
-        create_feature(white_one_square_left, black_one_square_left, game_phase),
-        create_feature(white_two_squares_left, black_two_squares_left, game_phase),
-        create_feature(white_three_squares_left, black_three_squares_left, game_phase),
-        create_feature(white_four_squares_left, black_four_squares_left, game_phase),
-        create_feature(white_five_squares_left, black_five_squares_left, game_phase),
-        create_feature(white_six_squares_left, black_six_squares_left, game_phase)};
+
+    return score * 24;
 }
 
-PawnChainFeatures get_pawn_chain_feature(BoardState *board_state, double game_phase)
+int32_t get_pawn_chain_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
+    int32_t score = 0;
+
     uint64_t white_pawn_attacks = board_state->white_attacks.pawns;
     uint64_t black_pawn_attacks = board_state->black_attacks.pawns;
 
@@ -269,24 +212,23 @@ PawnChainFeatures get_pawn_chain_feature(BoardState *board_state, double game_ph
     protected_white_pawns &= ~protected_by_protected_white_pawns;
     protected_black_pawns &= ~protected_by_protected_black_pawns;
 
-    return (PawnChainFeatures){
-        create_feature(
-            __builtin_popcountll(protected_white_pawns),
-            __builtin_popcountll(protected_black_pawns),
-            game_phase),
-        create_feature(
-            __builtin_popcountll(protected_by_protected_white_pawns),
-            __builtin_popcountll(protected_by_protected_black_pawns),
-            game_phase)};
+    score += __builtin_popcountll(protected_white_pawns) * (PROTECTED_PAWN_MIDDLEGAME * middlegame_phase + PROTECTED_PAWN_ENDGAME * endgame_phase);
+    score -= __builtin_popcountll(protected_black_pawns) * (PROTECTED_PAWN_MIDDLEGAME * middlegame_phase + PROTECTED_PAWN_ENDGAME * endgame_phase);
+    score += __builtin_popcountll(protected_by_protected_white_pawns) * (PROTECTED_BY_PROTECTED_PAWN_MIDDLEGAME * middlegame_phase + PROTECTED_BY_PROTECTED_PAWN_ENDGAME * endgame_phase);
+    score -= __builtin_popcountll(protected_by_protected_black_pawns) * (PROTECTED_BY_PROTECTED_PAWN_MIDDLEGAME * middlegame_phase + PROTECTED_BY_PROTECTED_PAWN_ENDGAME * endgame_phase);
+
+    return score;
 }
 
-PawnStructureFeatures get_pawn_structure_features(BoardState *board_state, double game_phase)
+int32_t get_pawn_structure_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
-    PawnStructureFeatures features;
-    features.double_pawns = get_double_pawn_feature(board_state, game_phase);
-    features.isolated_pawns = get_isolated_pawn_feature(board_state, game_phase);
-    features.backward_pawns = get_backward_pawn_feature(board_state, game_phase);
-    features.passed_pawns = get_passed_pawn_features(board_state, game_phase);
-    features.pawn_chains = get_pawn_chain_feature(board_state, game_phase);
-    return features;
+    int32_t score = 0;
+
+    score += get_double_pawn_score(board_state, middlegame_phase, endgame_phase);
+    score += get_isolated_pawn_score(board_state, middlegame_phase, endgame_phase);
+    score += get_backward_pawn_score(board_state, middlegame_phase, endgame_phase);
+    score += get_passed_pawn_score(board_state);
+    score += get_pawn_chain_score(board_state, middlegame_phase, endgame_phase);
+
+    return score;
 }

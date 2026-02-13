@@ -18,13 +18,13 @@ typedef enum
 
 typedef struct
 {
-    double score;
+    int32_t score;
     Result result;
     uint8_t depth;
 } BoardScore;
 
-static const BoardScore BEST_SCORE = {DBL_MAX, WON, 0};
-static const BoardScore WORST_SCORE = {DBL_MIN, LOST, 0};
+static const BoardScore BEST_SCORE = {INT32_MAX, WON, 0};
+static const BoardScore WORST_SCORE = {INT32_MIN, LOST, 0};
 bool is_draw(Result result);
 BoardScore invert_score(BoardScore score);
 const char *result_to_string(Result result);

@@ -1,23 +1,11 @@
 #include "square_control.h"
-#include "../../engine/attack_generation/attack_generation.h"
+#include "engine/attack_generation/attack_generation.h"
 #include "heuristic_values.h"
-#include "../../utils/bitboard.h"
+#include "utils/bitboard.h"
 
-SquareControlFeatures get_square_control_features(BoardState *board_state, double game_phase)
+int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
-    int8_t bishop_my_side_attacks_white = 0;
-    int8_t bishop_opponent_side_attacks_white = 0;
-    int8_t rook_my_side_attacks_white = 0;
-    int8_t rook_opponent_side_attacks_white = 0;
-    int8_t queen_my_side_attacks_white = 0;
-    int8_t queen_opponent_side_attacks_white = 0;
-
-    int8_t bishop_my_side_attacks_black = 0;
-    int8_t bishop_opponent_side_attacks_black = 0;
-    int8_t rook_my_side_attacks_black = 0;
-    int8_t rook_opponent_side_attacks_black = 0;
-    int8_t queen_my_side_attacks_black = 0;
-    int8_t queen_opponent_side_attacks_black = 0;
+    int32_t score = 0;
 
     uint64_t white_bishops = board_state->board.white_pieces.bishops;
     while (white_bishops)
@@ -26,8 +14,8 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->white_pieces;
         uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
-        bishop_my_side_attacks_white += __builtin_popcountll(my_side_attacks);
-        bishop_opponent_side_attacks_white += __builtin_popcountll(opponent_side_attacks);
+        score += __builtin_popcountll(my_side_attacks) * (BISHOP_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score += __builtin_popcountll(opponent_side_attacks) * (BISHOP_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_bishops &= white_bishops - 1;
     }
 
@@ -38,8 +26,8 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->black_pieces;
         uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
-        bishop_my_side_attacks_black += __builtin_popcountll(my_side_attacks);
-        bishop_opponent_side_attacks_black += __builtin_popcountll(opponent_side_attacks);
+        score -= __builtin_popcountll(my_side_attacks) * (BISHOP_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score -= __builtin_popcountll(opponent_side_attacks) * (BISHOP_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_bishops &= black_bishops - 1;
     }
 
@@ -50,8 +38,8 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->white_pieces;
         uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
-        rook_my_side_attacks_white += __builtin_popcountll(my_side_attacks);
-        rook_opponent_side_attacks_white += __builtin_popcountll(opponent_side_attacks);
+        score += __builtin_popcountll(my_side_attacks) * (ROOK_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score += __builtin_popcountll(opponent_side_attacks) * (ROOK_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_rooks &= white_rooks - 1;
     }
 
@@ -62,8 +50,8 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->black_pieces;
         uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
-        rook_my_side_attacks_black += __builtin_popcountll(my_side_attacks);
-        rook_opponent_side_attacks_black += __builtin_popcountll(opponent_side_attacks);
+        score -= __builtin_popcountll(my_side_attacks) * (ROOK_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score -= __builtin_popcountll(opponent_side_attacks) * (ROOK_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_rooks &= black_rooks - 1;
     }
 
@@ -74,8 +62,8 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->white_pieces;
         uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
-        queen_my_side_attacks_white += __builtin_popcountll(my_side_attacks);
-        queen_opponent_side_attacks_white += __builtin_popcountll(opponent_side_attacks);
+        score += __builtin_popcountll(my_side_attacks) * (QUEEN_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score += __builtin_popcountll(opponent_side_attacks) * (QUEEN_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_queens &= white_queens - 1;
     }
 
@@ -86,16 +74,10 @@ SquareControlFeatures get_square_control_features(BoardState *board_state, doubl
         uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->black_pieces;
         uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
         uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
-        queen_my_side_attacks_black += __builtin_popcountll(my_side_attacks);
-        queen_opponent_side_attacks_black += __builtin_popcountll(opponent_side_attacks);
+        score -= __builtin_popcountll(my_side_attacks) * (QUEEN_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+        score -= __builtin_popcountll(opponent_side_attacks) * (QUEEN_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_queens &= black_queens - 1;
     }
 
-    return (SquareControlFeatures){
-        create_feature(bishop_my_side_attacks_white, bishop_my_side_attacks_black, game_phase),
-        create_feature(bishop_opponent_side_attacks_white, bishop_opponent_side_attacks_black, game_phase),
-        create_feature(rook_my_side_attacks_white, rook_my_side_attacks_black, game_phase),
-        create_feature(rook_opponent_side_attacks_white, rook_opponent_side_attacks_black, game_phase),
-        create_feature(queen_my_side_attacks_white, queen_my_side_attacks_black, game_phase),
-        create_feature(queen_opponent_side_attacks_white, queen_opponent_side_attacks_black, game_phase)};
+    return score;
 }

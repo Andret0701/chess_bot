@@ -31,7 +31,7 @@ bool TT_lookup(uint64_t hash, TT_Entry *entry)
     return true;
 }
 
-void TT_store(uint64_t hash, uint8_t depth, double score,
+void TT_store(uint64_t hash, uint8_t depth, int32_t score,
               Result result, TT_Entry_Type type, uint16_t move)
 {
     TT_Entry *entry = &transposition_table[hash & TT_MASK];

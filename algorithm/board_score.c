@@ -1,6 +1,8 @@
 #include "board_score.h"
 #include <stdio.h>
 #include <limits.h>
+#include <inttypes.h>
+#include "algorithm/heuristic/heuristic_values.h"
 
 bool is_draw(Result result)
 {
@@ -41,7 +43,8 @@ const char *result_to_string(Result result)
 
 void print_score(BoardScore score)
 {
-    printf("Score: %.2f, Result: %s, Depth: %d\n", score.score, result_to_string(score.result), score.depth);
+    double score_value = ((double)score.score) / ((double)HEURISTIC_SCALE * 24);
+    printf("Score: %.2f, Result: %s, Depth: %d\n", score_value, result_to_string(score.result), score.depth);
 }
 
 bool is_greater_score(BoardScore a, BoardScore b)

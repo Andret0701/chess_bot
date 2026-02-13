@@ -7,8 +7,8 @@
 #include "board_score.h"
 #include "search_result.h"
 
-double quiescence(BoardState *board_state,
-                  BoardStack *stack,
-                  double alpha,
-                  double beta,
-                  int depth_in_quiescence, uint64_t *nodes_searched);
+int32_t quiescence(BoardState *board_state,
+                   BoardStack *stack,
+                   int32_t alpha,
+                   int32_t beta,
+                   int depth_in_quiescence, uint64_t *nodes_searched);

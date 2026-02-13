@@ -9,8 +9,8 @@
 #include "algorithm/game_history.h"
 #include "utils/move.h"
 #include "algorithm/bot.h"
-#include "algorithm/heuristic/heuristic_io.h"
 #include "algorithm/zobrist_hash.h"
+#include "algorithm/heuristic/heuristic_values.h"
 
 #define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
@@ -298,13 +298,12 @@ void uci_loop(bool debug_mode)
             }
 
             if (debug_mode)
-                respond("bestmove %s score %lf depth %d result %s", result.move, result.score.score, result.depth, result_to_string(result.score.result));
+            {
+                double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
+                respond("bestmove %s score %.2f depth %d result %s", result.move, score_value, result.depth, result_to_string(result.score.result));
+            }
             else
                 respond("bestmove %s", result.move);
-        }
-        else if (strcmp(input, "features") == 0)
-        {
-            print_features_for_board(&current_board);
         }
         else if (strcmp(input, "quit") == 0)
         {

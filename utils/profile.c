@@ -1,15 +1,16 @@
 #include "profile.h"
 
-#include "../engine/board_stack.h"
-#include "../algorithm/bot.h"
-#include "fen.h"
 #include <time.h>
 #include <stdio.h>
-#include "move.h"
-#include "../algorithm/game_history.h"
-#include "../algorithm/heuristic/heuristic.h"
 #include <stdlib.h>
-#include "../engine/piece_moves.h"
+#include "fen.h"
+#include "move.h"
+#include "engine/board_stack.h"
+#include "engine/piece_moves.h"
+#include "algorithm/bot.h"
+#include "algorithm/game_history.h"
+#include "algorithm/heuristic/heuristic.h"
+#include "algorithm/heuristic/heuristic_values.h"
 #include "algorithm/zobrist_hash.h"
 
 void play_game(double time_seconds, double increment_seconds)
@@ -66,7 +67,9 @@ void play_game(double time_seconds, double increment_seconds)
         push_game_history(hash);
         board_state = board_to_board_state(&board);
         print_board(&board);
-        printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, result.score.score, result.score.depth, result_to_string(result.score.result));
+
+        double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
+        printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, score_value, result.score.depth, result_to_string(result.score.result));
         printf("White time: %.1f, Black time: %.1f\n", wtime / 1000.0, btime / 1000.0);
 
         if (threefold_repetition())

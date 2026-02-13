@@ -119,7 +119,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         if (!finished)
         {
             uint64_t _nodes_searched = *nodes_searched;
-            double quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0, nodes_searched);
+            int32_t quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0, nodes_searched);
             if (use_max_nodes && *nodes_searched > max_nodes)
             {
                 pop_game_history(hash);

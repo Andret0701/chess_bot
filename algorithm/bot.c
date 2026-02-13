@@ -11,6 +11,8 @@
 #include "time_manager.h"
 #include "zobrist_hash.h"
 #include "heuristic/heuristic.h"
+#include "heuristic/heuristic_values.h"
+#include <inttypes.h>
 
 #define DEBUG_INFO false
 
@@ -19,10 +21,11 @@
 
 void print_bot_result(BotResult result)
 {
+    double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
     printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d, Result: %s)\n",
            result.move,
            result.depth,
-           result.score.score,
+           score_value,
            result.score.depth,
            result_to_string(result.score.result));
 }
@@ -253,12 +256,12 @@ BotResult run_heuristic_bot(Board board)
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(&board_state, stack);
-    double best_score = -1e9;
+    int32_t best_score = INT32_MIN;
     uint16_t best_move_index = 0;
     for (uint16_t i = 0; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
-        double score = score_board(next_board_state);
+        int32_t score = score_board(next_board_state);
         if (score > best_score)
         {
             best_score = score;

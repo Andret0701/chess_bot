@@ -2,45 +2,48 @@
 #include "../../utils/bitboard.h"
 #include "heuristic_values.h"
 
-CastlingFeatures get_castling_features(BoardState *board_state, double game_phase)
+int32_t get_castling_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
-    Board *board = &board_state->board;
+    int32_t score = 0;
 
-    Feature can_castle_both_sides = create_feature(
-        (((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0)) ? 1.0 : 0.0,
-        (((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0) && ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0)) ? 1.0 : 0.0,
-        game_phase);
+    bool white_can_castle_kingside = (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE) != 0;
+    bool white_can_castle_queenside = (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE) != 0;
+    bool white_has_castled_kingside = (board_state->has_castled & WHITE_KINGSIDE_CASTLE) != 0;
+    bool white_has_castled_queenside = (board_state->has_castled & WHITE_QUEENSIDE_CASTLE) != 0;
+    bool black_can_castle_kingside = (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE) != 0;
+    bool black_can_castle_queenside = (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE) != 0;
+    bool black_has_castled_kingside = (board_state->has_castled & BLACK_KINGSIDE_CASTLE) != 0;
+    bool black_has_castled_queenside = (board_state->has_castled & BLACK_QUEENSIDE_CASTLE) != 0;
 
-    Feature can_castle_kingside = create_feature(
-        ((board->castling_rights & WHITE_KINGSIDE_CASTLE) != 0) ? 1.0 : 0.0,
-        ((board->castling_rights & BLACK_KINGSIDE_CASTLE) != 0) ? 1.0 : 0.0,
-        game_phase);
+    if (white_can_castle_kingside && white_can_castle_queenside)
+        score += CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
+    if (white_can_castle_kingside)
+        score += CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
+    if (white_can_castle_queenside)
+        score += CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
+    if (white_has_castled_kingside)
+        score += HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
+    if (white_has_castled_queenside)
+        score += HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
 
-    Feature can_castle_queenside = create_feature(
-        ((board->castling_rights & WHITE_QUEENSIDE_CASTLE) != 0) ? 1.0 : 0.0,
-        ((board->castling_rights & BLACK_QUEENSIDE_CASTLE) != 0) ? 1.0 : 0.0,
-        game_phase);
+    if (black_can_castle_kingside && black_can_castle_queenside)
+        score -= CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
+    if (black_can_castle_kingside)
+        score -= CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
+    if (black_can_castle_queenside)
+        score -= CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
+    if (black_has_castled_kingside)
+        score -= HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
+    if (black_has_castled_queenside)
+        score -= HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
 
-    Feature has_castled_kingside = create_feature(
-        (board_state->has_castled & WHITE_KINGSIDE_CASTLE) ? 1.0 : 0.0,
-        (board_state->has_castled & BLACK_KINGSIDE_CASTLE) ? 1.0 : 0.0,
-        game_phase);
-
-    Feature has_castled_queenside = create_feature(
-        (board_state->has_castled & WHITE_QUEENSIDE_CASTLE) ? 1.0 : 0.0,
-        (board_state->has_castled & BLACK_QUEENSIDE_CASTLE) ? 1.0 : 0.0,
-        game_phase);
-
-    return (CastlingFeatures){
-        can_castle_both_sides,
-        can_castle_kingside,
-        can_castle_queenside,
-        has_castled_kingside,
-        has_castled_queenside};
+    return score;
 }
 
-PawnShelterFeatures get_pawn_shelter_features(Board *board, double game_phase)
+int32_t get_pawn_shelter_score(Board *board, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
+    int32_t score = 0;
+
     // White king shelter
     uint64_t front_of_white_king_mask = increment_rank(board->white_pieces.king);
     uint64_t ahead_of_white_king_mask = increment_rank(front_of_white_king_mask);
@@ -65,27 +68,31 @@ PawnShelterFeatures get_pawn_shelter_features(Board *board, double game_phase)
     bool has_black_left_pawn = (board->black_pieces.pawns & left_of_black_king_mask) != 0;
     bool has_black_right_pawn = (board->black_pieces.pawns & right_of_black_king_mask) != 0;
 
-    return (PawnShelterFeatures){
-        create_feature(
-            has_white_front_pawn ? 1.0 : 0.0,
-            has_black_front_pawn ? 1.0 : 0.0,
-            game_phase),
-        create_feature(
-            has_white_ahead_pawn ? 1.0 : 0.0,
-            has_black_ahead_pawn ? 1.0 : 0.0,
-            game_phase),
-        create_feature(
-            has_white_left_pawn ? 1.0 : 0.0,
-            has_black_left_pawn ? 1.0 : 0.0,
-            game_phase),
-        create_feature(
-            has_white_right_pawn ? 1.0 : 0.0,
-            has_black_right_pawn ? 1.0 : 0.0,
-            game_phase)};
+    if (has_white_front_pawn)
+        score += FRONT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + FRONT_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_white_ahead_pawn)
+        score += AHEAD_PAWN_BONUS_MIDDLEGAME * middlegame_phase + AHEAD_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_white_left_pawn)
+        score += LEFT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + LEFT_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_white_right_pawn)
+        score += RIGHT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + RIGHT_PAWN_BONUS_ENDGAME * endgame_phase;
+
+    if (has_black_front_pawn)
+        score -= FRONT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + FRONT_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_black_ahead_pawn)
+        score -= AHEAD_PAWN_BONUS_MIDDLEGAME * middlegame_phase + AHEAD_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_black_left_pawn)
+        score -= LEFT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + LEFT_PAWN_BONUS_ENDGAME * endgame_phase;
+    if (has_black_right_pawn)
+        score -= RIGHT_PAWN_BONUS_MIDDLEGAME * middlegame_phase + RIGHT_PAWN_BONUS_ENDGAME * endgame_phase;
+
+    return score;
 }
 
-Feature get_attacking_king_squares_feature(BoardState *board_state, double game_phase)
+int32_t get_attacking_king_squares_score(BoardState *board_state)
 {
+    int32_t score = 0;
+
     // Calculate squares adjacent to the kings, excluding the squares they currently occupy
     uint64_t white_king_squares = expand_bitboard(board_state->board.white_pieces.king) & ~board_state->board.white_pieces.king;
     uint64_t black_king_squares = expand_bitboard(board_state->board.black_pieces.king) & ~board_state->board.black_pieces.king;
@@ -97,16 +104,19 @@ Feature get_attacking_king_squares_feature(BoardState *board_state, double game_
     attacked_white_king_squares *= attacked_white_king_squares;
     attacked_black_king_squares *= attacked_black_king_squares;
 
-    return create_feature(attacked_white_king_squares, attacked_black_king_squares, game_phase);
+    score += attacked_white_king_squares * ATTACKING_KING_SQUARES * 24;
+    score -= attacked_black_king_squares * ATTACKING_KING_SQUARES * 24;
+
+    return score;
 }
 
-KingSafetyFeatures get_king_safety_features(BoardState *board_state, double game_phase)
+int32_t get_king_safety_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
-    CastlingFeatures castling = get_castling_features(board_state, game_phase);
-    PawnShelterFeatures pawn_shelter = get_pawn_shelter_features(&board_state->board, game_phase);
-    Feature attacking_king_squares = get_attacking_king_squares_feature(board_state, game_phase);
-    return (KingSafetyFeatures){
-        castling,
-        pawn_shelter,
-        attacking_king_squares};
+    int32_t score = 0;
+
+    score += get_castling_score(board_state, middlegame_phase, endgame_phase);
+    score += get_pawn_shelter_score(&board_state->board, middlegame_phase, endgame_phase);
+    score += get_attacking_king_squares_score(board_state);
+
+    return score;
 }
