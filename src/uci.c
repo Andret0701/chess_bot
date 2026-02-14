@@ -299,8 +299,8 @@ void uci_loop(bool debug_mode)
 
             if (debug_mode)
             {
-                double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
-                respond("bestmove %s score %.2f depth %d result %s", result.move, score_value, result.depth, result_to_string(result.score.result));
+                double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+                respond("bestmove %s score %.2f depth %d", result.move, score_value, result.depth);
             }
             else
                 respond("bestmove %s", result.move);

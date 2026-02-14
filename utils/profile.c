@@ -68,8 +68,8 @@ void play_game(double time_seconds, double increment_seconds)
         board_state = board_to_board_state(&board);
         print_board(&board);
 
-        double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
-        printf("Move: %s, Score: %.2f, Depth: %d, Result: %s\n", result.move, score_value, result.score.depth, result_to_string(result.score.result));
+        double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+        printf("Move: %s, Score: %.2f, Depth: %d\n", result.move, score_value, result.depth);
         printf("White time: %.1f, Black time: %.1f\n", wtime / 1000.0, btime / 1000.0);
 
         if (threefold_repetition())

@@ -5,13 +5,13 @@
 typedef struct
 {
     BoardState *board;
-    BoardScore score;
+    int32_t score;
 } BotMove;
 
 typedef struct
 {
     char *move;
-    BoardScore score;
+    int32_t score;
     uint8_t depth;
 } BotResult;
 

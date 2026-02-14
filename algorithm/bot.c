@@ -16,18 +16,16 @@
 
 #define DEBUG_INFO false
 
-#define MAX_DEPTH 150
 #define MAX_MOVES 300
 
 void print_bot_result(BotResult result)
 {
-    double score_value = ((double)result.score.score) / ((double)HEURISTIC_SCALE * 24);
-    printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d, Result: %s)\n",
+    double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+    printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d)\n",
            result.move,
            result.depth,
            score_value,
-           result.score.depth,
-           result_to_string(result.score.result));
+           result.depth);
 }
 
 // BoardScore move_scores[MAX_DEPTH][MAX_MOVES];
@@ -113,6 +111,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
 {
     clock_t start = clock();
     uint64_t nodes_searched = 0;
+    bool search_cancelled = false;
     TT_clear_generation();
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
@@ -124,13 +123,13 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
 
     for (uint8_t depth = 0;; depth++)
     {
-        BoardScore best_score = WORST_SCORE;
+        int32_t best_score = WORST_SCORE;
         BoardState *best_board = moves[0].board;
         for (uint16_t i = 0; i < num_moves; i++)
         {
-            if (depth != 0 && moves[i].score.result == LOST)
+            if (depth != 0 && is_losing(moves[i].score))
             {
-                if (is_greater_score(moves[i].score, best_score))
+                if (moves[i].score > best_score)
                 {
                     best_board = moves[i].board;
                     best_score = moves[i].score;
@@ -139,9 +138,8 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
 
             BoardState *current_board_state = moves[i].board;
-            SearchResult search_result = nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, invert_score(best_score), use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true);
-            search_result.board_score = invert_score(search_result.board_score);
-            if (search_result.valid == INVALID)
+            int32_t score = -nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, -best_score, use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true, &search_cancelled);
+            if (search_cancelled)
             {
                 if (i == 0)
                 {
@@ -159,22 +157,20 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
                 return result;
             }
 
-            BoardScore score = search_result.board_score;
             moves[i].score = score;
-            if (is_greater_score(score, best_score))
+            if (score > best_score)
             {
                 best_board = current_board_state;
                 best_score = score;
             }
 
             // If the move is winning. Do not search deeper.
-            if (best_score.result == WON && best_score.depth <= depth)
+            if (is_winning(best_score) && depth > 0)
             {
                 // if (DEBUG_INFO)
                 //     print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
 
-                TT_store(hash_board(&board_state.board), depth, best_score.score,
-                         best_score.result, EXACT, best_board->move);
+                TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
 
                 BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
                 destroy_board_stack(stack);
@@ -182,15 +178,14 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
         }
 
-        TT_store(hash_board(&board_state.board), depth, best_score.score,
-                 best_score.result, EXACT, best_board->move);
+        TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
 
         // Sort moves array using insertion sort based on the score at current depth
         for (uint16_t i = 1; i < num_moves; ++i)
         {
             BotMove key = moves[i];
             int j = i - 1;
-            while (j >= 0 && is_greater_score(key.score, moves[j].score))
+            while (j >= 0 && key.score > moves[j].score)
             {
                 moves[j + 1] = moves[j];
                 --j;
@@ -198,26 +193,26 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             moves[j + 1] = key;
         }
 
-        // if no move is unknown
-        bool all_moves_known = true;
-        for (uint16_t i = 0; i < num_moves; i++)
-        {
-            if (moves[i].score.result == UNKNOWN)
-            {
-                all_moves_known = false;
-                break;
-            }
-        }
+        // // if no move is unknown
+        // bool all_moves_known = true;
+        // for (uint16_t i = 0; i < num_moves; i++)
+        // {
+        //     if (moves[i].score.result == UNKNOWN)
+        //     {
+        //         all_moves_known = false;
+        //         break;
+        //     }
+        // }
 
-        if (all_moves_known)
-        {
-            // if (DEBUG_INFO)
-            //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
+        // if (all_moves_known)
+        // {
+        //     // if (DEBUG_INFO)
+        //     //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
 
-            BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
-            destroy_board_stack(stack);
-            return result;
-        }
+        //     BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+        //     destroy_board_stack(stack);
+        //     return result;
+        // }
 
         if (depth + 1 >= MAX_DEPTH || (use_max_depth && depth + 1 >= max_depth))
         {
@@ -268,7 +263,7 @@ BotResult run_heuristic_bot(Board board)
             best_move_index = i;
         }
     }
-    BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), (BoardScore){best_score, UNKNOWN, 0}, 0};
+    BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), best_score, 0};
     destroy_board_stack(stack);
     return result;
 }

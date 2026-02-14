@@ -31,8 +31,7 @@ bool TT_lookup(uint64_t hash, TT_Entry *entry)
     return true;
 }
 
-void TT_store(uint64_t hash, uint8_t depth, int32_t score,
-              Result result, TT_Entry_Type type, uint16_t move)
+void TT_store(uint64_t hash, uint8_t depth, int32_t score, TT_Entry_Type type, uint16_t move)
 {
     TT_Entry *entry = &transposition_table[hash & TT_MASK];
     if (entry->hash == hash && entry->depth > depth && entry->type == EXACT)
@@ -47,7 +46,7 @@ void TT_store(uint64_t hash, uint8_t depth, int32_t score,
         depth > entry->depth ||
         (depth == entry->depth && (type == EXACT || entry->type != EXACT)))
     {
-        *entry = (TT_Entry){hash, depth, score, result, type, move, current_generation};
+        *entry = (TT_Entry){hash, depth, score, type, move, current_generation};
     }
 }
 

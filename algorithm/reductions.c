@@ -2,7 +2,6 @@
 #include "move_categorization.h"
 #include <math.h>
 
-#define MAX_DEPTH 150
 #define MAX_MOVES 300
 
 uint8_t reductions[MAX_DEPTH][MAX_MOVES];
@@ -12,7 +11,10 @@ void init_reductions()
     {
         for (uint16_t move_number = 0; move_number < MAX_MOVES; move_number++)
         {
-            reductions[depth][move_number] = (int)(1.35 + log(depth) * log(move_number) / 2.75);
+            if (depth < 2 || move_number < 2)
+                reductions[depth][move_number] = 0;
+            else
+                reductions[depth][move_number] = (uint8_t)(1.35 + log((double)depth) * log((double)move_number) / 2.75);
         }
     }
 }

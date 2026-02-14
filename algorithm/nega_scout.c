@@ -34,14 +34,20 @@ static bool has_non_pawn_material(BoardState *board_state)
     return non_pawn_black != 0;
 }
 
-SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move)
+int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, int32_t alpha, int32_t beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move, bool *search_cancelled)
 {
     if (use_max_nodes && *nodes_searched >= max_nodes)
-        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+    {
+        *search_cancelled = true;
+        return 0;
+    }
     (*nodes_searched)++;
 
     if (use_max_time && has_timed_out(start, seconds))
-        return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+    {
+        *search_cancelled = true;
+        return 0;
+    }
 
     uint64_t hash = hash_board(&board_state->board);
     TT_prefetch(hash);
@@ -49,38 +55,36 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     push_game_history(hash);
     if (threefold_repetition())
     {
-        BoardScore score = (BoardScore){0, THREEFOLD_REPETITION, depth};
         pop_game_history(hash);
-        return (SearchResult){score, VALID};
+        return 0;
     }
 
     if (depth > max_depth)
         max_depth = depth;
     uint8_t remaining_depth = max_depth - depth;
 
-    BoardScore alpha_orig = alpha; // Save original alpha
+    int32_t alpha_orig = alpha; // Save original alpha
     TT_Entry tt_entry;
     bool found_tt = TT_lookup(hash, &tt_entry);
 
     // TT cutoff with proper bounds checking
     if (found_tt && tt_entry.depth >= remaining_depth)
     {
-        BoardScore tt_score = {tt_entry.score, tt_entry.result, depth + tt_entry.depth};
-
+        int32_t tt_score = value_from_tt(tt_entry.score, depth);
         if (tt_entry.type == EXACT)
         {
             pop_game_history(hash);
-            return (SearchResult){tt_score, VALID};
+            return tt_score;
         }
-        else if (tt_entry.type == LOWERBOUND && is_greater_equal_score(tt_score, beta))
+        else if (tt_entry.type == LOWERBOUND && tt_score >= beta)
         {
             pop_game_history(hash);
-            return (SearchResult){tt_score, VALID};
+            return tt_score;
         }
-        else if (tt_entry.type == UPPERBOUND && is_less_equal_score(tt_score, alpha))
+        else if (tt_entry.type == UPPERBOUND && tt_score <= alpha)
         {
             pop_game_history(hash);
-            return (SearchResult){tt_score, VALID};
+            return tt_score;
         }
     }
 
@@ -93,23 +97,21 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         BoardState null_board_state = apply_null_move(board_state);
         uint8_t null_max_depth = max_depth - NULL_MOVE_R;
 
-        BoardScore child_alpha = invert_score(beta);
-        BoardScore child_beta = child_alpha;
-        child_beta.score += 1; // Set child alpha to beta - 1
+        int32_t child_alpha = -beta;
+        int32_t child_beta = child_alpha + 1;
 
-        SearchResult null_search_result = nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, false);
-        null_search_result.board_score = invert_score(null_search_result.board_score);
-        if (null_search_result.valid == INVALID)
+        int32_t null_search_score = -nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, false, search_cancelled);
+        if (*search_cancelled)
         {
             pop_game_history(hash);
-            return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+            return 0;
         }
 
         /* Fail-high?  => prune. */
-        if (is_greater_equal_score(null_search_result.board_score, beta))
+        if (null_search_score >= beta)
         {
             pop_game_history(hash);
-            return (SearchResult){null_search_result.board_score, VALID};
+            return null_search_score;
         }
     }
     // =============== END NULL MOVE PRUNING ===============
@@ -120,26 +122,23 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         Result result = get_result(board_state, finished);
         finished |= result != UNKNOWN;
 
-        BoardScore score;
+        int32_t score;
         if (!finished)
         {
-            uint64_t _nodes_searched = *nodes_searched;
-            int32_t quiescence_score = quiescence(board_state, stack, alpha.score, beta.score, 0, nodes_searched);
+            score = quiescence(board_state, stack, alpha_orig, beta, depth, 0, nodes_searched);
             if (use_max_nodes && *nodes_searched > max_nodes)
             {
                 pop_game_history(hash);
-                *nodes_searched = _nodes_searched;
-                return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+                *search_cancelled = true;
+                return 0;
             }
-
-            score = (BoardScore){quiescence_score, UNKNOWN, depth};
         }
         else
-            score = (BoardScore){0, result, depth};
+            score = get_result_score(result, depth);
 
         pop_game_history(hash);
-        TT_store(hash, 0, score.score, result, EXACT, 0);
-        return (SearchResult){score, VALID};
+        TT_store(hash, 0, value_to_tt(score, depth), EXACT, 0);
+        return score;
     }
 
     uint16_t base = stack->count;
@@ -150,10 +149,11 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     finished |= result != UNKNOWN;
     if (finished)
     {
-        BoardScore score = (BoardScore){0, result, depth};
+        int32_t score = get_result_score(result, depth);
         stack->count = base;
         pop_game_history(hash);
-        return (SearchResult){score, VALID};
+        TT_store(hash, 0, value_to_tt(score, depth), EXACT, 0);
+        return score;
     }
 
     if (found_tt)
@@ -161,7 +161,7 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
     else
         sort_moves(board_state, stack, base);
 
-    BoardScore best_score = WORST_SCORE;
+    int32_t best_score = WORST_SCORE;
     uint16_t best_move = 0;
     for (uint16_t i = base; i < stack->count; i++)
     {
@@ -170,54 +170,51 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
 
         BoardState *next_board_state = &stack->boards[i];
 
-        int extension = 0;
+        uint8_t extension = 0;
         bool is_check = is_move_check(next_board_state);
         bool is_threatening_promo = is_move_threatening_promotion(board_state, next_board_state);
         if (is_check || is_threatening_promo)
             extension = 1;
 
-        SearchResult search_result;
+        uint8_t new_max_depth = max_depth + extension;
+
+        int32_t score;
         if (first_move)
         {
-            search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
-            search_result.board_score = invert_score(search_result.board_score);
-            if (search_result.valid == INVALID)
-                goto invalid;
+            score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+            if (*search_cancelled)
+                goto cancelled;
         }
         else
         {
             uint8_t reduction = calculate_reduction(board_state, next_board_state, remaining_depth, move_number);
             // Null window search
-            int new_max_depth = max_depth + extension - reduction;
-            if (new_max_depth < 0)
-                new_max_depth = 0;
-            search_result = nega_scout(next_board_state, stack, new_max_depth, depth + 1, invert_score((BoardScore){alpha.score + 1, alpha.result, alpha.depth}), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
-            search_result.board_score = invert_score(search_result.board_score);
-            if (search_result.valid == INVALID)
-                goto invalid;
+            uint8_t reduced_max_depth = 0;
+            if (new_max_depth > reduction)
+                reduced_max_depth = new_max_depth - reduction;
+            // check second alpha here
+            score = -nega_scout(next_board_state, stack, reduced_max_depth, depth + 1, -(alpha + 1), -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+            if (*search_cancelled)
+                goto cancelled;
 
-            bool alpha_cutoff = is_greater_score(search_result.board_score, alpha);
-            if ((alpha_cutoff && is_less_score(search_result.board_score, beta)) || ((reduction != 0) && alpha_cutoff))
+            bool alpha_cutoff = score > alpha;
+            if ((alpha_cutoff && score < beta) || ((reduction != 0) && alpha_cutoff))
             {
-                search_result = nega_scout(next_board_state, stack, max_depth + extension, depth + 1, invert_score(beta), invert_score(alpha), use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move);
-                search_result.board_score = invert_score(search_result.board_score);
-                if (search_result.valid == INVALID)
-                    goto invalid;
+                score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+                if (*search_cancelled)
+                    goto cancelled;
             }
         }
 
-        BoardScore score = search_result.board_score;
-
-        if (is_greater_score(score, best_score))
+        if (score > best_score)
         {
             best_score = score;
             best_move = next_board_state->move;
         }
-        alpha = max_score(alpha, score);
-        if (is_greater_equal_score(alpha, beta))
-        {
+        if (best_score > alpha)
+            alpha = best_score;
+        if (alpha >= beta)
             break; // Beta cutoff
-        }
     }
 
     stack->count = base;
@@ -225,11 +222,11 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
 
     // Determine TT entry type
     TT_Entry_Type type;
-    if (is_less_equal_score(best_score, alpha_orig))
+    if (best_score <= alpha_orig)
     {
         type = UPPERBOUND;
     }
-    else if (is_greater_equal_score(best_score, beta))
+    else if (best_score >= beta)
     {
         type = LOWERBOUND;
     }
@@ -238,13 +235,12 @@ SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_
         type = EXACT;
     }
 
-    TT_store(hash, remaining_depth, best_score.score,
-             best_score.result, type, best_move);
+    TT_store(hash, remaining_depth, value_to_tt(best_score, depth), type, best_move);
 
-    return (SearchResult){best_score, VALID};
+    return best_score;
 
-invalid:
+cancelled:
     stack->count = base;
     pop_game_history(hash);
-    return (SearchResult){(BoardScore){0, UNKNOWN, 0}, INVALID};
+    return 0;
 }

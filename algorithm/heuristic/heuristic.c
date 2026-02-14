@@ -57,6 +57,18 @@ Result get_result(BoardState *board_state, bool is_finished)
     return result;
 }
 
+int32_t get_result_score(Result result, uint8_t depth)
+{
+    if (result == LOST)
+        return -MATE_SCORE + depth;
+    else if (result == WON)
+        printf("Error: get_result_score should not be called for WON result\n");
+    else if (result == UNKNOWN)
+        printf("Error: get_result_score should not be called for UNKNOWN result\n");
+
+    return 0;
+}
+
 uint8_t get_middlegame_phase(Board *board)
 {
     const uint8_t PHASE_KNIGHT = 1;
@@ -109,5 +121,38 @@ int32_t score_board(BoardState *board_state)
     if (board_state->board.side_to_move == BLACK)
         score = -score;
 
+    return score;
+}
+
+bool is_winning(int32_t score)
+{
+    return score >= MATE_SCORE - MAX_DEPTH;
+}
+
+bool is_losing(int32_t score)
+{
+    return score <= -MATE_SCORE + MAX_DEPTH;
+}
+
+bool is_mate_score(int32_t score)
+{
+    return is_winning(score) || is_losing(score);
+}
+
+int32_t value_to_tt(int32_t score, uint8_t depth)
+{
+    if (is_winning(score))
+        return score + depth;
+    if (is_losing(score))
+        return score - depth;
+    return score;
+}
+
+int32_t value_from_tt(int32_t score, uint8_t depth)
+{
+    if (is_winning(score))
+        return score - depth;
+    if (is_losing(score))
+        return score + depth;
     return score;
 }
