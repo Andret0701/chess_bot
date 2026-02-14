@@ -17,16 +17,21 @@
 static bool has_non_pawn_material(BoardState *board_state)
 {
     // Count non-pawn material for both sides
-    uint64_t non_pawn_white = board_state->board.white_pieces.knights |
-                              board_state->board.white_pieces.bishops |
-                              board_state->board.white_pieces.rooks |
-                              board_state->board.white_pieces.queens;
+    if (board_state->board.side_to_move == WHITE)
+    {
+        uint64_t non_pawn_white = board_state->board.white_pieces.knights |
+                                  board_state->board.white_pieces.bishops |
+                                  board_state->board.white_pieces.rooks |
+                                  board_state->board.white_pieces.queens;
+
+        return non_pawn_white != 0;
+    }
     uint64_t non_pawn_black = board_state->board.black_pieces.knights |
                               board_state->board.black_pieces.bishops |
                               board_state->board.black_pieces.rooks |
                               board_state->board.black_pieces.queens;
 
-    return (non_pawn_white | non_pawn_black) != 0;
+    return non_pawn_black != 0;
 }
 
 SearchResult nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, BoardScore alpha, BoardScore beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move)
