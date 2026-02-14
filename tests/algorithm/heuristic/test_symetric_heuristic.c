@@ -1,3 +1,4 @@
+#include "test_symetric_heuristic.h"
 #include "unity.h"
 
 #include "tests/test_utils.h"
@@ -13,9 +14,6 @@
 
 #include <math.h>
 #include <stdio.h>
-
-void setUp(void) {}
-void tearDown(void) {}
 
 void test_symmetry(const TestPosition *test_position)
 {
@@ -40,11 +38,4 @@ void test_symmetry_wrapper(void)
 {
     for (size_t i = 0; i < sizeof(test_positions) / sizeof(TestPosition); i++)
         test_symmetry(&test_positions[i]);
-}
-
-int main(void)
-{
-    UNITY_BEGIN();
-    RUN_TEST(test_symmetry_wrapper);
-    return UNITY_END();
 }
