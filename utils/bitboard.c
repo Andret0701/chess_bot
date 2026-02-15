@@ -36,6 +36,11 @@ uint64_t position_to_bitboard(uint8_t x, uint8_t y)
     return 1ULL << (x + y * 8);
 }
 
+uint64_t square_to_bitboard(int square)
+{
+    return 1ULL << square;
+}
+
 uint64_t decrement_file(uint64_t bitboard)
 {
     return (bitboard & ~FILE_A_MASK) >> 1;
@@ -148,4 +153,25 @@ uint64_t get_black_front_file_mask(uint64_t piece)
     mask |= decrement_rank(mask);
     mask |= decrement_rank(mask);
     return mask;
+}
+
+uint64_t get_file_mask(int square)
+{
+    int file = square % 8;
+    if (file == 0)
+        return FILE_A_MASK;
+    else if (file == 1)
+        return FILE_B_MASK;
+    else if (file == 2)
+        return FILE_C_MASK;
+    else if (file == 3)
+        return FILE_D_MASK;
+    else if (file == 4)
+        return FILE_E_MASK;
+    else if (file == 5)
+        return FILE_F_MASK;
+    else if (file == 6)
+        return FILE_G_MASK;
+    else
+        return FILE_H_MASK;
 }

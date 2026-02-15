@@ -7,6 +7,7 @@
 #include "pawn_structure_score.h"
 #include "king_safety_score.h"
 #include "square_control.h"
+#include "rook_score.h"
 #include "heuristic_values.h"
 
 bool has_insufficient_material(Board *board)
@@ -117,6 +118,13 @@ int32_t score_board(BoardState *board_state)
 
     // Square control scoring
     score += get_square_control_score(board_state, middlegame_phase, endgame_phase);
+
+    // Connected rooks
+    score += 3 * 24 * (board_state->board.white_pieces.rooks & board_state->white_attacks.rooks != 0);
+    score -= 3 * 24 * (board_state->board.black_pieces.rooks & board_state->black_attacks.rooks != 0);
+
+    // Rook scoring
+    score += get_rook_score(board_state, middlegame_phase, endgame_phase);
 
     if (board_state->board.side_to_move == BLACK)
         score = -score;
