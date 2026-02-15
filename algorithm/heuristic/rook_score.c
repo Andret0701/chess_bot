@@ -36,11 +36,22 @@ int32_t get_open_file_score(Board *board, uint8_t middlegame_phase, uint8_t endg
     return score;
 }
 
+int32_t get_connected_rook_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
+{
+    int32_t score = 0;
+
+    score += (board_state->board.white_pieces.rooks & board_state->white_attacks.rooks != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
+    score -= (board_state->board.black_pieces.rooks & board_state->black_attacks.rooks != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
+
+    return score;
+}
+
 int32_t get_rook_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
     int32_t score = 0;
 
     score += get_open_file_score(&board_state->board, middlegame_phase, endgame_phase);
+    score += get_connected_rook_score(board_state, middlegame_phase, endgame_phase);
 
     return score;
 }

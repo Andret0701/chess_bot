@@ -14,3 +14,12 @@ uint8_t position_to_index(uint8_t x, uint8_t y)
 {
     return (x + y * 8);
 }
+
+uint32_t clamp(int32_t value, int32_t min, int32_t max)
+{
+    if (value < min)
+        return min;
+    if (value > max)
+        return max;
+    return value;
+}

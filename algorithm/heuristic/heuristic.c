@@ -1,6 +1,7 @@
 #include "heuristic.h"
 
 #include "utils/bitboard.h"
+#include "utils/utils.h"
 
 #include "material_score.h"
 #include "position_score.h"
@@ -105,7 +106,11 @@ int32_t score_board(BoardState *board_state)
     uint8_t endgame_phase = 24 - middlegame_phase;
 
     // Material counting
-    score += get_material_score(&board_state->board, middlegame_phase, endgame_phase);
+    int32_t material_score = get_material_score(&board_state->board, middlegame_phase, endgame_phase);
+    score += material_score;
+
+    int32_t material_lead = clamp(material_score, -600 * 24 * HEURISTIC_SCALE, 600 * 24 * HEURISTIC_SCALE);
+    score += (material_lead / (100 * 24 * HEURISTIC_SCALE)) * (TRADE_OFF_MATERIAL_MIDDLEGAME * middlegame_phase + TRADE_OFF_MATERIAL_ENDGAME * endgame_phase);
 
     // Positional scoring
     score += get_position_score(&board_state->board, middlegame_phase, endgame_phase);
@@ -118,10 +123,6 @@ int32_t score_board(BoardState *board_state)
 
     // Square control scoring
     score += get_square_control_score(board_state, middlegame_phase, endgame_phase);
-
-    // Connected rooks
-    score += 3 * 24 * (board_state->board.white_pieces.rooks & board_state->white_attacks.rooks != 0);
-    score -= 3 * 24 * (board_state->board.black_pieces.rooks & board_state->black_attacks.rooks != 0);
 
     // Rook scoring
     score += get_rook_score(board_state, middlegame_phase, endgame_phase);
