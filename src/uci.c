@@ -17,12 +17,14 @@
 #define INPUT_BUFFER_SIZE 8192
 #define LOG_UCI false
 
+Board previous_board;
 Board current_board;
 int move_overhead = 50;
 
 void new_game(char *input)
 {
     current_board = fen_to_board(input);
+    previous_board = current_board;
     reset_game_history();
 
     uint64_t hash = hash_board(&current_board);
@@ -33,9 +35,9 @@ void do_move(char *move)
 {
     if (can_move(&current_board, move))
     {
+        previous_board = current_board;
         current_board = apply_move(&current_board, move);
-        uint64_t hash = hash_board(&current_board);
-        push_game_history(hash);
+        force_push_game_history(&previous_board, &current_board);
     }
 }
 
@@ -75,8 +77,7 @@ void parse_position(char *input)
         while ((token = strtok(NULL, " ")) != NULL)
         {
             do_move(token);
-            uint64_t hash = hash_board(&current_board);
-            push_game_history(hash);
+            force_push_game_history(&previous_board, &current_board);
         }
     }
 }

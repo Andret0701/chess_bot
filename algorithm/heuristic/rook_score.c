@@ -40,8 +40,8 @@ int32_t get_connected_rook_score(BoardState *board_state, uint8_t middlegame_pha
 {
     int32_t score = 0;
 
-    score += (board_state->board.white_pieces.rooks & board_state->white_attacks.rooks != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
-    score -= (board_state->board.black_pieces.rooks & board_state->black_attacks.rooks != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
+    score += ((board_state->board.white_pieces.rooks & board_state->white_attacks.rooks) != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
+    score -= ((board_state->board.black_pieces.rooks & board_state->black_attacks.rooks) != 0) * (CONNECTED_ROOKS_MIDDLEGAME * middlegame_phase + CONNECTED_ROOKS_ENDGAME * endgame_phase);
 
     return score;
 }

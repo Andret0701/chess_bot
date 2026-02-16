@@ -109,8 +109,8 @@ int32_t score_board(BoardState *board_state)
     int32_t material_score = get_material_score(&board_state->board, middlegame_phase, endgame_phase);
     score += material_score;
 
-    int32_t material_lead = clamp(material_score, -600 * 24 * HEURISTIC_SCALE, 600 * 24 * HEURISTIC_SCALE);
-    score += (material_lead / (100 * 24 * HEURISTIC_SCALE)) * (TRADE_OFF_MATERIAL_MIDDLEGAME * middlegame_phase + TRADE_OFF_MATERIAL_ENDGAME * endgame_phase);
+    // int32_t material_lead = clamp(material_score, -600 * 24 * HEURISTIC_SCALE, 600 * 24 * HEURISTIC_SCALE);
+    // score += (material_lead / (100 * 24 * HEURISTIC_SCALE)) * (TRADE_OFF_MATERIAL_MIDDLEGAME * middlegame_phase + TRADE_OFF_MATERIAL_ENDGAME * endgame_phase);
 
     // Positional scoring
     score += get_position_score(&board_state->board, middlegame_phase, endgame_phase);
