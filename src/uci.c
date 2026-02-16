@@ -77,7 +77,6 @@ void parse_position(char *input)
         while ((token = strtok(NULL, " ")) != NULL)
         {
             do_move(token);
-            force_push_game_history(&previous_board, &current_board);
         }
     }
 }
