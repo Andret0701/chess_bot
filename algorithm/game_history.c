@@ -54,16 +54,20 @@ void pop_game_history(uint64_t hash)
 
 bool threefold_repetition()
 {
+    if (move_count < 9)
+        return false;
+
     uint64_t current = game_history[move_count - 1];
     int repetitions = 1;
 
-    for (int i = move_count - 3; i >= 0; i -= 2)
+    for (int i = move_count - 5; i >= 0; i -= 2)
     {
         if (game_history[i] == current)
         {
             repetitions++;
             if (repetitions >= 3)
                 return true;
+            i -= 2;
         }
     }
 
