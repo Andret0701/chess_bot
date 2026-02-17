@@ -13,6 +13,7 @@
 #include "heuristic/heuristic.h"
 #include "heuristic/heuristic_values.h"
 #include <inttypes.h>
+#include "algorithm/move_sort.h"
 
 #define DEBUG_INFO false
 
@@ -113,6 +114,8 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
     uint64_t nodes_searched = 0;
     bool search_cancelled = false;
     TT_clear_generation();
+    clear_killer_moves();
+
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(&board_state, stack);

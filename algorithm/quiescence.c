@@ -47,7 +47,7 @@ int32_t quiescence(BoardState *board_state,
     // 4) Recurse on captures
     uint16_t base = stack->count;
     generate_captures(board_state, stack);
-    sort_moves(board_state, stack, base);
+    sort_moves(board_state, stack, base, 0);
 
     for (uint16_t i = base; i < stack->count; i++)
     {

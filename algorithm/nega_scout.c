@@ -156,10 +156,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         return score;
     }
 
-    if (found_tt)
-        sort_moves_tt(board_state, stack, base, tt_entry.move);
-    else
-        sort_moves(board_state, stack, base);
+    sort_moves(board_state, stack, base, found_tt ? tt_entry.move : 0);
 
     int32_t best_score = WORST_SCORE;
     uint16_t best_move = 0;
@@ -214,7 +211,11 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         if (best_score > alpha)
             alpha = best_score;
         if (alpha >= beta)
+        {
+            if (!is_move_capture(board_state, next_board_state))
+                add_killer_move(best_move, depth);
             break; // Beta cutoff
+        }
     }
 
     stack->count = base;
