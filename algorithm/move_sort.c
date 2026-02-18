@@ -140,15 +140,10 @@ void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_
     }
 }
 
-void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
+void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
 {
     for (uint16_t i = base; i < stack->count; i++)
-    {
-        if (encoded_move_equals(stack->boards[i].move, tt_move))
-            stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
-        else
-            stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
-    }
+        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
 
     uint16_t num_moves = stack->count - base;
     for (uint16_t i = 1; i < num_moves; ++i)

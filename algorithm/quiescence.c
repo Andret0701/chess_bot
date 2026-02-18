@@ -4,6 +4,7 @@
 #include "zobrist_hash.h"
 #include "../engine/piece_moves.h"
 #include "move_sort.h"
+#include "algorithm/heuristic/heuristic.h"
 
 #define MAX_QUIESCENCE_DEPTH 6
 
@@ -21,6 +22,9 @@ int32_t quiescence(BoardState *board_state,
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool tt_hit = TT_lookup(hash, &tt_entry);
+    if (is_mate_score(tt_entry.score) && tt_hit)
+        tt_hit = false; // Don't use mate scores from quiescence search
+
     if (tt_hit)
     {
         int32_t tt_score = value_from_tt(tt_entry.score, depth);
@@ -48,7 +52,7 @@ int32_t quiescence(BoardState *board_state,
     // 4) Recurse on captures
     uint16_t base = stack->count;
     generate_captures(board_state, stack);
-    sort_moves_q(board_state, stack, base, tt_hit ? tt_entry.move : 0);
+    sort_moves_q(board_state, stack, base);
 
     for (uint16_t i = base; i < stack->count; i++)
     {
