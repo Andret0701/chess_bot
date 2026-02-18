@@ -20,7 +20,8 @@ int32_t quiescence(BoardState *board_state,
 
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
-    if (TT_lookup(hash, &tt_entry))
+    bool tt_hit = TT_lookup(hash, &tt_entry);
+    if (tt_hit)
     {
         int32_t tt_score = value_from_tt(tt_entry.score, depth);
         if (tt_entry.type == EXACT)
@@ -47,7 +48,7 @@ int32_t quiescence(BoardState *board_state,
     // 4) Recurse on captures
     uint16_t base = stack->count;
     generate_captures(board_state, stack);
-    sort_moves(board_state, stack, base, 0);
+    sort_moves_q(board_state, stack, base, tt_hit ? tt_entry.move : 0);
 
     for (uint16_t i = base; i < stack->count; i++)
     {

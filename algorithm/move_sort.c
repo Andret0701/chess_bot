@@ -42,7 +42,7 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
     else
     {
         if (from->white_pieces == to->white_pieces)
-            return from->white_check || to->white_check;
+            return to->black_check || to->white_check;
         moved_piece = from->black_pieces & ~to->black_pieces;
         captured_piece = from->white_pieces & ~to->white_pieces;
     }
@@ -107,19 +107,45 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
             captured_piece_index = 5;
     }
 
-    return piece_values[captured_piece_index] - piece_values[moved_piece_index] + 10000;
+    return piece_values[captured_piece_index] * 1000 - piece_values[moved_piece_index] + 10000;
 }
 
-void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
+void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move, uint8_t depth)
 {
     for (uint16_t i = base; i < stack->count; i++)
     {
         if (encoded_move_equals(stack->boards[i].move, tt_move))
             stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
-        else if (encoded_move_equals(stack->boards[i].move, killer_moves[from->board.side_to_move][0]))
-            stack->boards[i].mvvlva_score = UINT16_MAX - 1; // First killer move
-        else if (encoded_move_equals(stack->boards[i].move, killer_moves[from->board.side_to_move][1]))
-            stack->boards[i].mvvlva_score = UINT16_MAX - 2; // Second killer move
+        else if (is_move_capture(from, &stack->boards[i]))
+            stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
+        else if (encoded_move_equals(stack->boards[i].move, killer_moves[depth][0]))
+            stack->boards[i].mvvlva_score = 2; // First killer move
+        else if (encoded_move_equals(stack->boards[i].move, killer_moves[depth][1]))
+            stack->boards[i].mvvlva_score = 1; // Second killer move
+        else
+            stack->boards[i].mvvlva_score = 0; // Non-capture move
+    }
+
+    uint16_t num_moves = stack->count - base;
+    for (uint16_t i = 1; i < num_moves; ++i)
+    {
+        BoardState key = stack->boards[base + i];
+        int j = i - 1;
+        while (j >= 0 && stack->boards[base + j].mvvlva_score < key.mvvlva_score)
+        {
+            stack->boards[base + j + 1] = stack->boards[base + j];
+            --j;
+        }
+        stack->boards[base + j + 1] = key;
+    }
+}
+
+void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move)
+{
+    for (uint16_t i = base; i < stack->count; i++)
+    {
+        if (encoded_move_equals(stack->boards[i].move, tt_move))
+            stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
         else
             stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
     }
