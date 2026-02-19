@@ -17,24 +17,24 @@ int32_t get_castling_score(BoardState *board_state, uint8_t middlegame_phase, ui
 
     if (white_can_castle_kingside && white_can_castle_queenside)
         score += CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
-    if (white_can_castle_kingside)
+    else if (white_can_castle_kingside)
         score += CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
-    if (white_can_castle_queenside)
+    else if (white_can_castle_queenside)
         score += CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
-    if (white_has_castled_kingside)
+    else if (white_has_castled_kingside)
         score += HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
-    if (white_has_castled_queenside)
+    else if (white_has_castled_queenside)
         score += HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
 
     if (black_can_castle_kingside && black_can_castle_queenside)
         score -= CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
-    if (black_can_castle_kingside)
+    else if (black_can_castle_kingside)
         score -= CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
-    if (black_can_castle_queenside)
+    else if (black_can_castle_queenside)
         score -= CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
-    if (black_has_castled_kingside)
+    else if (black_has_castled_kingside)
         score -= HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
-    if (black_has_castled_queenside)
+    else if (black_has_castled_queenside)
         score -= HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
 
     return score;
