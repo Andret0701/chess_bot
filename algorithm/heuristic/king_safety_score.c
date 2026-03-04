@@ -1,4 +1,5 @@
 #include "king_safety_score.h"
+#include "engine/attack_generation/attack_generation.h"
 #include "../../utils/bitboard.h"
 #include "heuristic_values.h"
 
@@ -110,6 +111,28 @@ int32_t get_attacking_king_squares_score(BoardState *board_state)
     return score;
 }
 
+int32_t get_king_as_queen_penalty(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
+{
+    int32_t score = 0;
+
+    int white_king_square = __builtin_ctzll(board_state->board.white_pieces.king);
+    uint64_t white_king_queen_attack = generate_queen_attack(board_state->white_pieces | board_state->board.black_pieces.pawns, white_king_square) & ~board_state->white_pieces;
+    uint64_t white_king_zone = expand_bitboard(board_state->board.white_pieces.king);
+    white_king_zone |= expand_bitboard(white_king_zone);
+
+    int black_king_square = __builtin_ctzll(board_state->board.black_pieces.king);
+    uint64_t black_king_queen_attack = generate_queen_attack(board_state->black_pieces | board_state->board.white_pieces.pawns, black_king_square) & ~board_state->black_pieces;
+    uint64_t black_king_zone = expand_bitboard(board_state->board.black_pieces.king);
+    black_king_zone |= expand_bitboard(black_king_zone);
+
+    uint8_t white_king_queen_attacks = __builtin_popcountll(white_king_queen_attack & white_king_zone);
+    uint8_t black_king_queen_attacks = __builtin_popcountll(black_king_queen_attack & black_king_zone);
+    score += white_king_queen_attacks * (KING_AS_QUEEN_PENALTY_MIDDLEGAME * middlegame_phase + KING_AS_QUEEN_PENALTY_ENDGAME * endgame_phase);
+    score -= black_king_queen_attacks * (KING_AS_QUEEN_PENALTY_MIDDLEGAME * middlegame_phase + KING_AS_QUEEN_PENALTY_ENDGAME * endgame_phase);
+
+    return score;
+}
+
 int32_t get_king_safety_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
     int32_t score = 0;
@@ -117,6 +140,7 @@ int32_t get_king_safety_score(BoardState *board_state, uint8_t middlegame_phase,
     score += get_castling_score(board_state, middlegame_phase, endgame_phase);
     score += get_pawn_shelter_score(&board_state->board, middlegame_phase, endgame_phase);
     score += get_attacking_king_squares_score(board_state);
+    score += get_king_as_queen_penalty(board_state, middlegame_phase, endgame_phase);
 
     return score;
 }
