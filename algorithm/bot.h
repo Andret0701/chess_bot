@@ -21,3 +21,4 @@ BotResult run_time_bot(Board board, int wtime, int btime, int winc, int binc);
 BotResult run_movetime_bot(Board board, int movetime);
 BotResult run_nodes_bot(Board board, uint64_t nodes);
 BotResult run_heuristic_bot(Board board);
+void run_heuristic_all(Board board);

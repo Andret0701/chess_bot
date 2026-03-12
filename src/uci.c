@@ -11,6 +11,7 @@
 #include "algorithm/bot.h"
 #include "algorithm/zobrist_hash.h"
 #include "algorithm/heuristic/heuristic_values.h"
+#include "src/evalfile.h"
 
 #define IS_JUNIOR false
 #define UCI_LOG_FILE "uci_log.txt"
@@ -268,6 +269,14 @@ void uci_loop(bool debug_mode)
             parse_position(input);
             log_board(current_board);
         }
+        else if (strncmp(input, "heuristic", 9) == 0)
+        {
+            run_heuristic_all(current_board);
+        }
+        else if (strncmp(input, "evalfile", 8) == 0)
+        {
+            evalfile_run_uci_command(input);
+        }
         else if (strncmp(input, "go", 2) == 0)
         {
             // Instead of searching, return a dummy move
@@ -299,7 +308,7 @@ void uci_loop(bool debug_mode)
 
             if (debug_mode)
             {
-                double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+                double score_value = ((double)result.score) / ((double)1000 * 24);
                 respond("bestmove %s score %.2f depth %d", result.move, score_value, result.depth);
             }
             else

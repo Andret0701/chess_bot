@@ -21,7 +21,7 @@
 
 void print_bot_result(BotResult result)
 {
-    double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+    double score_value = ((double)result.score) / ((double)1000 * 24);
     printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d)\n",
            result.move,
            result.depth,
@@ -259,7 +259,7 @@ BotResult run_heuristic_bot(Board board)
     for (uint16_t i = 0; i < stack->count; i++)
     {
         BoardState *next_board_state = &stack->boards[i];
-        int32_t score = score_board(next_board_state);
+        int32_t score = -score_board(next_board_state);
         if (score > best_score)
         {
             best_score = score;
@@ -269,4 +269,20 @@ BotResult run_heuristic_bot(Board board)
     BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), best_score, 0};
     destroy_board_stack(stack);
     return result;
+}
+
+void run_heuristic_all(Board board)
+{
+    BoardState board_state = board_to_board_state(&board);
+    BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
+    generate_moves(&board_state, stack);
+    for (uint16_t i = 0; i < stack->count; i++)
+    {
+        BoardState *next_board_state = &stack->boards[i];
+        int32_t score = -score_board(next_board_state);
+
+        printf("%s %d ", board_to_move(&board, &stack->boards[i].board), score);
+    }
+    printf("\n");
+    destroy_board_stack(stack);
 }

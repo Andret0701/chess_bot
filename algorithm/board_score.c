@@ -43,7 +43,7 @@ const char *result_to_string(Result result)
 
 void print_score(BoardScore score)
 {
-    double score_value = ((double)score.score) / ((double)HEURISTIC_SCALE * 24);
+    double score_value = ((double)score.score) / ((double)1000 * 24);
     printf("Score: %.2f, Result: %s, Depth: %d\n", score_value, result_to_string(score.result), score.depth);
 }
 

@@ -113,19 +113,24 @@ int32_t score_board(BoardState *board_state)
     // score += (material_lead / (100 * 24 * HEURISTIC_SCALE)) * (TRADE_OFF_MATERIAL_MIDDLEGAME * middlegame_phase + TRADE_OFF_MATERIAL_ENDGAME * endgame_phase);
 
     // Positional scoring
-    score += get_position_score(&board_state->board, middlegame_phase, endgame_phase);
+    int32_t position_score = get_position_score(&board_state->board, middlegame_phase, endgame_phase);
+    score += position_score;
 
     // King safety scoring
-    score += get_king_safety_score(board_state, middlegame_phase, endgame_phase);
+    int32_t king_safety_score = get_king_safety_score(board_state, middlegame_phase, endgame_phase);
+    score += king_safety_score;
 
     // Pawn structure scoring
-    score += get_pawn_structure_score(board_state, middlegame_phase, endgame_phase);
+    int32_t pawn_structure_score = get_pawn_structure_score(board_state, middlegame_phase, endgame_phase);
+    score += pawn_structure_score;
 
     // Square control scoring
-    score += get_square_control_score(board_state, middlegame_phase, endgame_phase);
+    int32_t square_control_score = get_square_control_score(board_state, middlegame_phase, endgame_phase);
+    score += square_control_score;
 
     // Rook scoring
-    score += get_rook_score(board_state, middlegame_phase, endgame_phase);
+    int32_t rook_score = get_rook_score(board_state, middlegame_phase, endgame_phase);
+    score += rook_score;
 
     if (board_state->board.side_to_move == BLACK)
         score = -score;

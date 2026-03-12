@@ -68,7 +68,7 @@ void play_game(double time_seconds, double increment_seconds)
         board_state = board_to_board_state(&board);
         print_board(&board);
 
-        double score_value = ((double)result.score) / ((double)HEURISTIC_SCALE * 24);
+        double score_value = ((double)result.score) / ((double)1000 * 24);
         printf("Move: %s, Score: %.2f, Depth: %d\n", result.move, score_value, result.depth);
         printf("White time: %.1f, Black time: %.1f\n", wtime / 1000.0, btime / 1000.0);
 
