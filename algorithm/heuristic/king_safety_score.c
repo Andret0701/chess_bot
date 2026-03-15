@@ -9,34 +9,20 @@ int32_t get_castling_score(BoardState *board_state, uint8_t middlegame_phase, ui
 
     bool white_can_castle_kingside = (board_state->board.castling_rights & WHITE_KINGSIDE_CASTLE) != 0;
     bool white_can_castle_queenside = (board_state->board.castling_rights & WHITE_QUEENSIDE_CASTLE) != 0;
-    bool white_has_castled_kingside = (board_state->has_castled & WHITE_KINGSIDE_CASTLE) != 0;
-    bool white_has_castled_queenside = (board_state->has_castled & WHITE_QUEENSIDE_CASTLE) != 0;
     bool black_can_castle_kingside = (board_state->board.castling_rights & BLACK_KINGSIDE_CASTLE) != 0;
     bool black_can_castle_queenside = (board_state->board.castling_rights & BLACK_QUEENSIDE_CASTLE) != 0;
-    bool black_has_castled_kingside = (board_state->has_castled & BLACK_KINGSIDE_CASTLE) != 0;
-    bool black_has_castled_queenside = (board_state->has_castled & BLACK_QUEENSIDE_CASTLE) != 0;
-
     if (white_can_castle_kingside && white_can_castle_queenside)
         score += CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
     else if (white_can_castle_kingside)
         score += CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
     else if (white_can_castle_queenside)
         score += CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
-    else if (white_has_castled_kingside)
-        score += HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
-    else if (white_has_castled_queenside)
-        score += HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
-
     if (black_can_castle_kingside && black_can_castle_queenside)
         score -= CAN_CASTLE_BOTH_SIDES_MIDDLEGAME * middlegame_phase + CAN_CASTLE_BOTH_SIDES_ENDGAME * endgame_phase;
     else if (black_can_castle_kingside)
         score -= CAN_CASTLE_KINGSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_KINGSIDE_ENDGAME * endgame_phase;
     else if (black_can_castle_queenside)
         score -= CAN_CASTLE_QUEENSIDE_MIDDLEGAME * middlegame_phase + CAN_CASTLE_QUEENSIDE_ENDGAME * endgame_phase;
-    else if (black_has_castled_kingside)
-        score -= HAS_CASTLED_KINGSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_KINGSIDE_ENDGAME * endgame_phase;
-    else if (black_has_castled_queenside)
-        score -= HAS_CASTLED_QUEENSIDE_MIDDLEGAME * middlegame_phase + HAS_CASTLED_QUEENSIDE_ENDGAME * endgame_phase;
 
     return score;
 }
@@ -90,7 +76,7 @@ int32_t get_pawn_shelter_score(Board *board, uint8_t middlegame_phase, uint8_t e
     return score;
 }
 
-int32_t get_attacking_king_squares_score(BoardState *board_state)
+int32_t get_attacking_king_squares_score(BoardState *board_state, uint8_t middlegame_phase, uint8_t endgame_phase)
 {
     int32_t score = 0;
 
@@ -105,8 +91,8 @@ int32_t get_attacking_king_squares_score(BoardState *board_state)
     attacked_white_king_squares *= attacked_white_king_squares;
     attacked_black_king_squares *= attacked_black_king_squares;
 
-    score += attacked_white_king_squares * ATTACKING_KING_SQUARES * 24;
-    score -= attacked_black_king_squares * ATTACKING_KING_SQUARES * 24;
+    score += attacked_white_king_squares * (ATTACKING_KING_SQUARES_MIDDLEGAME * middlegame_phase + ATTACKING_KING_SQUARES_ENDGAME * endgame_phase);
+    score -= attacked_black_king_squares * (ATTACKING_KING_SQUARES_MIDDLEGAME * middlegame_phase + ATTACKING_KING_SQUARES_ENDGAME * endgame_phase);
 
     return score;
 }
@@ -139,7 +125,7 @@ int32_t get_king_safety_score(BoardState *board_state, uint8_t middlegame_phase,
 
     score += get_castling_score(board_state, middlegame_phase, endgame_phase);
     score += get_pawn_shelter_score(&board_state->board, middlegame_phase, endgame_phase);
-    score += get_attacking_king_squares_score(board_state);
+    score += get_attacking_king_squares_score(board_state, middlegame_phase, endgame_phase);
     score += get_king_as_queen_penalty(board_state, middlegame_phase, endgame_phase);
 
     return score;
