@@ -4,7 +4,7 @@
 BoardStack *create_board_stack(uint32_t size)
 {
     BoardStack *stack = malloc(sizeof(BoardStack));
-    stack->boards = malloc(size * sizeof(Board));
+    stack->boards = malloc(size * sizeof(BoardState));
     stack->count = 0;
     stack->size = size;
     return stack;

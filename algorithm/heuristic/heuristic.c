@@ -36,8 +36,8 @@ bool has_insufficient_material(Board *board)
     if (white_knights + black_knights == 0 && white_bishops == 1 && black_bishops == 1)
     {
         // Check if bishops are on same colored squares
-        bool white_bishop_on_light = (board->white_pieces.bishops & 0b0101010101010101010101010101010101010101010101010101010101010101) > 0;
-        bool black_bishop_on_light = (board->black_pieces.bishops & 0b0101010101010101010101010101010101010101010101010101010101010101) > 0;
+        bool white_bishop_on_light = (board->white_pieces.bishops & LIGHT_SQUARES_MASK) > 0;
+        bool black_bishop_on_light = (board->black_pieces.bishops & LIGHT_SQUARES_MASK) > 0;
         return white_bishop_on_light == black_bishop_on_light;
     }
 
