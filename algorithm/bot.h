@@ -13,6 +13,7 @@ typedef struct
     char *move;
     int32_t score;
     uint8_t depth;
+    uint64_t nodes_searched;
 } BotResult;
 
 void print_bot_result(BotResult result);

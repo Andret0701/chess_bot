@@ -22,7 +22,7 @@ int32_t quiescence(BoardState *board_state,
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool tt_hit = TT_lookup(hash, &tt_entry);
-    if (is_mate_score(tt_entry.score) && tt_hit)
+    if (tt_hit && is_mate_score(tt_entry.score))
         tt_hit = false; // Don't use mate scores from quiescence search
 
     if (tt_hit)

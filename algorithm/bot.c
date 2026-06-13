@@ -119,6 +119,12 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(&board_state, stack);
+    if (stack->count == 0)
+    {
+        BotResult result = {"0000", get_result_score(get_game_result(&board_state), 0), 0, nodes_searched};
+        destroy_board_stack(stack);
+        return result;
+    }
 
     uint16_t num_moves = stack->count;
     for (uint16_t i = 0; i < num_moves; i++)
@@ -155,7 +161,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
                 if (i == 0)
                     depth--;
 
-                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
                 destroy_board_stack(stack);
                 return result;
             }
@@ -175,7 +181,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
 
                 TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
 
-                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
                 destroy_board_stack(stack);
                 return result;
             }
@@ -212,7 +218,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
         //     // if (DEBUG_INFO)
         //     //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
 
-        //     BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+        //     BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
         //     destroy_board_stack(stack);
         //     return result;
         // }
@@ -221,7 +227,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
         {
             // if (DEBUG_INFO)
             //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);
-            BotResult result = {board_to_move(&board, &best_board->board), best_score, depth};
+            BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
             destroy_board_stack(stack);
             return result;
         }
@@ -266,7 +272,7 @@ BotResult run_heuristic_bot(Board board)
             best_move_index = i;
         }
     }
-    BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), best_score, 0};
+    BotResult result = {board_to_move(&board, &stack->boards[best_move_index].board), best_score, 0, 0};
     destroy_board_stack(stack);
     return result;
 }

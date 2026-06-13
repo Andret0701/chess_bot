@@ -20,7 +20,6 @@ void init_reductions()
 }
 uint8_t calculate_reduction(BoardState *current, BoardState *next, uint8_t depth, uint16_t move_number)
 {
-    __builtin_prefetch(&reductions[depth][move_number], 0, 3);
 
     bool is_capture = is_move_capture(current, next);
     bool is_promo = is_move_promotion(current, next);

@@ -1,8 +1,10 @@
 #include "move_sort.h"
 #include <stdio.h>
 #include "../engine/encoded_move.h"
+#include "move_categorization.h"
 
 #define MAX_DEPTH 255
+#define MAX_MOVES 300
 
 uint16_t killer_moves[MAX_DEPTH][2] = {0};
 
@@ -26,23 +28,25 @@ void add_killer_move(uint16_t move, uint8_t depth)
     killer_moves[depth][0] = move;
 }
 
-uint16_t get_mvvlva(BoardState *from, BoardState *to)
+uint8_t get_mvvlva(BoardState *from, BoardState *to)
 {
-    const int piece_values[6] = {100, 300, 300, 500, 900, 10000}; // Pawn, Knight, Bishop, Rook, Queen, King
+    const int MVV_LVA[5][6] = {
+        {50, 51, 52, 53, 54, 55}, // victim Q, attacker K, Q, R, B, N, P
+        {40, 41, 42, 43, 44, 45}, // victim R, attacker K, Q, R, B, N, P
+        {30, 31, 32, 33, 34, 35}, // victim B, attacker K, Q, R, B, N, P
+        {20, 21, 22, 23, 24, 25}, // victim N, attacker K， Q， R， B， N， P
+        {10, 11, 12, 13, 14, 15}, // victim P， attacker K， Q， R， B， N， P
+    };
 
     uint64_t moved_piece;
     uint64_t captured_piece;
     if (from->board.side_to_move == WHITE)
     {
-        if (from->black_pieces == to->black_pieces)
-            return to->black_check || to->white_check;
         moved_piece = from->white_pieces & ~to->white_pieces;
         captured_piece = from->black_pieces & ~to->black_pieces;
     }
     else
     {
-        if (from->white_pieces == to->white_pieces)
-            return to->black_check || to->white_check;
         moved_piece = from->black_pieces & ~to->black_pieces;
         captured_piece = from->white_pieces & ~to->white_pieces;
     }
@@ -53,108 +57,129 @@ uint16_t get_mvvlva(BoardState *from, BoardState *to)
     if (from->board.side_to_move == WHITE)
     {
         if (moved_piece & from->board.white_pieces.pawns)
-            moved_piece_index = 0;
-        else if (moved_piece & from->board.white_pieces.knights)
-            moved_piece_index = 1;
-        else if (moved_piece & from->board.white_pieces.bishops)
-            moved_piece_index = 2;
-        else if (moved_piece & from->board.white_pieces.rooks)
-            moved_piece_index = 3;
-        else if (moved_piece & from->board.white_pieces.queens)
-            moved_piece_index = 4;
-        else
             moved_piece_index = 5;
+        else if (moved_piece & from->board.white_pieces.knights)
+            moved_piece_index = 4;
+        else if (moved_piece & from->board.white_pieces.bishops)
+            moved_piece_index = 3;
+        else if (moved_piece & from->board.white_pieces.rooks)
+            moved_piece_index = 2;
+        else if (moved_piece & from->board.white_pieces.queens)
+            moved_piece_index = 1;
+        else
+            moved_piece_index = 0;
 
         if (captured_piece & from->board.black_pieces.pawns)
-            captured_piece_index = 0;
+            captured_piece_index = 4;
         else if (captured_piece & from->board.black_pieces.knights)
-            captured_piece_index = 1;
+            captured_piece_index = 3;
         else if (captured_piece & from->board.black_pieces.bishops)
             captured_piece_index = 2;
         else if (captured_piece & from->board.black_pieces.rooks)
-            captured_piece_index = 3;
-        else if (captured_piece & from->board.black_pieces.queens)
-            captured_piece_index = 4;
+            captured_piece_index = 1;
         else
-            captured_piece_index = 5;
+            captured_piece_index = 0;
     }
     else
     {
         if (moved_piece & from->board.black_pieces.pawns)
-            moved_piece_index = 0;
-        else if (moved_piece & from->board.black_pieces.knights)
-            moved_piece_index = 1;
-        else if (moved_piece & from->board.black_pieces.bishops)
-            moved_piece_index = 2;
-        else if (moved_piece & from->board.black_pieces.rooks)
-            moved_piece_index = 3;
-        else if (moved_piece & from->board.black_pieces.queens)
-            moved_piece_index = 4;
-        else
             moved_piece_index = 5;
+        else if (moved_piece & from->board.black_pieces.knights)
+            moved_piece_index = 4;
+        else if (moved_piece & from->board.black_pieces.bishops)
+            moved_piece_index = 3;
+        else if (moved_piece & from->board.black_pieces.rooks)
+            moved_piece_index = 2;
+        else if (moved_piece & from->board.black_pieces.queens)
+            moved_piece_index = 1;
+        else
+            moved_piece_index = 0;
 
         if (captured_piece & from->board.white_pieces.pawns)
-            captured_piece_index = 0;
+            captured_piece_index = 4;
         else if (captured_piece & from->board.white_pieces.knights)
-            captured_piece_index = 1;
+            captured_piece_index = 3;
         else if (captured_piece & from->board.white_pieces.bishops)
             captured_piece_index = 2;
         else if (captured_piece & from->board.white_pieces.rooks)
-            captured_piece_index = 3;
-        else if (captured_piece & from->board.white_pieces.queens)
-            captured_piece_index = 4;
+            captured_piece_index = 1;
         else
-            captured_piece_index = 5;
+            captured_piece_index = 0;
     }
 
-    return piece_values[captured_piece_index] * 1000 - piece_values[moved_piece_index] + 10000;
+    return MVV_LVA[captured_piece_index][moved_piece_index] * 2 + (is_move_check(to) ? 1 : 0);
 }
 
 void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move, uint8_t depth)
 {
-    for (uint16_t i = base; i < stack->count; i++)
+    uint16_t num_moves = stack->count - base;
+    uint8_t scores[MAX_MOVES];
+
+    for (uint16_t i = 0; i < num_moves; i++)
     {
-        if (encoded_move_equals(stack->boards[i].move, tt_move))
-            stack->boards[i].mvvlva_score = UINT16_MAX; // Move from transposition table
-        else if (is_move_capture(from, &stack->boards[i]))
-            stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
-        else if (encoded_move_equals(stack->boards[i].move, killer_moves[depth][0]))
-            stack->boards[i].mvvlva_score = 2; // First killer move
-        else if (encoded_move_equals(stack->boards[i].move, killer_moves[depth][1]))
-            stack->boards[i].mvvlva_score = 1; // Second killer move
+        BoardState *move_state = &stack->boards[base + i];
+
+        if (encoded_move_equals(move_state->move, tt_move))
+            scores[i] = 250;
+        else if (is_move_capture(from, move_state))
+            scores[i] = get_mvvlva(from, move_state);
+        else if (depth < MAX_DEPTH && encoded_move_equals(move_state->move, killer_moves[depth][0]))
+            scores[i] = 3;
+        else if (depth < MAX_DEPTH && encoded_move_equals(move_state->move, killer_moves[depth][1]))
+            scores[i] = 2;
         else
-            stack->boards[i].mvvlva_score = 0; // Non-capture move
+            scores[i] = is_move_check(move_state) ? 1 : 0;
     }
 
-    uint16_t num_moves = stack->count - base;
     for (uint16_t i = 1; i < num_moves; ++i)
     {
         BoardState key = stack->boards[base + i];
+        uint8_t key_score = scores[i];
+
         int j = i - 1;
-        while (j >= 0 && stack->boards[base + j].mvvlva_score < key.mvvlva_score)
+
+        while (j >= 0 && scores[j] < key_score)
         {
             stack->boards[base + j + 1] = stack->boards[base + j];
+            scores[j + 1] = scores[j];
             --j;
         }
+
         stack->boards[base + j + 1] = key;
+        scores[j + 1] = key_score;
     }
 }
 
 void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
 {
-    for (uint16_t i = base; i < stack->count; i++)
-        stack->boards[i].mvvlva_score = get_mvvlva(from, &stack->boards[i]);
-
     uint16_t num_moves = stack->count - base;
+    uint8_t scores[MAX_MOVES];
+
+    for (uint16_t i = 0; i < num_moves; i++)
+    {
+        BoardState *move_state = &stack->boards[base + i];
+
+        if (is_move_capture(from, move_state))
+            scores[i] = get_mvvlva(from, move_state);
+        else
+            scores[i] = is_move_check(move_state) ? 1 : 0;
+    }
+
     for (uint16_t i = 1; i < num_moves; ++i)
     {
         BoardState key = stack->boards[base + i];
+        uint8_t key_score = scores[i];
+
         int j = i - 1;
-        while (j >= 0 && stack->boards[base + j].mvvlva_score < key.mvvlva_score)
+
+        while (j >= 0 && scores[j] < key_score)
         {
             stack->boards[base + j + 1] = stack->boards[base + j];
+            scores[j + 1] = scores[j];
             --j;
         }
+
         stack->boards[base + j + 1] = key;
+        scores[j + 1] = key_score;
     }
 }

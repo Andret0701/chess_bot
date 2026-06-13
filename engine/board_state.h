@@ -21,8 +21,7 @@ typedef struct
     bool black_check;
 
     uint8_t has_castled;
-    uint16_t move;         // Move that led to this position
-    uint16_t mvvlva_score; // for sorting moves
+    uint16_t move; // Move that led to this position
 } BoardState;
 
 BoardState board_to_board_state(Board *board);

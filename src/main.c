@@ -6,6 +6,7 @@
 
 #include "engine/tests/count_test.h"
 #include "engine/benchmark/count_benchmark.h"
+#include "engine/benchmark/nodes_benchmark.h"
 #include "algorithm/board_score.h"
 
 #include "algorithm/bot.h"
@@ -64,6 +65,12 @@ int main(int argc, char *argv[])
     {
         printf("Running benchmark\n");
         run_count_benchmark();
+        exit(0);
+    }
+    else if (argc >= 2 && strcmp(argv[1], "nodes") == 0)
+    {
+        printf("Running nodes benchmark\n");
+        run_nodes_benchmark();
         exit(0);
     }
     else if (argc >= 2 && strcmp(argv[1], "debug") == 0)
