@@ -123,9 +123,15 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         finished |= result != UNKNOWN;
 
         int32_t score;
+        TT_Entry_Type type = EXACT;
         if (!finished)
         {
             score = quiescence(board_state, stack, alpha_orig, beta, depth, 0, nodes_searched);
+            if (score <= alpha_orig)
+                type = UPPERBOUND;
+            else if (score >= beta)
+                type = LOWERBOUND;
+
             if (use_max_nodes && *nodes_searched > max_nodes)
             {
                 pop_game_history(hash);
@@ -137,7 +143,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
             score = get_result_score(result, depth);
 
         pop_game_history(hash);
-        TT_store(hash, 0, value_to_tt(score, depth), EXACT, 0);
+        TT_store(hash, 0, value_to_tt(score, depth), type, 0);
         return score;
     }
 
