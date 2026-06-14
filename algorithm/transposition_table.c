@@ -5,7 +5,7 @@
 #define NUM_TT_ENTRIES (1 << 25)
 #define TT_MASK (NUM_TT_ENTRIES - 1)
 
-uint8_t current_generation = 0;
+uint64_t current_generation = 0;
 
 // At the start of a new search:
 void TT_clear_generation()
