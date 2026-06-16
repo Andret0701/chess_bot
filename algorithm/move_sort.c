@@ -110,6 +110,63 @@ uint8_t get_mvvlva(BoardState *from, BoardState *to)
     return MVV_LVA[captured_piece_index][moved_piece_index] * 2 + (is_move_check(to) ? 1 : 0);
 }
 
+uint8_t get_quiet_score(BoardState *from, BoardState *to)
+{
+    uint64_t from_moved_piece;
+    uint64_t to_moved_piece;
+
+    if (from->board.side_to_move == WHITE)
+    {
+        from_moved_piece = from->white_pieces & ~to->white_pieces;
+        to_moved_piece = to->white_pieces & ~from->white_pieces;
+    }
+    else
+    {
+        from_moved_piece = from->black_pieces & ~to->black_pieces;
+        to_moved_piece = to->black_pieces & ~from->black_pieces;
+    }
+
+    bool from_attacked;
+    bool to_protected;
+    bool to_attacked;
+
+    if (from->board.side_to_move == WHITE)
+    {
+        from_attacked = (from->black_attack & from_moved_piece) != 0;
+        to_protected = (to->white_attack & to_moved_piece) != 0;
+        to_attacked = (to->black_attack & to_moved_piece) != 0;
+    }
+    else
+    {
+        from_attacked = (from->white_attack & from_moved_piece) != 0;
+        to_protected = (to->black_attack & to_moved_piece) != 0;
+        to_attacked = (to->white_attack & to_moved_piece) != 0;
+    }
+
+    uint8_t score = 0;
+
+    if (is_move_check(to))
+        score += 8;
+
+    if (is_move_threatening_promotion(from, to))
+        score += 10;
+
+    if (from_attacked && !to_attacked)
+        score += 6; // escaping attack to safety
+    else if (!to_attacked && to_protected)
+        score += 5; // safe and defended
+    else if (!to_attacked)
+        score += 4; // safe but undefended
+    else if (from_attacked && to_attacked && to_protected)
+        score += 3; // still attacked, but at least defended
+    else if (to_attacked && to_protected)
+        score += 2; // walks into attacked square, but defended
+    else
+        score += 0; // attacked and undefended
+
+    return score;
+}
+
 void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_move, uint8_t depth)
 {
     uint16_t num_moves = stack->count - base;
@@ -122,13 +179,13 @@ void sort_moves(BoardState *from, BoardStack *stack, uint16_t base, uint16_t tt_
         if (encoded_move_equals(move_state->move, tt_move))
             scores[i] = 250;
         else if (is_move_capture(from, move_state))
-            scores[i] = get_mvvlva(from, move_state);
+            scores[i] = get_mvvlva(from, move_state) + 50;
         else if (depth < MAX_DEPTH && encoded_move_equals(move_state->move, killer_moves[depth][0]))
-            scores[i] = 3;
+            scores[i] = 49;
         else if (depth < MAX_DEPTH && encoded_move_equals(move_state->move, killer_moves[depth][1]))
-            scores[i] = 2;
+            scores[i] = 48;
         else
-            scores[i] = is_move_check(move_state) ? 1 : 0;
+            scores[i] = get_quiet_score(from, move_state);
     }
 
     for (uint16_t i = 1; i < num_moves; ++i)
@@ -158,11 +215,7 @@ void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
     for (uint16_t i = 0; i < num_moves; i++)
     {
         BoardState *move_state = &stack->boards[base + i];
-
-        if (is_move_capture(from, move_state))
-            scores[i] = get_mvvlva(from, move_state);
-        else
-            scores[i] = is_move_check(move_state) ? 1 : 0;
+        scores[i] = get_mvvlva(from, move_state);
     }
 
     for (uint16_t i = 1; i < num_moves; ++i)

@@ -5,6 +5,7 @@
 #include "../piece_moves.h"
 #include "../tests/count_tests.h"
 #include "../../algorithm/bot.h"
+#include <inttypes.h>
 
 void run_nodes_benchmark()
 {
@@ -23,14 +24,19 @@ void run_nodes_benchmark()
         boards[i] = fen_to_board(tests[i].fen);
     }
 
-    double average_nodes = 0;
+    uint64_t total_nodes = 0;
+    uint64_t total_squares = 0;
     for (size_t i = 0; i < num_tests; i++)
     {
         BoardState board_state = board_to_board_state(&boards[i]);
         BotResult result = run_depth_bot(boards[i], 5);
-        average_nodes += result.nodes_searched * (1.0 / num_tests);
+        total_nodes += result.nodes_searched;
+        total_squares += result.nodes_searched * result.nodes_searched;
     }
-    printf("Average nodes searched: %.2f\n", average_nodes);
+    printf("Total nodes searched: %" PRIu64 "\n", total_nodes);
+    printf("Average nodes per position: %.2f\n", (double)total_nodes / num_tests);
+    printf("Total nodes squared: %" PRIu64 "\n", total_squares);
+    printf("Average nodes squared per position: %.2f\n", (double)total_squares / num_tests);
 
     free(boards);
 }

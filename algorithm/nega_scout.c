@@ -76,12 +76,19 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
             pop_game_history(hash);
             return tt_score;
         }
-        else if (tt_entry.type == LOWERBOUND && tt_score >= beta)
+
+        if (tt_entry.type == LOWERBOUND)
         {
-            pop_game_history(hash);
-            return tt_score;
+            if (tt_score > alpha)
+                alpha = tt_score;
         }
-        else if (tt_entry.type == UPPERBOUND && tt_score <= alpha)
+        else if (tt_entry.type == UPPERBOUND)
+        {
+            if (tt_score < beta)
+                beta = tt_score;
+        }
+
+        if (alpha >= beta)
         {
             pop_game_history(hash);
             return tt_score;

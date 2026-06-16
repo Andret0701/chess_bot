@@ -13,12 +13,12 @@ typedef enum
 
 typedef struct
 {
-    uint64_t hash;       // Zobrist hash of the position.
-    uint8_t depth;       // Remaining depth at which this evaluation was computed.
-    int32_t score;       // The evaluation score.
-    TT_Entry_Type type;  // The type of the evaluation.
-    uint16_t move;       // The best move for this position.
-    uint64_t generation; // The generation of the entry.
+    uint64_t hash;      // Zobrist hash of the position.
+    uint8_t depth;      // Remaining depth at which this evaluation was computed.
+    int32_t score;      // The evaluation score.
+    TT_Entry_Type type; // The type of the evaluation.
+    uint16_t move;      // The best move for this position.
+    uint8_t generation; // The generation of the entry.
 } TT_Entry;
 
 void TT_clear_generation();
