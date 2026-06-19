@@ -145,6 +145,33 @@ bool is_losing(int32_t score)
     return score <= -MATE_SCORE + MAX_DEPTH;
 }
 
+uint8_t get_depth_to_mate(int32_t score)
+{
+    if (is_winning(score))
+        return MATE_SCORE - score;
+    else if (is_losing(score))
+        return MATE_SCORE + score;
+    else
+        return 0;
+}
+
+double score_to_centipawns(int32_t score)
+{
+    return (double)(score / ((double)24.0 * CENTER_PAWN_MIDDLEGAME));
+}
+
+char *format_score(int32_t score)
+{
+    static char buffer[20];
+    if (is_winning(score))
+        sprintf(buffer, "#%d", get_depth_to_mate(score));
+    else if (is_losing(score))
+        sprintf(buffer, "#-%d", get_depth_to_mate(score));
+    else
+        sprintf(buffer, "%.2f", score_to_centipawns(score));
+    return buffer;
+}
+
 bool is_mate_score(int32_t score)
 {
     return is_winning(score) || is_losing(score);

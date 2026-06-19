@@ -166,6 +166,8 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
                 return result;
             }
 
+            // printf("Depth: %d, Move: %s, Score: %s\n", depth, board_to_move(&board, &current_board_state->board), format_score(score));
+
             moves[i].score = score;
             if (score > best_score)
             {
