@@ -62,44 +62,26 @@ int32_t get_isolated_pawn_score(BoardState *board_state, uint8_t middlegame_phas
     uint64_t white_pawns = board_state->board.white_pieces.pawns;
     uint64_t black_pawns = board_state->board.black_pieces.pawns;
 
-    bool file_a_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_A_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_B_MASK) == 0;
-    bool file_b_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_B_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_C_MASK) == 0;
-    bool file_c_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_C_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_D_MASK) == 0;
-    bool file_d_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_D_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_E_MASK) == 0;
-    bool file_e_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_E_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_F_MASK) == 0;
-    bool file_f_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_F_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_G_MASK) == 0;
-    bool file_g_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_G_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_H_MASK) == 0;
-    bool file_h_has_isolated_white_pawn = __builtin_popcountll(white_pawns & FILE_H_MASK) == 1 && __builtin_popcountll(white_pawns & FILE_G_MASK) == 0;
+    uint8_t file_a_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_B_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_A_MASK) : 0;
+    uint8_t file_b_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_C_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_B_MASK) : 0;
+    uint8_t file_c_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_D_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_C_MASK) : 0;
+    uint8_t file_d_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_E_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_D_MASK) : 0;
+    uint8_t file_e_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_F_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_E_MASK) : 0;
+    uint8_t file_f_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_G_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_F_MASK) : 0;
+    uint8_t file_g_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(white_pawns & FILE_H_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_G_MASK) : 0;
+    uint8_t file_h_isolated_white_pawns = (__builtin_popcountll(white_pawns & FILE_G_MASK) == 0) ? __builtin_popcountll(white_pawns & FILE_H_MASK) : 0;
 
-    bool file_a_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_A_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_B_MASK) == 0;
-    bool file_b_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_B_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_C_MASK) == 0;
-    bool file_c_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_C_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_D_MASK) == 0;
-    bool file_d_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_D_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_E_MASK) == 0;
-    bool file_e_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_E_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0;
-    bool file_f_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_F_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0;
-    bool file_g_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_G_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_H_MASK) == 0;
-    bool file_h_has_isolated_black_pawn = __builtin_popcountll(black_pawns & FILE_H_MASK) == 1 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0;
+    uint8_t file_a_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_B_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_A_MASK) : 0;
+    uint8_t file_b_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_A_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_C_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_B_MASK) : 0;
+    uint8_t file_c_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_B_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_D_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_C_MASK) : 0;
+    uint8_t file_d_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_C_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_E_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_D_MASK) : 0;
+    uint8_t file_e_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_D_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_F_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_E_MASK) : 0;
+    uint8_t file_f_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_E_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_G_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_F_MASK) : 0;
+    uint8_t file_g_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_F_MASK) == 0 && __builtin_popcountll(black_pawns & FILE_H_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_G_MASK) : 0;
+    uint8_t file_h_isolated_black_pawns = (__builtin_popcountll(black_pawns & FILE_G_MASK) == 0) ? __builtin_popcountll(black_pawns & FILE_H_MASK) : 0;
 
-    uint8_t white_isolated_pawns = 0;
-    uint8_t black_isolated_pawns = 0;
-
-    white_isolated_pawns += file_a_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_b_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_c_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_d_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_e_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_f_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_g_has_isolated_white_pawn ? 1 : 0;
-    white_isolated_pawns += file_h_has_isolated_white_pawn ? 1 : 0;
-
-    black_isolated_pawns += file_a_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_b_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_c_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_d_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_e_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_f_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_g_has_isolated_black_pawn ? 1 : 0;
-    black_isolated_pawns += file_h_has_isolated_black_pawn ? 1 : 0;
+    uint8_t white_isolated_pawns = file_a_isolated_white_pawns + file_b_isolated_white_pawns + file_c_isolated_white_pawns + file_d_isolated_white_pawns + file_e_isolated_white_pawns + file_f_isolated_white_pawns + file_g_isolated_white_pawns + file_h_isolated_white_pawns;
+    uint8_t black_isolated_pawns = file_a_isolated_black_pawns + file_b_isolated_black_pawns + file_c_isolated_black_pawns + file_d_isolated_black_pawns + file_e_isolated_black_pawns + file_f_isolated_black_pawns + file_g_isolated_black_pawns + file_h_isolated_black_pawns;
 
     score += white_isolated_pawns * (ISOLATED_PAWN_MIDDLEGAME * middlegame_phase + ISOLATED_PAWN_ENDGAME * endgame_phase);
     score -= black_isolated_pawns * (ISOLATED_PAWN_MIDDLEGAME * middlegame_phase + ISOLATED_PAWN_ENDGAME * endgame_phase);
