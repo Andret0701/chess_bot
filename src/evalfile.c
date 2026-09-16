@@ -264,7 +264,8 @@ static bool eval_position_neg_cpl(const char *fen_str, Board board, const char *
     if (n <= 0)
         return false;
 
-    BotResult bot_result = run_nodes_bot(board, EVALFILE_DEFAULT_NODES);
+    // BotResult bot_result = run_nodes_bot(board, EVALFILE_DEFAULT_NODES);
+    BotResult bot_result = run_heuristic_bot(board);
     const char *uci = bot_result.move;
 
     if (!uci || !*uci)

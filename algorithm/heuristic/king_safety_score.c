@@ -126,7 +126,7 @@ int32_t get_king_safety_score(BoardState *board_state, uint8_t middlegame_phase,
     score += get_castling_score(board_state, middlegame_phase, endgame_phase);
     score += get_pawn_shelter_score(&board_state->board, middlegame_phase, endgame_phase);
     score += get_attacking_king_squares_score(board_state, middlegame_phase, endgame_phase);
-    score += get_king_as_queen_penalty(board_state, middlegame_phase, endgame_phase);
+    //  score += get_king_as_queen_penalty(board_state, middlegame_phase, endgame_phase);
 
     return score;
 }

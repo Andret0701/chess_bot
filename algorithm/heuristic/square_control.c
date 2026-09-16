@@ -12,8 +12,8 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(white_bishops);
         uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->white_pieces;
-        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->black_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->black_attacks.pawns;
         score += __builtin_popcountll(my_side_attacks) * (BISHOP_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score += __builtin_popcountll(opponent_side_attacks) * (BISHOP_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_bishops &= white_bishops - 1;
@@ -24,8 +24,8 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(black_bishops);
         uint64_t attacks = generate_bishop_attack(board_state->occupied, square) & ~board_state->black_pieces;
-        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->white_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->white_attacks.pawns;
         score -= __builtin_popcountll(my_side_attacks) * (BISHOP_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score -= __builtin_popcountll(opponent_side_attacks) * (BISHOP_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + BISHOP_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_bishops &= black_bishops - 1;
@@ -36,8 +36,8 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(white_rooks);
         uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->white_pieces;
-        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->black_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->black_attacks.pawns;
         score += __builtin_popcountll(my_side_attacks) * (ROOK_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score += __builtin_popcountll(opponent_side_attacks) * (ROOK_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_rooks &= white_rooks - 1;
@@ -48,8 +48,8 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(black_rooks);
         uint64_t attacks = generate_rook_attack(board_state->occupied, square) & ~board_state->black_pieces;
-        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->white_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->white_attacks.pawns;
         score -= __builtin_popcountll(my_side_attacks) * (ROOK_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score -= __builtin_popcountll(opponent_side_attacks) * (ROOK_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + ROOK_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_rooks &= black_rooks - 1;
@@ -60,8 +60,8 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(white_queens);
         uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->white_pieces;
-        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->black_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->black_attacks.pawns;
         score += __builtin_popcountll(my_side_attacks) * (QUEEN_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score += __builtin_popcountll(opponent_side_attacks) * (QUEEN_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         white_queens &= white_queens - 1;
@@ -72,11 +72,69 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     {
         int square = __builtin_ctzll(black_queens);
         uint64_t attacks = generate_queen_attack(board_state->occupied, square) & ~board_state->black_pieces;
-        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK;
-        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK;
+        uint64_t my_side_attacks = attacks & BLACK_SIDE_MASK & ~board_state->white_attacks.pawns;
+        uint64_t opponent_side_attacks = attacks & WHITE_SIDE_MASK & ~board_state->white_attacks.pawns;
         score -= __builtin_popcountll(my_side_attacks) * (QUEEN_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
         score -= __builtin_popcountll(opponent_side_attacks) * (QUEEN_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase + QUEEN_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
         black_queens &= black_queens - 1;
+    }
+
+    uint64_t white_knights = board_state->board.white_pieces.knights;
+    while (white_knights)
+    {
+        int square = __builtin_ctzll(white_knights);
+
+        uint64_t attacks =
+            generate_knight_attacks(square) &
+            ~board_state->white_pieces;
+
+        uint64_t pawn_safe_attacks =
+            attacks & ~board_state->black_attacks.pawns;
+
+        uint64_t my_side_attacks =
+            pawn_safe_attacks & WHITE_SIDE_MASK;
+
+        uint64_t opponent_side_attacks =
+            pawn_safe_attacks & BLACK_SIDE_MASK;
+
+        score += __builtin_popcountll(my_side_attacks) *
+                 (KNIGHT_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase +
+                  KNIGHT_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+
+        score += __builtin_popcountll(opponent_side_attacks) *
+                 (KNIGHT_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase +
+                  KNIGHT_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
+
+        white_knights &= white_knights - 1;
+    }
+
+    uint64_t black_knights = board_state->board.black_pieces.knights;
+    while (black_knights)
+    {
+        int square = __builtin_ctzll(black_knights);
+
+        uint64_t attacks =
+            generate_knight_attacks(square) &
+            ~board_state->black_pieces;
+
+        uint64_t pawn_safe_attacks =
+            attacks & ~board_state->white_attacks.pawns;
+
+        uint64_t my_side_attacks =
+            pawn_safe_attacks & BLACK_SIDE_MASK;
+
+        uint64_t opponent_side_attacks =
+            pawn_safe_attacks & WHITE_SIDE_MASK;
+
+        score -= __builtin_popcountll(my_side_attacks) *
+                 (KNIGHT_ATTACKS_MY_SIDE_MIDDLEGAME * middlegame_phase +
+                  KNIGHT_ATTACKS_MY_SIDE_ENDGAME * endgame_phase);
+
+        score -= __builtin_popcountll(opponent_side_attacks) *
+                 (KNIGHT_ATTACKS_OPPONENT_SIDE_MIDDLEGAME * middlegame_phase +
+                  KNIGHT_ATTACKS_OPPONENT_SIDE_ENDGAME * endgame_phase);
+
+        black_knights &= black_knights - 1;
     }
 
     return score;

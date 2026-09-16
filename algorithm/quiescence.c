@@ -5,6 +5,7 @@
 #include "../engine/piece_moves.h"
 #include "move_sort.h"
 #include "algorithm/heuristic/heuristic.h"
+#include "algorithm/move_categorization.h"
 
 #define MAX_QUIESCENCE_DEPTH 6
 
@@ -16,14 +17,21 @@ int32_t quiescence(BoardState *board_state,
                    uint8_t depth_in_quiescence, uint64_t *nodes_searched)
 {
     (*nodes_searched)++;
-    if (depth_in_quiescence >= MAX_QUIESCENCE_DEPTH)
+
+    bool in_check = is_move_check(board_state);
+
+    /*
+     * A position in check must search an evasion, even when the
+     * normal quiescence depth limit has been reached.
+     */
+    if (depth_in_quiescence >= MAX_QUIESCENCE_DEPTH && !in_check)
         return score_board(board_state);
 
     uint64_t hash = hash_board(&board_state->board);
     TT_Entry tt_entry;
     bool tt_hit = TT_lookup(hash, &tt_entry);
-    if (tt_hit && is_mate_score(tt_entry.score))
-        tt_hit = false; // Don't use mate scores from quiescence search
+    // if (tt_hit && is_mate_score(tt_entry.score))
+    //     tt_hit = false; // Don't use mate scores from quiescence search
 
     if (tt_hit)
     {
@@ -38,38 +46,70 @@ int32_t quiescence(BoardState *board_state,
             return tt_score;
     }
 
-    // 1) Stand-pat
-    int32_t stand_pat = score_board(board_state);
-    int32_t best_score = stand_pat;
+    int32_t best_score;
 
-    // 2) β-cutoff on stand-pat
-    if (stand_pat >= beta)
-        return stand_pat;
+    if (!in_check)
+    {
+        int32_t stand_pat = score_board(board_state);
+        best_score = stand_pat;
 
-    if (stand_pat > alpha)
-        alpha = stand_pat;
+        if (stand_pat >= beta)
+            return stand_pat;
 
-    // 4) Recurse on captures
+        if (stand_pat > alpha)
+            alpha = stand_pat;
+    }
+    else
+    {
+        best_score = WORST_SCORE;
+    }
+
     uint16_t base = stack->count;
-    generate_captures(board_state, stack);
-    sort_moves_q(board_state, stack, base);
+
+    if (in_check)
+    {
+        generate_moves(board_state, stack);
+        sort_moves(board_state, stack, base, tt_entry.move, depth);
+    }
+    else
+    {
+        generate_captures(board_state, stack);
+        sort_moves_q(board_state, stack, base);
+    }
+
+    /*
+     * No legal evasion means checkmate.
+     */
+    if (in_check && stack->count == base)
+    {
+        stack->count = base;
+        return -MATE_SCORE + depth;
+    }
 
     for (uint16_t i = base; i < stack->count; i++)
     {
         BoardState *child = &stack->boards[i];
-        int32_t score = -quiescence(child, stack, -beta, -alpha, depth + 1, depth_in_quiescence + 1, nodes_searched);
 
-        if (score >= beta)
-        {
-            stack->count = base;
-            return score;
-        }
+        int32_t score = -quiescence(
+            child,
+            stack,
+            -beta,
+            -alpha,
+            depth + 1,
+            depth_in_quiescence + 1,
+            nodes_searched);
 
         if (score > best_score)
             best_score = score;
 
         if (score > alpha)
             alpha = score;
+
+        if (alpha >= beta)
+        {
+            stack->count = base;
+            return best_score;
+        }
     }
 
     stack->count = base;
