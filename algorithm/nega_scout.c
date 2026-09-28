@@ -226,7 +226,14 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         if (alpha >= beta)
         {
             if (!is_move_capture(board_state, next_board_state))
+            {
                 add_killer_move(next_board_state->move, depth);
+
+                update_history_move(
+                    board_state->board.side_to_move,
+                    next_board_state->move,
+                    remaining_depth);
+            }
             break; // Beta cutoff
         }
     }

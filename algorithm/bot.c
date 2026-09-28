@@ -115,6 +115,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
     bool search_cancelled = false;
     TT_clear_generation();
     clear_killer_moves();
+    clear_history_moves();
 
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
