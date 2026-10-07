@@ -4,6 +4,7 @@
 
 #include "test_threefold_repetition.h"
 #include "heuristic/test_symetric_heuristic.h"
+#include "test_search.h"
 
 void setUp(void)
 {
@@ -17,5 +18,6 @@ int main(void)
     UNITY_BEGIN();
     RUN_TEST(test_symmetry_wrapper);
     RUN_TEST(test_threefold_repetition_wrapper);
+    RUN_TEST(test_search_wrapper);
     return UNITY_END();
 }

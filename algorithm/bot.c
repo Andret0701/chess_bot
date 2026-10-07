@@ -21,11 +21,10 @@
 
 void print_bot_result(BotResult result)
 {
-    double score_value = ((double)result.score) / ((double)1000 * 24);
-    printf("Move: %s, Depth: %d (Score: %.2f, Depth: %d)\n",
+    printf("Move: %s, Depth: %d (Score: %s, Depth: %d)\n",
            result.move,
            result.depth,
-           score_value,
+           format_score(result.score),
            result.depth);
 }
 

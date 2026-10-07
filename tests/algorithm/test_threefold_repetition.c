@@ -116,7 +116,7 @@ static void play_moves_and_record_history_with_reset(Board *board, const char *u
             char msg[1024];
             snprintf(
                 msg, sizeof(msg),
-                "Unexpected threefold repetition after move '%s' in sequence: %s",
+                "Unexpected threefold repetition after move with reset '%s' in sequence: %s",
                 token, uci_move_list);
             TEST_FAIL_MESSAGE(msg);
         }

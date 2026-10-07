@@ -68,7 +68,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
     bool found_tt = TT_lookup(hash, &tt_entry);
 
     // TT cutoff with proper bounds checking
-    if (found_tt && tt_entry.depth >= remaining_depth)
+    if (found_tt && tt_entry.depth >= remaining_depth && !(threefold_repetition_possible() && depth == 0))
     {
         int32_t tt_score = value_from_tt(tt_entry.score, depth);
         if (tt_entry.type == EXACT)
@@ -76,8 +76,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
             pop_game_history(hash);
             return tt_score;
         }
-
-        if (tt_entry.type == LOWERBOUND)
+        else if (tt_entry.type == LOWERBOUND)
         {
             if (tt_score > alpha)
                 alpha = tt_score;

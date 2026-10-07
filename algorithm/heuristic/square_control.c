@@ -83,9 +83,10 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     while (white_knights)
     {
         int square = __builtin_ctzll(white_knights);
+        uint64_t knight = 1ULL << square;
 
         uint64_t attacks =
-            generate_knight_attacks(square) &
+            generate_knight_attacks(knight) &
             ~board_state->white_pieces;
 
         uint64_t pawn_safe_attacks =
@@ -112,9 +113,10 @@ int32_t get_square_control_score(BoardState *board_state, uint8_t middlegame_pha
     while (black_knights)
     {
         int square = __builtin_ctzll(black_knights);
+        uint64_t knight = 1ULL << square;
 
         uint64_t attacks =
-            generate_knight_attacks(square) &
+            generate_knight_attacks(knight) &
             ~board_state->black_pieces;
 
         uint64_t pawn_safe_attacks =

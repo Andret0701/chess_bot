@@ -1,6 +1,7 @@
 #include "game_history.h"
 #include <stdlib.h>
 #include "algorithm/zobrist_hash.h"
+#include <assert.h>
 
 #define MAX_GAME_HISTORY 20000
 
@@ -49,6 +50,9 @@ void push_game_history(uint64_t hash)
 
 void pop_game_history(uint64_t hash)
 {
+    // assert(move_count > 0);
+    // assert(game_history[move_count - 1] == hash);
+
     move_count--;
 }
 
@@ -60,7 +64,7 @@ bool threefold_repetition()
     uint64_t current = game_history[move_count - 1];
     int repetitions = 1;
 
-    for (int i = move_count - 5; i >= 0; i -= 2)
+    for (int i = (int)move_count - 5; i >= 0; i -= 2)
     {
         if (game_history[i] == current)
         {
@@ -72,4 +76,23 @@ bool threefold_repetition()
     }
 
     return false;
+}
+
+bool threefold_repetition_possible()
+{
+    for (int i = (int)move_count - 2; i >= 2; i -= 2)
+    {
+        for (int j = i - 2; j >= 0; j -= 2)
+        {
+            if (game_history[i] == game_history[j])
+                return true;
+        }
+    }
+
+    return false;
+}
+
+uint16_t get_move_count()
+{
+    return move_count;
 }

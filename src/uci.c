@@ -11,6 +11,7 @@
 #include "algorithm/bot.h"
 #include "algorithm/zobrist_hash.h"
 #include "algorithm/heuristic/heuristic_values.h"
+#include "algorithm/heuristic/heuristic.h"
 #include "src/evalfile.h"
 
 #define IS_JUNIOR false
@@ -308,8 +309,7 @@ void uci_loop(bool debug_mode)
 
             if (debug_mode)
             {
-                double score_value = ((double)result.score) / ((double)1000 * 24);
-                respond("bestmove %s score %.2f depth %d", result.move, score_value, result.depth);
+                respond("bestmove %s score %s depth %d", result.move, format_score(result.score), result.depth);
             }
             else
                 respond("bestmove %s", result.move);
