@@ -119,9 +119,19 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
     BoardState board_state = board_to_board_state(&board);
     BoardStack *stack = create_board_stack(BOARD_STACK_SIZE);
     generate_moves(&board_state, stack);
+
+    // Zero moves means the game is over. Return the result of the game.
     if (stack->count == 0)
     {
         BotResult result = {"0000", get_result_score(get_game_result(&board_state), 0), 0, nodes_searched};
+        destroy_board_stack(stack);
+        return result;
+    }
+
+    // Forced move. Return the only move available.
+    if (stack->count == 1)
+    {
+        BotResult result = {board_to_move(&board, &stack->boards[0].board), 0, 0, nodes_searched};
         destroy_board_stack(stack);
         return result;
     }
