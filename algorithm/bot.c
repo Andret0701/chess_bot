@@ -138,7 +138,10 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
 
     uint16_t num_moves = stack->count;
     for (uint16_t i = 0; i < num_moves; i++)
+    {
         moves[i].board = &stack->boards[i];
+        moves[i].opponent_can_threefold = check_opponent_can_threefold(&stack->boards[i], stack);
+    }
 
     for (uint8_t depth = 0;; depth++)
     {
@@ -157,7 +160,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
 
             BoardState *current_board_state = moves[i].board;
-            int32_t score = -nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, -best_score, use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true, &search_cancelled);
+            int32_t score = -nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, -best_score, use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true, &search_cancelled, moves[i].opponent_can_threefold);
             if (search_cancelled)
             {
                 if (i == 0)

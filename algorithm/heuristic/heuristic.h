@@ -22,6 +22,7 @@ bool is_losing(int32_t score);
 uint8_t get_depth_to_mate(int32_t score);
 double score_to_centipawns(int32_t score);
 char *format_score(int32_t score);
+char *format_score_uci(int32_t score);
 bool is_mate_score(int32_t score);
 int32_t value_to_tt(int32_t score, uint8_t depth);
 int32_t value_from_tt(int32_t score, uint8_t depth);

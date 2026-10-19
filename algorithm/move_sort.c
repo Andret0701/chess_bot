@@ -210,6 +210,58 @@ uint8_t get_quiet_score(BoardState *from, BoardState *to)
     return score;
 }
 
+typedef struct
+{
+    int32_t score;
+    uint16_t index;
+} IndexedScore;
+
+static void sort_indexed_moves(
+    BoardStack *stack,
+    uint16_t base,
+    IndexedScore *scores,
+    uint16_t num_moves)
+{
+    // Sort indices by score (stable insertion sort)
+    for (uint16_t i = 1; i < num_moves; ++i)
+    {
+        IndexedScore key = scores[i];
+        int j = i - 1;
+
+        while (j >= 0 && scores[j].score < key.score)
+        {
+            scores[j + 1] = scores[j];
+            --j;
+        }
+
+        scores[j + 1] = key;
+    }
+
+    // Rearrange BoardStates using permutation cycles
+    for (uint16_t i = 0; i < num_moves; i++)
+    {
+        if (scores[i].index == i)
+            continue;
+
+        BoardState temp = stack->boards[base + i];
+        uint16_t j = i;
+
+        while (scores[j].index != i)
+        {
+            uint16_t next = scores[j].index;
+
+            stack->boards[base + j] =
+                stack->boards[base + next];
+
+            scores[j].index = j;
+            j = next;
+        }
+
+        stack->boards[base + j] = temp;
+        scores[j].index = j;
+    }
+}
+
 void sort_moves(
     BoardState *from,
     BoardStack *stack,
@@ -218,19 +270,20 @@ void sort_moves(
     uint8_t depth)
 {
     uint16_t num_moves = stack->count - base;
-    int32_t scores[MAX_MOVES];
+    IndexedScore scores[MAX_MOVES];
 
     for (uint16_t i = 0; i < num_moves; i++)
     {
         BoardState *move_state = &stack->boards[base + i];
+        scores[i].index = i;
 
         if (encoded_move_equals(move_state->move, tt_move))
         {
-            scores[i] = TT_MOVE_SCORE;
+            scores[i].score = TT_MOVE_SCORE;
         }
         else if (is_move_capture(from, move_state))
         {
-            scores[i] =
+            scores[i].score =
                 CAPTURE_SCORE +
                 get_mvvlva(from, move_state);
         }
@@ -239,18 +292,18 @@ void sort_moves(
                      move_state->move,
                      killer_moves[depth][0]))
         {
-            scores[i] = KILLER_1_SCORE;
+            scores[i].score = KILLER_1_SCORE;
         }
         else if (depth < MAX_DEPTH &&
                  encoded_move_equals(
                      move_state->move,
                      killer_moves[depth][1]))
         {
-            scores[i] = KILLER_2_SCORE;
+            scores[i].score = KILLER_2_SCORE;
         }
         else
         {
-            scores[i] =
+            scores[i].score =
                 get_history_score(
                     from->board.side_to_move,
                     move_state->move) +
@@ -260,57 +313,21 @@ void sort_moves(
         }
     }
 
-    for (uint16_t i = 1; i < num_moves; ++i)
-    {
-        BoardState key = stack->boards[base + i];
-        int32_t key_score = scores[i];
-
-        int j = i - 1;
-
-        while (j >= 0 && scores[j] < key_score)
-        {
-            stack->boards[base + j + 1] =
-                stack->boards[base + j];
-
-            scores[j + 1] = scores[j];
-
-            --j;
-        }
-
-        stack->boards[base + j + 1] = key;
-        scores[j + 1] = key_score;
-    }
+    sort_indexed_moves(stack, base, scores, num_moves);
 }
 
 void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
 {
     uint16_t num_moves = stack->count - base;
-    uint8_t scores[MAX_MOVES];
+    IndexedScore scores[MAX_MOVES];
 
     for (uint16_t i = 0; i < num_moves; i++)
     {
         BoardState *move_state = &stack->boards[base + i];
-        scores[i] = get_mvvlva(from, move_state);
+
+        scores[i].index = i;
+        scores[i].score = get_mvvlva(from, move_state);
     }
 
-    for (uint16_t i = 1; i < num_moves; ++i)
-    {
-        BoardState key = stack->boards[base + i];
-        uint8_t key_score = scores[i];
-
-        int j = i - 1;
-
-        while (j >= 0 && scores[j] < key_score)
-        {
-            stack->boards[base + j + 1] =
-                stack->boards[base + j];
-
-            scores[j + 1] = scores[j];
-
-            --j;
-        }
-
-        stack->boards[base + j + 1] = key;
-        scores[j + 1] = key_score;
-    }
+    sort_indexed_moves(stack, base, scores, num_moves);
 }

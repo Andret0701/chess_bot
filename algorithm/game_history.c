@@ -96,3 +96,36 @@ uint16_t get_move_count()
 {
     return move_count;
 }
+
+bool check_opponent_can_threefold(BoardState *board_state, BoardStack *stack)
+{
+    uint32_t base = stack->count;
+
+    uint64_t current_hash = hash_board(&board_state->board);
+    push_game_history(current_hash);
+
+    generate_moves(board_state, stack);
+
+    bool can_threefold = false;
+
+    for (uint32_t i = base; i < stack->count; i++)
+    {
+        BoardState *next_board_state = &stack->boards[i];
+        uint64_t hash = hash_board(&next_board_state->board);
+
+        push_game_history(hash);
+        bool repetition = threefold_repetition();
+        pop_game_history(hash);
+
+        if (repetition)
+        {
+            can_threefold = true;
+            break;
+        }
+    }
+
+    stack->count = base;
+    pop_game_history(current_hash);
+
+    return can_threefold;
+}

@@ -307,12 +307,8 @@ void uci_loop(bool debug_mode)
                 }
             }
 
-            if (debug_mode)
-            {
-                respond("bestmove %s score %s depth %d", result.move, format_score(result.score), result.depth);
-            }
-            else
-                respond("bestmove %s", result.move);
+            respond("info depth %d score %s nodes %llu", result.depth, format_score_uci(result.score), result.nodes_searched);
+            respond("bestmove %s", result.move);
         }
         else if (strcmp(input, "quit") == 0)
         {

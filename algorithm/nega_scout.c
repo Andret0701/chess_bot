@@ -34,7 +34,7 @@ static bool has_non_pawn_material(BoardState *board_state)
     return non_pawn_black != 0;
 }
 
-int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, int32_t alpha, int32_t beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move, bool *search_cancelled)
+int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth, uint8_t depth, int32_t alpha, int32_t beta, bool use_max_time, clock_t start, double seconds, bool use_max_nodes, uint64_t *nodes_searched, uint64_t max_nodes, bool allow_null_move, bool *search_cancelled, bool opponent_can_threefold)
 {
     if (use_max_nodes && *nodes_searched >= max_nodes)
     {
@@ -68,7 +68,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
     bool found_tt = TT_lookup(hash, &tt_entry);
 
     // TT cutoff with proper bounds checking
-    if (found_tt && tt_entry.depth >= remaining_depth && !(threefold_repetition_possible() && depth == 0))
+    if (found_tt && tt_entry.depth >= remaining_depth && !opponent_can_threefold)
     {
         int32_t tt_score = value_from_tt(tt_entry.score, depth);
         if (tt_entry.type == EXACT)
@@ -106,7 +106,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         int32_t child_alpha = -beta;
         int32_t child_beta = child_alpha + 1;
 
-        int32_t null_search_score = -nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, false, search_cancelled);
+        int32_t null_search_score = -nega_scout(&null_board_state, stack, null_max_depth, depth + 1, child_alpha, child_beta, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, false, search_cancelled, false);
         if (*search_cancelled)
         {
             pop_game_history(hash);
@@ -190,7 +190,7 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         int32_t score;
         if (first_move)
         {
-            score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+            score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled, false);
             if (*search_cancelled)
                 goto cancelled;
         }
@@ -202,14 +202,14 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
             if (new_max_depth > reduction)
                 reduced_max_depth = new_max_depth - reduction;
             // check second alpha here
-            score = -nega_scout(next_board_state, stack, reduced_max_depth, depth + 1, -(alpha + 1), -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+            score = -nega_scout(next_board_state, stack, reduced_max_depth, depth + 1, -(alpha + 1), -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled, false);
             if (*search_cancelled)
                 goto cancelled;
 
             bool alpha_cutoff = score > alpha;
             if ((alpha_cutoff && score < beta) || ((reduction != 0) && alpha_cutoff))
             {
-                score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled);
+                score = -nega_scout(next_board_state, stack, new_max_depth, depth + 1, -beta, -alpha, use_max_time, start, seconds, use_max_nodes, nodes_searched, max_nodes, allow_null_move, search_cancelled, false);
                 if (*search_cancelled)
                     goto cancelled;
             }

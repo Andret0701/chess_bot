@@ -172,6 +172,18 @@ char *format_score(int32_t score)
     return buffer;
 }
 
+char *format_score_uci(int32_t score)
+{
+    static char buffer[20];
+    if (is_winning(score))
+        sprintf(buffer, "mate %d", (get_depth_to_mate(score) + 1) / 2);
+    else if (is_losing(score))
+        sprintf(buffer, "mate -%d", get_depth_to_mate(score) / 2);
+    else
+        sprintf(buffer, "cp %.0f", score_to_centipawns(score));
+    return buffer;
+}
+
 bool is_mate_score(int32_t score)
 {
     return is_winning(score) || is_losing(score);

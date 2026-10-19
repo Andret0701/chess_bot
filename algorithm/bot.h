@@ -6,6 +6,7 @@ typedef struct
 {
     BoardState *board;
     int32_t score;
+    bool opponent_can_threefold;
 } BotMove;
 
 typedef struct
