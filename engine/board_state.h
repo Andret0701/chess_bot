@@ -3,7 +3,7 @@
 #include "../utils/board.h"
 #include "../algorithm/board_score.h"
 
-typedef struct
+typedef struct BoardState
 {
     Board board;
 
