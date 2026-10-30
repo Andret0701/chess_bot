@@ -22,6 +22,8 @@ typedef struct
 
     uint8_t has_castled;
     uint16_t move; // Move that led to this position
+
+    struct BoardState *next; // Pointer to the next board to be searched in the move stack
 } BoardState;
 
 BoardState board_to_board_state(Board *board);

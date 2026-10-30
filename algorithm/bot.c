@@ -143,13 +143,13 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
         moves[i].opponent_can_threefold = check_opponent_can_threefold(&stack->boards[i], stack);
     }
 
-    for (uint8_t depth = 0;; depth++)
+    for (uint8_t depth = 1;; depth++)
     {
         int32_t best_score = WORST_SCORE;
         BoardState *best_board = moves[0].board;
         for (uint16_t i = 0; i < num_moves; i++)
         {
-            if (depth != 0 && is_losing(moves[i].score))
+            if (depth > 1 && is_losing(moves[i].score))
             {
                 if (moves[i].score > best_score)
                 {
@@ -160,7 +160,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
             }
 
             BoardState *current_board_state = moves[i].board;
-            int32_t score = -nega_scout(current_board_state, stack, depth, 0, WORST_SCORE, -best_score, use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true, &search_cancelled, moves[i].opponent_can_threefold);
+            int32_t score = -nega_scout(current_board_state, stack, depth, 1, WORST_SCORE, -best_score, use_max_time, start, seconds, use_max_nodes, &nodes_searched, max_nodes, true, &search_cancelled, moves[i].opponent_can_threefold);
             if (search_cancelled)
             {
                 if (i == 0)
@@ -187,19 +187,39 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
                 best_board = current_board_state;
                 best_score = score;
             }
+        }
 
-            // If the move is winning. Do not search deeper.
-            if (is_winning(best_score) && depth > 0)
+        // If the move is winning. Do not search deeper.
+        if (is_winning(best_score) && get_depth_to_mate(best_score) <= depth)
+        {
+            TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
+
+            BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
+            destroy_board_stack(stack);
+            return result;
+        }
+
+        bool all_moves_losing = true;
+
+        for (uint16_t i = 0; i < num_moves; i++)
+        {
+            if (!is_losing(moves[i].score))
             {
-                // if (DEBUG_INFO)
-                //     print_out_search_info(stack, &board, best_board, best_score, depth, i + 1, seconds);
-
-                TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
-
-                BotResult result = {board_to_move(&board, &best_board->board), best_score, depth, nodes_searched};
-                destroy_board_stack(stack);
-                return result;
+                all_moves_losing = false;
+                break;
             }
+        }
+
+        if (all_moves_losing)
+        {
+            BotResult result = {
+                board_to_move(&board, &best_board->board),
+                best_score,
+                depth,
+                nodes_searched};
+
+            destroy_board_stack(stack);
+            return result;
         }
 
         TT_store(hash_board(&board_state.board), depth, value_to_tt(best_score, 0), EXACT, best_board->move);
@@ -238,7 +258,7 @@ BotResult run_bot(Board board, bool use_max_time, double seconds, bool use_max_d
         //     return result;
         // }
 
-        if (depth + 1 >= MAX_DEPTH || (use_max_depth && depth + 1 >= max_depth))
+        if (depth >= MAX_DEPTH || (use_max_depth && depth >= max_depth))
         {
             // if (DEBUG_INFO)
             //     print_out_search_info(stack, &board, best_board, best_score, depth, stack->count + 1, seconds);

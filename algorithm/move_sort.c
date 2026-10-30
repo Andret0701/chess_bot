@@ -155,36 +155,28 @@ uint8_t get_mvvlva(BoardState *from, BoardState *to)
 
 uint8_t get_quiet_score(BoardState *from, BoardState *to)
 {
-    uint64_t from_moved_piece;
-    uint64_t to_moved_piece;
+    // bool from_attacked;
+    // bool to_protected;
+    // bool to_attacked;
 
-    if (from->board.side_to_move == WHITE)
-    {
-        from_moved_piece = from->white_pieces & ~to->white_pieces;
-        to_moved_piece = to->white_pieces & ~from->white_pieces;
-    }
-    else
-    {
-        from_moved_piece = from->black_pieces & ~to->black_pieces;
-        to_moved_piece = to->black_pieces & ~from->black_pieces;
-    }
+    // if (from->board.side_to_move == WHITE)
+    // {
+    //     uint64_t from_moved_piece = from->white_pieces & ~to->white_pieces;
+    //     uint64_t to_moved_piece = to->white_pieces & ~from->white_pieces;
 
-    bool from_attacked;
-    bool to_protected;
-    bool to_attacked;
+    //     from_attacked = (from->black_attack & from_moved_piece) != 0;
+    //     to_protected = (to->white_attack & to_moved_piece) != 0;
+    //     to_attacked = (to->black_attack & to_moved_piece) != 0;
+    // }
+    // else
+    // {
+    //     uint64_t from_moved_piece = from->black_pieces & ~to->black_pieces;
+    //     uint64_t to_moved_piece = to->black_pieces & ~from->black_pieces;
 
-    if (from->board.side_to_move == WHITE)
-    {
-        from_attacked = (from->black_attack & from_moved_piece) != 0;
-        to_protected = (to->white_attack & to_moved_piece) != 0;
-        to_attacked = (to->black_attack & to_moved_piece) != 0;
-    }
-    else
-    {
-        from_attacked = (from->white_attack & from_moved_piece) != 0;
-        to_protected = (to->black_attack & to_moved_piece) != 0;
-        to_attacked = (to->white_attack & to_moved_piece) != 0;
-    }
+    //     from_attacked = (from->white_attack & from_moved_piece) != 0;
+    //     to_protected = (to->black_attack & to_moved_piece) != 0;
+    //     to_attacked = (to->white_attack & to_moved_piece) != 0;
+    // }
 
     uint8_t score = 0;
 
@@ -194,18 +186,16 @@ uint8_t get_quiet_score(BoardState *from, BoardState *to)
     if (is_move_threatening_promotion(from, to))
         score += 10;
 
-    if (from_attacked && !to_attacked)
-        score += 6; // escaping attack to safety
-    else if (!to_attacked && to_protected)
-        score += 5; // safe and defended
-    else if (!to_attacked)
-        score += 4; // safe but undefended
-    else if (from_attacked && to_attacked && to_protected)
-        score += 3; // still attacked, but at least defended
-    else if (to_attacked && to_protected)
-        score += 2; // walks into attacked square, but defended
-    else
-        score += 0; // attacked and undefended
+    // if (from_attacked && !to_attacked)
+    //     return score + 6; // escaping attack to safety
+    // else if (!to_attacked && to_protected)
+    //     return score + 5; // safe and defended
+    // else if (!to_attacked)
+    //     return score + 4; // safe but undefended
+    // else if (from_attacked && to_attacked && to_protected)
+    //     return score + 3; // still attacked, but at least defended
+    // else if (to_attacked && to_protected)
+    //     return score + 2; // walks into attacked square, but defended
 
     return score;
 }
@@ -216,13 +206,13 @@ typedef struct
     uint16_t index;
 } IndexedScore;
 
-static void sort_indexed_moves(
+static BoardState *sort_indexed_moves(
     BoardStack *stack,
     uint16_t base,
     IndexedScore *scores,
     uint16_t num_moves)
 {
-    // Sort indices by score (stable insertion sort)
+    // Stable insertion sort
     for (uint16_t i = 1; i < num_moves; ++i)
     {
         IndexedScore key = scores[i];
@@ -237,32 +227,32 @@ static void sort_indexed_moves(
         scores[j + 1] = key;
     }
 
-    // Rearrange BoardStates using permutation cycles
-    for (uint16_t i = 0; i < num_moves; i++)
+    if (num_moves == 0)
+        return NULL;
+
+    // Link the boards in sorted order
+    for (uint16_t i = 0; i + 1 < num_moves; i++)
     {
-        if (scores[i].index == i)
-            continue;
+        BoardState *current =
+            &stack->boards[base + scores[i].index];
 
-        BoardState temp = stack->boards[base + i];
-        uint16_t j = i;
+        BoardState *next =
+            &stack->boards[base + scores[i + 1].index];
 
-        while (scores[j].index != i)
-        {
-            uint16_t next = scores[j].index;
-
-            stack->boards[base + j] =
-                stack->boards[base + next];
-
-            scores[j].index = j;
-            j = next;
-        }
-
-        stack->boards[base + j] = temp;
-        scores[j].index = j;
+        current->next = next;
     }
+
+    // Terminate the list
+    BoardState *last =
+        &stack->boards[base + scores[num_moves - 1].index];
+
+    last->next = NULL;
+
+    // Return highest-scoring move
+    return &stack->boards[base + scores[0].index];
 }
 
-void sort_moves(
+BoardState *sort_moves(
     BoardState *from,
     BoardStack *stack,
     uint16_t base,
@@ -306,17 +296,17 @@ void sort_moves(
             scores[i].score =
                 get_history_score(
                     from->board.side_to_move,
-                    move_state->move) +
-                get_quiet_score(
-                    from,
-                    move_state);
+                    move_state->move); // +
+                                       // get_quiet_score(
+                                       //     from,
+                                       //     move_state);
         }
     }
 
-    sort_indexed_moves(stack, base, scores, num_moves);
+    return sort_indexed_moves(stack, base, scores, num_moves);
 }
 
-void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
+BoardState *sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
 {
     uint16_t num_moves = stack->count - base;
     IndexedScore scores[MAX_MOVES];
@@ -329,5 +319,5 @@ void sort_moves_q(BoardState *from, BoardStack *stack, uint16_t base)
         scores[i].score = get_mvvlva(from, move_state);
     }
 
-    sort_indexed_moves(stack, base, scores, num_moves);
+    return sort_indexed_moves(stack, base, scores, num_moves);
 }

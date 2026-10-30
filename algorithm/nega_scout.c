@@ -168,17 +168,14 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
         return score;
     }
 
-    sort_moves(board_state, stack, base, found_tt ? tt_entry.move : 0, depth);
+    BoardState *next_board_state = sort_moves(board_state, stack, base, found_tt ? tt_entry.move : 0, depth);
 
     int32_t best_score = WORST_SCORE;
     uint16_t best_move = 0;
-    for (uint16_t i = base; i < stack->count; i++)
+    uint16_t move_number = 0;
+    while (next_board_state != NULL)
     {
-        uint16_t move_number = i - base;
         bool first_move = move_number == 0;
-
-        BoardState *next_board_state = &stack->boards[i];
-
         uint8_t extension = 0;
         bool is_check = is_move_check(next_board_state);
         bool is_threatening_promo = is_move_threatening_promotion(board_state, next_board_state);
@@ -235,6 +232,9 @@ int32_t nega_scout(BoardState *board_state, BoardStack *stack, uint8_t max_depth
             }
             break; // Beta cutoff
         }
+
+        next_board_state = next_board_state->next;
+        move_number++;
     }
 
     stack->count = base;

@@ -36,13 +36,22 @@ int32_t quiescence(BoardState *board_state,
     if (tt_hit)
     {
         int32_t tt_score = value_from_tt(tt_entry.score, depth);
+
         if (tt_entry.type == EXACT)
             return tt_score;
 
-        if (tt_entry.type == LOWERBOUND && tt_score >= beta)
-            return tt_score;
+        if (tt_entry.type == LOWERBOUND)
+        {
+            if (tt_score > alpha)
+                alpha = tt_score;
+        }
+        else if (tt_entry.type == UPPERBOUND)
+        {
+            if (tt_score < beta)
+                beta = tt_score;
+        }
 
-        if (tt_entry.type == UPPERBOUND && tt_score <= alpha)
+        if (alpha >= beta)
             return tt_score;
     }
 
@@ -66,15 +75,16 @@ int32_t quiescence(BoardState *board_state,
 
     uint16_t base = stack->count;
 
+    BoardState *next_board_state = NULL;
     if (in_check)
     {
         generate_moves(board_state, stack);
-        sort_moves(board_state, stack, base, tt_entry.move, depth);
+        next_board_state = sort_moves(board_state, stack, base, tt_hit ? tt_entry.move : 0, depth);
     }
     else
     {
         generate_captures(board_state, stack);
-        sort_moves_q(board_state, stack, base);
+        next_board_state = sort_moves_q(board_state, stack, base);
     }
 
     /*
@@ -85,13 +95,23 @@ int32_t quiescence(BoardState *board_state,
         stack->count = base;
         return -MATE_SCORE + depth;
     }
-
-    for (uint16_t i = base; i < stack->count; i++)
+    else if (!in_check && stack->count == base)
     {
-        BoardState *child = &stack->boards[i];
+        bool finished = is_finished(board_state);
+        Result result = get_result(board_state, finished);
+        finished |= result != UNKNOWN;
+        if (finished)
+        {
+            int32_t score = get_result_score(result, depth);
+            stack->count = base;
+            return score;
+        }
+    }
 
+    while (next_board_state != NULL)
+    {
         int32_t score = -quiescence(
-            child,
+            next_board_state,
             stack,
             -beta,
             -alpha,
@@ -110,6 +130,8 @@ int32_t quiescence(BoardState *board_state,
             stack->count = base;
             return best_score;
         }
+
+        next_board_state = next_board_state->next;
     }
 
     stack->count = base;

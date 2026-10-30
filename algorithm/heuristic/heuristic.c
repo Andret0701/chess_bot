@@ -157,18 +157,18 @@ uint8_t get_depth_to_mate(int32_t score)
 
 double score_to_centipawns(int32_t score)
 {
-    return (double)(score / ((double)24.0 * CENTER_PAWN_MIDDLEGAME));
+    return (double)((100 * score) / ((double)24.0 * CENTER_PAWN_MIDDLEGAME));
 }
 
 char *format_score(int32_t score)
 {
     static char buffer[20];
     if (is_winning(score))
-        sprintf(buffer, "#%d", get_depth_to_mate(score));
+        sprintf(buffer, "#%d", (get_depth_to_mate(score) + 1) / 2);
     else if (is_losing(score))
-        sprintf(buffer, "#-%d", get_depth_to_mate(score));
+        sprintf(buffer, "#-%d", get_depth_to_mate(score) / 2);
     else
-        sprintf(buffer, "%.2f", score_to_centipawns(score));
+        sprintf(buffer, "%.2f", score_to_centipawns(score) / 100.0);
     return buffer;
 }
 
